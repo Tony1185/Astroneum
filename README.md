@@ -52,9 +52,10 @@ npm install astroneum
 
 ## Release Automation
 
-This repository includes automated version bumping through GitHub Actions.
+This repository includes automated version bumping and npm publishing through GitHub Actions.
 
 - Workflow: `.github/workflows/auto-version-bump.yml`
+- Publish workflow: `.github/workflows/npm-publish.yml`
 - Auto trigger: every push to `main`
 - Manual trigger: Actions tab → Auto Version Bump → Run workflow
 
@@ -63,6 +64,8 @@ Default behavior on push:
 - Runs `npm version prerelease --preid beta --no-git-tag-version`
 - Commits updated version files with a skip-ci commit message
 - Creates and pushes a matching git tag (`v<version>`)
+- Tag pushes trigger the npm publish workflow automatically
+- Prerelease versions publish to their prerelease dist-tag such as `beta`; stable versions publish to `latest`
 
 Manual run supports these bump types:
 
@@ -70,6 +73,10 @@ Manual run supports these bump types:
 - patch
 - minor
 - major
+
+Repository secret required:
+
+- `NPM_TOKEN` with publish access to the `astroneum` package on npmjs
 
 ---
 

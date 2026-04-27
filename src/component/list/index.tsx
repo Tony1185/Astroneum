@@ -1,6 +1,6 @@
 import { Children, Fragment, type ReactNode } from 'react'
 
-import { type ParentComponent, type ParentProps, type JSX } from '@/react-shared'
+import { resolveCompatKey, type ParentComponent, type ParentProps, type JSX } from '@/react-shared'
 
 import Loading from '../loading'
 import Empty from '../empty'
@@ -11,19 +11,6 @@ export interface ListProps<T = unknown> extends ParentProps {
   loading?: boolean
   dataSource?: T[]
   renderItem?: (data: T, index: number) => JSX.Element
-}
-
-function resolveListKey (data: unknown, index: number): string | number {
-  if (typeof data === 'string' || typeof data === 'number') {
-    return data
-  }
-  if (typeof data === 'object' && data !== null) {
-    const candidate = (data as { key?: unknown; id?: unknown }).key ?? (data as { id?: unknown }).id
-    if (typeof candidate === 'string' || typeof candidate === 'number') {
-      return candidate
-    }
-  }
-  return index
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +32,7 @@ const List: ParentComponent<ListProps<any>> = props => {
 
   if (!hasChildren) {
     props.dataSource?.forEach((data, index) => {
-      const key = resolveListKey(data, index)
+      const key = resolveCompatKey(data, index)
       const rendered = props.renderItem?.(data, index)
       if (rendered !== undefined && rendered !== null) {
         children.push(<Fragment key={key}>{rendered}</Fragment>)
