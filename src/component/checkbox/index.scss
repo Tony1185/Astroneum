@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-checkbox {
+.#{$prefix-cls}-checkbox {
   display: flex;
   flex-direction: row;
   align-items: center;

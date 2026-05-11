@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-switch {
+.#{$prefix-cls}-switch {
   display: flex;
   flex-direction: row;
   position: relative;

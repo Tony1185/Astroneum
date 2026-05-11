@@ -1,11 +1,11 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-indicator-setting-modal-content {
+.#{$prefix-cls}-indicator-setting-modal-content {
   margin-top: 0;
   font-size: 13px;
 }
 
-.@{prefix-cls}-indicator-setting-modal-header {
+.#{$prefix-cls}-indicator-setting-modal-header {
   display: grid;
   grid-template-columns: 1fr 48px 52px;
   column-gap: 10px;
@@ -17,19 +17,19 @@
   span:nth-child(2), span:nth-child(3) { text-align: center; }
 }
 
-.@{prefix-cls}-indicator-setting-modal-row {
+.#{$prefix-cls}-indicator-setting-modal-row {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-bottom: 14px;
 }
 
-.@{prefix-cls}-indicator-setting-modal-label {
+.#{$prefix-cls}-indicator-setting-modal-label {
   flex: 1;
   white-space: nowrap;
 }
 
-.@{prefix-cls}-indicator-setting-modal-color {
+.#{$prefix-cls}-indicator-setting-modal-color {
   width: 28px;
   height: 28px;
   padding: 2px;

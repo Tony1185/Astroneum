@@ -1,18 +1,18 @@
-@import (reference) './base.less';
-@import '../component/index.less';
-@import '../widget/index.less';
+@use './base' as *;
+@use '../component';
+@use '../widget';
 @import '../assets/iconfonts/style.css';
 
-.@{prefix-cls} {
+.#{$prefix-cls} {
   // — Astroneum design tokens (light theme) —
-  --astroneum-primary-color: @c-primary;
-  --astroneum-hover-background-color: @c-hover-background-light;
-  --astroneum-background-color: @c-background-light;
-  --astroneum-popover-background-color: @c-popover-background-light;
-  --astroneum-text-color: @c-text-light;
-  --astroneum-text-second-color: @c-text-second-light;
-  --astroneum-border-color: @c-border-light;
-  --astroneum-selected-color: fade(@c-primary, 15%);
+  --astroneum-primary-color: #{$c-primary};
+  --astroneum-hover-background-color: #{$c-hover-background-light};
+  --astroneum-background-color: #{$c-background-light};
+  --astroneum-popover-background-color: #{$c-popover-background-light};
+  --astroneum-text-color: #{$c-text-light};
+  --astroneum-text-second-color: #{$c-text-second-light};
+  --astroneum-border-color: #{$c-border-light};
+  --astroneum-selected-color: #{rgba($c-primary, 0.15)};
 
   // — Bulma primary: #2962ff ≈ hsl(224deg, 100%, 58%) —
   --bulma-primary-h: 224deg;
@@ -57,7 +57,7 @@
     }
     &:focus, &.is-focused {
       border-color: var(--astroneum-primary-color);
-      box-shadow: 0 0 0 2px fade(#2962ff, 20%);
+      box-shadow: 0 0 0 2px rgba(#2962ff, 0.2);
     }
   }
   // Icon inside control
@@ -118,12 +118,12 @@
 
   // — Dark theme —
   &[data-theme="dark"] {
-    --astroneum-hover-background-color: @c-hover-background-dark;
-    --astroneum-background-color: @c-background-dark;
-    --astroneum-popover-background-color: @c-popover-background-dark;
-    --astroneum-text-color: @c-text-dark;
-    --astroneum-text-second-color: @c-text-second-dark;
-    --astroneum-border-color: @c-border-dark;
+    --astroneum-hover-background-color: #{$c-hover-background-dark};
+    --astroneum-background-color: #{$c-background-dark};
+    --astroneum-popover-background-color: #{$c-popover-background-dark};
+    --astroneum-text-color: #{$c-text-dark};
+    --astroneum-text-second-color: #{$c-text-second-dark};
+    --astroneum-border-color: #{$c-border-dark};
   }
 
   // — High-contrast theme (accessibility) —
@@ -198,13 +198,13 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: @widget-height;
+    height: $widget-height;
     // Explicit background ensures the correct theme colour shows behind the
     // transparent canvas layers, regardless of GPU compositing behaviour.
     background-color: var(--astroneum-background-color);
   }
   &-widget {
-    width: @widget-width;
+    width: $widget-width;
     height: 100%;
     margin-left: 0;
     background-color: var(--astroneum-background-color);

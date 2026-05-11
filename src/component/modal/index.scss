@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-modal {
+.#{$prefix-cls}-modal {
   &.modal {
     position: absolute;
     width: 100%;

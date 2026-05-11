@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-indicator-modal-list {
+.#{$prefix-cls}-indicator-modal-list {
   margin-left: -16px;
   margin-right: -16px;
   height: 400px;

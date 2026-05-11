@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-list  {
+.#{$prefix-cls}-list {
   position: relative;
   list-style: none;
   margin: 0;
@@ -9,7 +9,7 @@
   font-size: 13px;
   color: var(--astroneum-text-color);
   min-height: 200px;
-  .scrollbar();
+  @include scrollbar();
   li {
     display: flex;
     flex-direction: row;

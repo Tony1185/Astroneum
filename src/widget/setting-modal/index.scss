@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-setting-modal-content {
+.#{$prefix-cls}-setting-modal-content {
   display: grid;
   grid-template-columns: 1fr auto;
   row-gap: 14px;

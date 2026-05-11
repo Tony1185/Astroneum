@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-symbol-search-modal-input {
+.#{$prefix-cls}-symbol-search-modal-input {
   margin: 0 0 10px;
   height: 36px;
   svg {
@@ -13,7 +13,7 @@
   }
 }
 
-.@{prefix-cls}-symbol-search-modal-list {
+.#{$prefix-cls}-symbol-search-modal-list {
   height: 360px;
   margin-left: -16px;
   margin-right: -16px;

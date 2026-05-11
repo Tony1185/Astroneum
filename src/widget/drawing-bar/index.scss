@@ -1,9 +1,9 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-@gap: 4px;
+$gap: 4px;
 
-.@{prefix-cls}-drawing-bar {
-  width: @drawing-bar-width;
+.#{$prefix-cls}-drawing-bar {
+  width: $drawing-bar-width;
   height: 100%;
   box-sizing: border-box;
   border-right: solid 1px var(--astroneum-border-color);
@@ -17,7 +17,7 @@
     justify-content: center;
     position: relative;
     width: 100%;
-    margin-top: @gap;
+    margin-top: $gap;
     cursor: pointer;
     color: var(--astroneum-text-second-color);
     fill: var(--astroneum-text-second-color);
@@ -37,7 +37,7 @@
         stroke: var(--astroneum-text-color);
       }
       &.selected {
-        background-color: fade(#2962ff, 15%) !important;
+        background-color: rgba(#2962ff, 0.15) !important;
         fill: var(--astroneum-primary-color);
         stroke: var(--astroneum-primary-color);
       }

@@ -62,7 +62,7 @@
   "scripts": {
     "clean": "node -e \"const fs=require('node:fs');fs.rmSync('dist',{ recursive: true, force: true })\"",
     "build:js": "tsup --config tsup.config.ts",
-    "build:css": "lessc src/styles/index.less src/styles/.tmp-astroneum.css && esbuild src/styles/.tmp-astroneum.css --bundle --minify --loader:.eot=dataurl --loader:.ttf=dataurl --loader:.woff=dataurl --loader:.svg=dataurl --outfile=dist/astroneum.css && node -e \"const fs=require('node:fs');fs.rmSync('src/styles/.tmp-astroneum.css',{ force: true })\"",
+    "build:css": "sass src/styles/index.scss src/styles/.tmp-astroneum.css --no-source-map && esbuild src/styles/.tmp-astroneum.css --bundle --minify --loader:.eot=dataurl --loader:.ttf=dataurl --loader:.woff=dataurl --loader:.svg=dataurl --outfile=dist/astroneum.css && node -e \"const fs=require('node:fs');fs.rmSync('src/styles/.tmp-astroneum.css',{ force: true })\"",
     "build": "pnpm clean && pnpm build:js && pnpm build:css",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test src/__tests__/*.test.ts",
@@ -78,7 +78,7 @@
     "@webgpu/types": "^0.1.69",
     "esbuild": "^0.25.11",
     "eslint": "^9.39.4",
-    "less": "^4.6.4",
+    "sass": "^1.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tsup": "^8.5.1",

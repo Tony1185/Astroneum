@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-select {
+.#{$prefix-cls}-select {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -53,7 +53,7 @@
     border-radius: 4px;
     max-height: 200px;
     overflow-y: auto;
-    .scrollbar();
+    @include scrollbar();
     ul {
       list-style: none;
       margin: 0;
@@ -77,9 +77,9 @@
   }
 }
 
-.@{prefix-cls}-select-show {
+.#{$prefix-cls}-select-show {
   .selector-container {
-    border-color: var(--astroneum-primary-color)!important;
+    border-color: var(--astroneum-primary-color) !important;
     .value {
       color: var(--astroneum-primary-color);
     }
@@ -88,7 +88,7 @@
     }
   }
   .drop-down-container {
-    transform: scaleY(1)!important;
-    opacity: 1!important;
+    transform: scaleY(1) !important;
+    opacity: 1 !important;
   }
 }

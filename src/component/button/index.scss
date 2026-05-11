@@ -1,6 +1,6 @@
-@import (reference) '../../styles/base.less';
+@use '../../styles/base' as *;
 
-.@{prefix-cls}-button {
+.#{$prefix-cls}-button {
   &.button {
     font-family: inherit;
     font-weight: 600;
