@@ -9,6 +9,10 @@ Professional financial charting library for React applications.
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
+![Astroneum chart — dark theme with EMA, MACD, RSI and volume indicators](screenshort-1.png)
+
+![Astroneum chart — dark theme with multi-pane indicators](screenshort-2.png)
+
 ## Features
 
 - **Candlestick, bar, area, and line** chart types rendered via Canvas2D / WebGL2
@@ -62,10 +66,13 @@ This repository includes automated version bumping and npm publishing through Gi
 Default behavior on push:
 
 - Runs `npm version prerelease --preid beta --no-git-tag-version`
+- Installs dependencies and runs `pnpm verify`
+- Publishes the package to npmjs from the same workflow run
 - Commits updated version files with a skip-ci commit message
 - Creates and pushes a matching git tag (`v<version>`)
-- Tag pushes trigger the npm publish workflow automatically
 - Prerelease versions publish to their prerelease dist-tag such as `beta`; stable versions publish to `latest`
+
+The separate tagged publish workflow remains available for manual runs or tags pushed by a human, but the main branch release path no longer depends on a second workflow being triggered by an Actions-created tag.
 
 Manual run supports these bump types:
 

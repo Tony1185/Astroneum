@@ -399,35 +399,14 @@ export default class IndicatorImp<D = unknown, C = unknown, E = unknown> impleme
     return { ...result, sort }
   }
 
-  async calcImp (dataList: CandleData[], updateMode: 'full' | 'tail' = 'full'): Promise<boolean> {
-    // Tail path: recalc only the last maxPeriod*2 bars for live-tick updates.
-    // Avoids O(N) full recalc on every tick by slicing the window and splicing
-    // the result back into the existing result array.
-    if (
-      updateMode === 'tail' &&
-      this.result != null &&
-      this.result.length > 0 &&
-      this.result.length >= dataList.length - 1
-    ) {
-      const params = this.calcParams as number[]
-      const maxPeriod = params.length > 0 ? Math.max(...params) : 1
-      const windowStart = Math.max(0, dataList.length - maxPeriod * 2)
-      try {
-        const tailResult = await this.calc(dataList.slice(windowStart), this)
-        if (Array.isArray(tailResult)) {
-          // Extend result if a new bar was appended
-          if (this.result.length < dataList.length) {
-            this.result.length = dataList.length
-          }
-          for (let i = 0; i < tailResult.length; i++) {
-            this.result[windowStart + i] = tailResult[i]
-          }
-        }
-        return true
-      } catch (_e) {
-        // fall through to full recalc
-      }
-    }
+  async calcImp (dataList: CandleData[], _updateMode: 'full' | 'tail' = 'full'): Promise<boolean> {
+    // EMA and other IIR (infinite-impulse-response) indicators cannot be
+    // seeded correctly from a partial window slice — the SMA initialisation
+    // at bar (p-1) of a slice diverges from the true EMA that was built up
+    // from the full history, producing a visible kink/zigzag at the splice
+    // point.  For a tick update only the last bar's value changes, so a full
+    // recompute is also the cheapest correct strategy: on a 500-bar dataset
+    // the entire EMA pass takes < 1 ms and runs at background priority.
     try {
       const result = await this.calc(dataList, this)
       this.result = result

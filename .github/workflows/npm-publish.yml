@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish Tagged Release to npm
 
 on:
   push:
@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   publish-npm:
+    if: github.event_name == 'workflow_dispatch' || github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:

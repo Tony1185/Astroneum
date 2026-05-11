@@ -9,17 +9,29 @@
     top: 0;
     z-index: 99;
     overflow: hidden;
+    animation: astroneum-modal-backdrop-in 0.18s ease forwards;
   }
   .modal-background {
     position: absolute;
-    background-color: rgba(0, 0, 0, .4);
+    background-color: rgba(0, 0, 0, .45);
   }
   .modal-card {
-    border-radius: 6px;
+    border-radius: 8px;
     border: solid 1px var(--astroneum-border-color);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, .5);
+    box-shadow: 0 16px 48px 0 rgba(0, 0, 0, .55);
     max-height: calc(100% - 40px);
     // Prevent width 100% from Bulma on mobile
     width: unset;
+    animation: astroneum-modal-card-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
+}
+
+@keyframes astroneum-modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes astroneum-modal-card-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
 }
