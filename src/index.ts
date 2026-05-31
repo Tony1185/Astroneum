@@ -61,8 +61,6 @@ import {
   type ChartPluginContext
 } from './types'
 
-import './styles/index.less'
-
 overlays.forEach(o => { registerOverlay(o) })
 
 export {
@@ -115,6 +113,9 @@ export type {
   ChartPlugin, ChartPluginContext
 }
 export type { Viewport, IndicatorPlugin, ChartEventMap, Price, Volume, Timestamp } from './types'
+// Note: CSS is shipped as a separate artifact (`astroneum/style.css`) built from
+// src/styles/index.scss. It is intentionally NOT side-imported from the JS entry
+// so the bundle stays style-free for consumers that import the CSS themselves.
 export type { TickAnimatorOptions } from './engine/common/TickAnimator'
 export type { WebSocketDatafeedOptions } from './datafeed/WebSocketDatafeed'
 export type {

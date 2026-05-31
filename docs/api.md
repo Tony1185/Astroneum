@@ -102,6 +102,38 @@ Returns the currently active `Period`.
 
 ---
 
+## Subpath entry points
+
+Optional features are reachable through dedicated subpath imports so a
+consumer can pull in just what they need.
+
+| Subpath | Exports |
+| --- | --- |
+| `astroneum/replay` | `BarReplay`, types `BarReplayOptions`, `BarReplayState` |
+| `astroneum/multichart` | `MultiChartLayout`, types `MultiChartCount`, `MultiChartSlot`, `MultiChartLayoutOptions` |
+| `astroneum/watchlist` | `WatchlistManager`, types `Watchlist`, `WatchSymbol` |
+| `astroneum/portfolio` | `PortfolioTracker`, types `Position`, `PositionSide`, `PnLResult` |
+| `astroneum/alerts` | `AlertManager`, full alert type surface |
+| `astroneum/script` | `ScriptEngine`, types `CompiledIndicator`, `StudyOptions`, `PlotOptions`, `InputOptions` |
+| `astroneum/datafeeds/polygon` | `DefaultDatafeed`, `WebSocketDatafeed`, `WebSocketDatafeedOptions` |
+| `astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed`, `StandardCryptoDatafeed`, `STANDARD_CRYPTO_SYMBOLS`, `DATAFEED_ERROR_EVENT`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`, plus types |
+
+All listed symbols also re-export from the root `astroneum` entry today,
+but the root re-exports for these modules will be removed in **v1.0**
+(see the [Roadmap](../README.md#v10--stability)). Migrate to the subpath
+import to be forward-compatible.
+
+```ts
+// recommended — forward-compatible with v1.0
+import { BarReplay } from 'astroneum/replay'
+import { createStandardCryptoDatafeed } from 'astroneum/datafeeds/crypto'
+
+// legacy — works today, will be removed in v1.0
+import { BarReplay, createStandardCryptoDatafeed } from 'astroneum'
+```
+
+---
+
 ## Exported utilities
 
 ### Brand cast helpers
