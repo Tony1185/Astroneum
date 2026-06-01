@@ -21,7 +21,7 @@ import WatchlistManager from './chart/WatchlistManager'
 import PortfolioTracker from './chart/PortfolioTracker'
 import PerformanceMode from './chart/PerformanceMode'
 
-import { load } from './i18n'
+import { load, loadLocale, BUILTIN_LOCALES } from './i18n'
 import {
   formatPrice,
   formatVolume,
@@ -56,12 +56,11 @@ import {
   type DatafeedSubscribeCallback,
   type AstroneumOptions,
   type AstroneumHandle,
+  type SerializedChartState,
   type CandleData,
   type ChartPlugin,
   type ChartPluginContext
 } from './types'
-
-import './styles/index.less'
 
 overlays.forEach(o => { registerOverlay(o) })
 
@@ -78,6 +77,8 @@ export {
   PortfolioTracker,
   PerformanceMode,
   load as loadLocales,
+  loadLocale,
+  BUILTIN_LOCALES,
   formatPrice,
   formatVolume,
   formatPercent,
@@ -112,9 +113,12 @@ export { RingBuffer } from './engine/common/RingBuffer'
 
 export type {
   Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, AstroneumOptions, AstroneumHandle, CandleData,
-  ChartPlugin, ChartPluginContext
+  ChartPlugin, ChartPluginContext, SerializedChartState
 }
 export type { Viewport, IndicatorPlugin, ChartEventMap, Price, Volume, Timestamp } from './types'
+// Note: CSS is shipped as a separate artifact (`astroneum/style.css`) built from
+// src/styles/index.scss. It is intentionally NOT side-imported from the JS entry
+// so the bundle stays style-free for consumers that import the CSS themselves.
 export type { TickAnimatorOptions } from './engine/common/TickAnimator'
 export type { WebSocketDatafeedOptions } from './datafeed/WebSocketDatafeed'
 export type {

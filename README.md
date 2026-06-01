@@ -46,6 +46,34 @@ npm install astroneum
 - ESM-compatible bundler
 - Import styles from `astroneum/style.css`
 
+## Browser Support
+
+The library targets the **last two stable releases** of evergreen browsers
+on the desktop and the **current major** on mobile.
+
+| Browser | Minimum | Notes |
+| ------- | ------- | ----- |
+| Chrome / Edge (Chromium) | 110+ | Full WebGL2 + OPFS bar cache. |
+| Firefox | 115+ | Full WebGL2. OPFS support varies — falls back to in-memory cache. |
+| Safari (desktop) | 16.4+ | Full WebGL2. OPFS available on 17+. |
+| Safari (iOS / iPadOS) | 16.4+ | Touch + pinch supported. |
+| Chrome for Android | last 2 | |
+
+Older browsers may load the library but will silently downgrade:
+
+- No WebGL2 → Canvas2D fallback for both the renderer and indicator
+  overlays (`renderGL` plugins use `render2D`).
+- No OPFS → bar cache stays in-memory only.
+- No `OffscreenCanvas` → indicator worker pool reverts to main-thread
+  calculation.
+- No `WebTransport` → `WebTransportDatafeed` is unavailable; use
+  `WebSocketDatafeed` instead.
+
+**Node SSR:** the package is safe to import in a Next.js App Router
+server pass. It carries `'use client'` on every emitted entry and does not
+touch DOM globals during module evaluation
+(enforced by [src/__tests__/ssr-smoke.test.ts](src/__tests__/ssr-smoke.test.ts)).
+
 ## How To Use
 
 1. Install `astroneum` and ensure your app already provides `react` and `react-dom`.
@@ -398,7 +426,7 @@ Override or add locales with `loadLocales(key, dictionary)`.
 ## Main Exports
 
 | Export | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `AstroneumChart` | Main React chart component |
 | `DefaultDatafeed` | Polygon.io REST + WebSocket datafeed |
 | `createStandardCryptoDatafeed` | Built-in Binance/Bitget/OKX live crypto datafeed |
@@ -420,11 +448,198 @@ Override or add locales with `loadLocales(key, dictionary)`.
 | `RingBuffer` | Circular OHLCV ring buffer |
 | `formatPrice`, `formatVolume`, `formatPercent`, … | Formatting utilities |
 
+### Subpath Exports (v0.4)
+
+For smaller bundles, import optional features from a dedicated subpath
+instead of the root entry. Each subpath ships its own `'use client'` chunk
+and is tree-shakeable independently.
+
+| Subpath | Exports |
+| ------- | ------- |
+| `astroneum/replay` | `BarReplay`, `BarReplayOptions`, `BarReplayState` |
+| `astroneum/multichart` | `MultiChartLayout`, `MultiChartCount`, `MultiChartSlot`, `MultiChartLayoutOptions` |
+| `astroneum/watchlist` | `WatchlistManager`, `Watchlist`, `WatchSymbol` |
+| `astroneum/portfolio` | `PortfolioTracker`, `Position`, `PositionSide`, `PnLResult` |
+| `astroneum/alerts` | `AlertManager`, `Alert`, `AlertCondition`, `AlertStatus`, `AlertFrequency`, `AlertCreate`, `AlertCheckInput`, `AlertTriggeredCallback` |
+| `astroneum/script` | `ScriptEngine`, `CompiledIndicator`, `StudyOptions`, `PlotOptions`, `InputOptions` |
+| `astroneum/datafeeds/polygon` | `DefaultDatafeed`, `WebSocketDatafeed`, `WebSocketDatafeedOptions` |
+| `astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed`, `StandardCryptoDatafeed`, `STANDARD_CRYPTO_SYMBOLS`, `DATAFEED_ERROR_EVENT`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`, plus types |
+
+```ts
+import { BarReplay } from 'astroneum/replay'
+import { createStandardCryptoDatafeed } from 'astroneum/datafeeds/crypto'
+```
+
+The same symbols remain re-exported from the root `astroneum` entry for
+backwards compatibility — choose the subpath when you want to keep the
+chart core small or use a feature in isolation (e.g. a headless replay
+worker that never mounts the React chart).
+
+Bundle budgets per entry are enforced by `pnpm size`
+([.size-limit.json](.size-limit.json)).
+
 ---
 
 ## API Docs
 
 Full API reference: [docs/api.md](docs/api.md)
+
+---
+
+## Project Analysis
+
+A snapshot of where the library is strong today and where the largest gaps sit.
+This drives the roadmap below.
+
+### Strengths
+
+- Broad feature surface: candles/bar/area/line, 20+ indicators, drawing tools,
+  multi-chart, bar replay, alerts, watchlist, portfolio, script engine.
+- Solid performance foundation: TypedArray column store (`packBars`), Web Worker
+  indicator pool, OPFS bar cache, FlatBuffers wire codec, `TickAnimator`,
+  ring buffer, `PerformanceMode` adaptive quality.
+- Modern React story: React 18 + 19 support, `'use client'` baked in, ESM-only,
+  tree-shakeable, fully typed.
+- 19 built-in locales and pluggable theming via `setStyles` / `setTheme`.
+- Pluggable indicator system with optional WebGL2 render path
+  (`registerIndicatorPlugin` + `ChartPlugin`).
+
+### Gaps & Risks
+
+- **Tests are thin.** Only [src/__tests__](src/__tests__) — 4 unit files plus a
+  perf baseline. No React component tests, no datafeed tests, no rendering /
+  hit-testing tests, no SSR smoke test.
+- **No release hygiene docs.** `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+  and `CODE_OF_CONDUCT.md` are all missing.
+- **Bundle size is unmeasured.** No `size-limit` budget, no per-feature subpath
+  exports — heavy optional surfaces (`BarReplay`, `MultiChartLayout`,
+  `WatchlistManager`, `PortfolioTracker`, `ScriptEngine`, `DefaultDatafeed`)
+  all ship from the single `astroneum` entry.
+- **Locales are bundled together.** All 19 JSON dictionaries in
+  [src/i18n](src/i18n) are statically imported, so a Thai-only app still ships
+  Arabic, Hindi, etc.
+- **`WasmIndicators` is misnamed.** [src/engine/workers/WasmIndicators.ts](src/engine/workers/WasmIndicators.ts)
+  is pure TypeScript — no WASM, no SIMD. Either rename or ship a real WASM/SIMD
+  path.
+- **No WebGPU renderer** despite `@webgpu/types` being a dev dependency.
+- **Datafeed coupling.** `DefaultDatafeed` hard-codes Polygon.io and lives in
+  the core bundle. Only crypto-futures adapters exist
+  ([src/datafeed/StandardCryptoDatafeed.ts](src/datafeed/StandardCryptoDatafeed.ts))
+  — no stocks, forex, or options reference adapters.
+- **Accessibility is partial.** Modal traps focus and the watchlist has
+  `aria-*`, but the chart canvas itself has no keyboard navigation, no
+  screen-reader summary, and no documented contrast guarantees.
+- **Drawing persistence is implicit.** No first-class
+  `serialize()`/`deserialize()` for drawings + indicator layouts on
+  `AstroneumHandle`.
+- **No live documentation site / Storybook.** The demo is a single Next.js page;
+  there is no component playground or per-feature showcase.
+- **No benchmark CI.** The perf baseline exists locally but isn't run on PRs.
+- **Pre-1.0 with no stability statement.** Public API can break without notice.
+
+---
+
+## Roadmap
+
+Numbered to match priority. Anything in v1.0 is considered a blocker for the
+stable release. See [CHANGELOG.md](CHANGELOG.md) for what has shipped.
+
+### v0.3 — Hardening (partially shipped)
+
+1. **Testing**
+   - [ ] React component tests for `AstroneumChart` (mount, ref API, theme/locale
+         switching) using `@testing-library/react` + `jsdom`. Deferred to v0.5.
+   - [x] **Datafeed contract tests** — see [src/__tests__/datafeed-contract.test.ts](src/__tests__/datafeed-contract.test.ts).
+   - [x] **SSR smoke test** — root + every subpath import asserted in
+         [src/__tests__/ssr-smoke.test.ts](src/__tests__/ssr-smoke.test.ts).
+   - [ ] Visual-regression smoke test (Playwright + pixel diff). Deferred to v0.5.
+2. **Release hygiene**
+   - [x] [CHANGELOG.md](CHANGELOG.md) (Keep-a-Changelog format).
+   - [x] [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md),
+         [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+   - [x] **Supported browser matrix** — see [Browser Support](#browser-support).
+3. **Bundle visibility**
+   - [x] **`size-limit` budget** per entry — [.size-limit.json](.size-limit.json).
+         Run `pnpm size` after `pnpm build`.
+   - [ ] Publish a bundle-analysis artifact from CI. Deferred to v0.5.
+
+### v0.4 — Modularization (shipped)
+
+4. [x] **Subpath exports** — see [Subpath Exports](#subpath-exports-v04).
+       Eight new entry points: `astroneum/replay`, `/multichart`, `/watchlist`,
+       `/portfolio`, `/alerts`, `/script`, `/datafeeds/polygon`, `/datafeeds/crypto`.
+5. [x] **Lazy locales.** Only `en-US` is bundled eagerly; the other 18 locales
+       load on demand via `loadLocale(key)` (dynamic `import()`). See
+       [src/i18n/index.ts](src/i18n/index.ts).
+6. [ ] **Datafeed split (full).** The reference datafeeds are now reachable
+       via subpath but are still re-exported from the root entry for backwards
+       compatibility. The root re-export will be removed in v1.0.
+
+### v0.5 — Performance & Rendering (partial)
+
+7. [x] **Renamed `WasmIndicators` → `TypedArrayIndicators`.** A back-compat
+       shim re-exports from the old path with `@deprecated` JSDoc and will be
+       removed in v1.0. A real WASM+SIMD build is still on the wishlist.
+8. [ ] **WebGPU renderer (experimental).** Add an optional WebGPU candle renderer
+       behind `PerformanceMode`, with automatic WebGL2 → Canvas2D fallback.
+9. [x] **Benchmark CI.** [.github/workflows/benchmark.yml](.github/workflows/benchmark.yml)
+       runs `pnpm size` and the perf tests on every PR and posts the perf
+       output as a comment.
+10. [ ] **Backpressure SLA.** Document and enforce a max tick rate per pane; expose
+    `TickAnimator` tuning knobs through `AstroneumChart` props.
+11. [ ] **React component + visual regression tests.** Pulled forward from v0.3.
+
+### v0.6 — UX, Accessibility, Persistence (partial)
+
+13. [x] **Chart accessibility (opt-in).**
+    - `accessible` prop makes the canvas focusable (`tabindex=0`, `role="img"`,
+      `aria-label`).
+    - Cursor OHLCV is announced through a polite `aria-live` region (throttled).
+    - High-contrast theme variant ships under `theme="high-contrast"`.
+    - Keyboard pan/zoom shortcuts are still tracked for v0.7.
+14. [x] **Drawing & layout persistence.** `serializeState()` and
+    `loadState(state)` on `AstroneumHandle` cover drawings, indicators, theme,
+    locale, timezone, symbol, period, and styles. A `useChartStateSync` React
+    helper is still tracked for v0.7.
+15. [ ] **Mobile / touch polish.** Audit pinch-zoom, two-finger pan, long-press
+    context menu, and drawing handles on small screens.
+16. **Order entry hooks.** Optional `OrderManager` surface with horizontal
+    price lines, drag-to-edit handles, and a pluggable broker interface
+    (no built-in broker integration).
+
+### v0.7 — New Visualizations
+
+17. **Heatmap / depth of market** pane.
+18. **Footprint / market-profile** chart type.
+19. **Options chain** strip and IV-surface helper.
+20. **Compare overlay** — multiple symbols normalized on one pane (separate
+    from `MultiChartLayout`).
+
+### v1.0 — Stability
+
+21. **Public API freeze.** Lock the `astroneum` top-level entry and every
+    `astroneum/*` subpath; adopt strict semver and an `@deprecated` policy
+    with a one-minor deprecation window. Remove the root re-exports of
+    `BarReplay`, `MultiChartLayout`, `WatchlistManager`, `PortfolioTracker`,
+    `AlertManager`, `ScriptEngine`, `DefaultDatafeed`, and the crypto
+    datafeed — consumers must use the subpaths.
+22. **Live documentation site.** Storybook (or Ladle) with one story per
+    public component + per feature module, deployed from CI.
+23. **Reference broker adapter** built on the `OrderManager` interface,
+    shipped as a separate `@astroneum/broker-paper` package.
+24. **Performance budget published** (e.g. "60 fps with 5 indicators on
+    100K bars on a 2020 MacBook Air") and enforced by benchmark CI.
+
+### Nice-to-have / Backlog
+
+- Server-side rendering of a static snapshot to PNG/SVG (for emails, OG
+  images).
+- AI helper: indicator-from-natural-language compiled through `ScriptEngine`.
+- Drawing collaboration (CRDT / Yjs) over the existing `EventBus`.
+- Additional asset classes: equities, futures, FX reference datafeeds.
+- React Native (Skia) renderer experiment.
+
+---
 
 ## License
 

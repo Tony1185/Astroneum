@@ -100,6 +100,115 @@ getPeriod(): Period
 ```
 Returns the currently active `Period`.
 
+### `serializeState()` / `loadState()`
+
+```typescript
+serializeState(): SerializedChartState
+loadState(state: SerializedChartState): void
+```
+
+Capture and restore the chart's user-visible state — theme, locale,
+timezone, symbol, period, styles, indicators, and drawing overlays —
+as a JSON-safe object.
+
+```ts
+// save
+localStorage.setItem('chart-state', JSON.stringify(chartRef.current!.serializeState()))
+
+// restore on mount
+const saved = localStorage.getItem('chart-state')
+if (saved) chartRef.current!.loadState(JSON.parse(saved))
+```
+
+`loadState()` is a best-effort restore: missing or unknown indicator /
+overlay names are silently skipped (matching the engine's behaviour for
+unregistered names). The `version` field lets the format evolve without
+breaking older payloads; payloads from a newer format than the current
+library understands are ignored.
+
+---
+
+## Accessibility
+
+`<AstroneumChart>` accepts an `accessible` prop (default `false`) that
+opts the canvas into screen-reader and keyboard-focus support without
+changing visuals:
+
+- The container gets `tabindex=0`, `role="img"`, and an `aria-label`
+  (defaults to `"<ticker> <period text> chart"`; override via the
+  `ariaLabel` prop).
+- A visually-hidden `aria-live="polite"` region announces OHLCV on
+  crosshair changes, throttled to ~10 updates / second to avoid
+  flooding screen-reader queues.
+
+```tsx
+<AstroneumChart
+  symbol={{ ticker: 'BTC-USD' }}
+  period={{ multiplier: 1, timespan: 'minute', text: '1m' }}
+  datafeed={datafeed}
+  accessible
+  ariaLabel='Bitcoin / USD 1-minute candles'
+/>
+```
+
+For users who require a high-contrast UI, set `theme="high-contrast"`
+(or call `setTheme('high-contrast')`). The bundled theme uses a
+black background, white candles/grid, and yellow accents with strong
+focus rings.
+
+---
+
+## Lazy locales
+
+Only `en-US` is bundled with the main entry. Load any other built-in
+locale on demand:
+
+```ts
+import { loadLocale, BUILTIN_LOCALES } from 'astroneum'
+
+await loadLocale('ja-JP')
+chartRef.current?.setLocale('ja-JP')
+
+console.log(BUILTIN_LOCALES) // ['en-US', 'zh-CN', 'ja-JP', ...]
+```
+
+`loadLocale(key)` resolves with the dictionary on success, or `null`
+when `key` is not a built-in locale. Concurrent calls for the same
+locale are de-duplicated. To register a fully custom locale,
+keep using `loadLocales(key, dictionary)`.
+
+---
+
+## Subpath entry points
+
+Optional features are reachable through dedicated subpath imports so a
+consumer can pull in just what they need.
+
+| Subpath | Exports |
+| --- | --- |
+| `astroneum/replay` | `BarReplay`, types `BarReplayOptions`, `BarReplayState` |
+| `astroneum/multichart` | `MultiChartLayout`, types `MultiChartCount`, `MultiChartSlot`, `MultiChartLayoutOptions` |
+| `astroneum/watchlist` | `WatchlistManager`, types `Watchlist`, `WatchSymbol` |
+| `astroneum/portfolio` | `PortfolioTracker`, types `Position`, `PositionSide`, `PnLResult` |
+| `astroneum/alerts` | `AlertManager`, full alert type surface |
+| `astroneum/script` | `ScriptEngine`, types `CompiledIndicator`, `StudyOptions`, `PlotOptions`, `InputOptions` |
+| `astroneum/datafeeds/polygon` | `DefaultDatafeed`, `WebSocketDatafeed`, `WebSocketDatafeedOptions` |
+| `astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed`, `StandardCryptoDatafeed`, `STANDARD_CRYPTO_SYMBOLS`, `DATAFEED_ERROR_EVENT`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`, plus types |
+
+All listed symbols also re-export from the root `astroneum` entry today,
+but the root re-exports for these modules will be removed in **v1.0**
+(see the [Roadmap](../README.md#v10--stability)). Migrate to the subpath
+import to be forward-compatible.
+
+```ts
+// recommended — forward-compatible with v1.0
+import { BarReplay } from 'astroneum/replay'
+import { createStandardCryptoDatafeed } from 'astroneum/datafeeds/crypto'
+
+// legacy — works today, will be removed in v1.0
+import { BarReplay, createStandardCryptoDatafeed } from 'astroneum'
+```
+
 ---
 
 ## Exported utilities
@@ -198,6 +307,7 @@ import type {
   // Core
   AstroneumOptions,
   AstroneumHandle,
+  SerializedChartState,
   Datafeed,
   SymbolInfo,
   Period,

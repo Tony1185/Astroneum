@@ -1,0 +1,56 @@
+[
+  {
+    "name": "root entry (full library)",
+    "path": "dist/index.js",
+    "limit": "200 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/replay",
+    "path": "dist/entries/replay.js",
+    "limit": "15 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/multichart",
+    "path": "dist/entries/multichart.js",
+    "limit": "15 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/watchlist",
+    "path": "dist/entries/watchlist.js",
+    "limit": "10 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/portfolio",
+    "path": "dist/entries/portfolio.js",
+    "limit": "10 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/alerts",
+    "path": "dist/entries/alerts.js",
+    "limit": "10 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/script",
+    "path": "dist/entries/script.js",
+    "limit": "15 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/datafeeds/polygon",
+    "path": "dist/entries/datafeeds/polygon.js",
+    "limit": "30 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "astroneum/datafeeds/crypto",
+    "path": "dist/entries/datafeeds/crypto.js",
+    "limit": "30 KB",
+    "ignore": ["react", "react-dom"]
+  }
+]
