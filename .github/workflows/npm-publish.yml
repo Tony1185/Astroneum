@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      otp:
+        description: 'NPM one-time password (OTP) for 2FA'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -49,6 +54,6 @@ jobs:
           echo "dist_tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Publish package
-        run: pnpm publish --no-git-checks --access public --tag "${{ steps.npm_tag.outputs.dist_tag }}" --provenance
+        run: pnpm publish --no-git-checks --access public --tag "${{ steps.npm_tag.outputs.dist_tag }}" --provenance ${{ inputs.otp && format('--otp={0}', inputs.otp) || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
