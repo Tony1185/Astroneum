@@ -54,6 +54,11 @@ jobs:
           echo "dist_tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Publish package
-        run: pnpm publish --no-git-checks --access public --tag "${{ steps.npm_tag.outputs.dist_tag }}" --provenance ${{ inputs.otp && format('--otp={0}', inputs.otp) || '' }}
+        run: |
+          OTP_FLAG=""
+          if [ -n "${{ inputs.otp }}" ]; then
+            OTP_FLAG="--otp=${{ inputs.otp }}"
+          fi
+          pnpm publish --no-git-checks --access public --tag "${{ steps.npm_tag.outputs.dist_tag }}" --provenance $OTP_FLAG
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
