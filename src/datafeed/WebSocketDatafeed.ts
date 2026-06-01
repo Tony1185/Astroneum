@@ -124,7 +124,6 @@ export abstract class WebSocketDatafeed implements Datafeed {
   // -------------------------------------------------------------------------
 
   /** Optionally override to search your symbol catalogue. Default returns []. */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   searchSymbols(_search?: string): Promise<SymbolInfo[]> {
     return Promise.resolve([])
   }
@@ -133,7 +132,6 @@ export abstract class WebSocketDatafeed implements Datafeed {
    * Called immediately after a WebSocket connection opens.
    * Override to send a subscription frame (e.g., Binance topic subscribe JSON).
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected onOpen(_ws: WebSocket, _symbol: SymbolInfo, _period: Period): void {
     // no-op by default
   }
