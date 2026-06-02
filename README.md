@@ -16,18 +16,19 @@ Professional financial charting library for React applications.
 ## Features
 
 - **Candlestick, bar, area, and line** chart types rendered via Canvas2D / WebGL2
-- **20+ built-in indicators** — MA, EMA, BOLL, MACD, RSI, KDJ, and more
-- **Custom indicator plugins** via `registerIndicatorPlugin` with optional WebGL2 render path
-- **Drawing tools** — trend lines, Fibonacci, Gann, pitchfork, Elliott waves, and more; with snap, templates, and undo/redo
+- **28 built-in indicators** — SMA, EMA, MACD, RSI, KDJ, Bollinger Bands, TRIX, SAR, and more
+- **Custom indicator plugins** via `registerIndicatorPlugin()` with optional WebGL2 render path
+- **17 drawing tools** — trend lines, Fibonacci (circle, spiral, extension), Gann boxes, Elliott waves, harmonic patterns (ABCD, XABCD), and more; with smart snapping, templates, and undo/redo
 - **Off-main-thread indicator calculations** using a Web Worker pool and TypedArray column store
 - **OPFS historical cache** — persists fetched bar data in the Origin Private File System for instant repeat loads
 - **FlatBuffers binary codec** (`BarsCodec`) for efficient bar serialisation
-- **Bar replay** mode with controllable playback speed
-- **Multi-chart layout** for side-by-side symbol comparison
-- **Alert manager**, **watchlist**, **portfolio tracker**
-- **Script editor** — write custom indicators in a sandboxed JS environment
-- **19 built-in locales**; fully customisable dark/light theme and styles
-- Tree-shakeable ESM, fully typed TypeScript
+- **Bar replay** mode with controllable playback speed; subpath entry for headless backtesting
+- **Multi-chart layout** for side-by-side symbol comparison; standalone subpath entry
+- **Alert manager**, **watchlist manager**, **portfolio tracker** — each with independent subpath exports
+- **Script editor** — sandboxed JS environment for custom indicator development
+- **19 built-in locales** (lazy-loaded on demand); fully customisable dark/light theme and high-contrast accessibility support
+- **State serialization** — full chart state persistence & recovery
+- **8 tree-shakeable subpath exports** (replay, multichart, watchlist, portfolio, alerts, script, crypto datafeeds, polygon datafeeds); fully typed TypeScript
 
 ---
 
@@ -74,6 +75,29 @@ server pass. It carries `'use client'` on every emitted entry and does not
 touch DOM globals during module evaluation
 (enforced by [src/__tests__/ssr-smoke.test.ts](src/__tests__/ssr-smoke.test.ts)).
 
+## Subpath Exports
+
+Astroneum exports tree-shakeable subpaths for selective bundling:
+
+```tsx
+// Main chart + 28 indicators + 17 drawing tools
+import { AstroneumChart, DefaultDatafeed } from 'astroneum'
+
+// Feature-specific modules (tree-shakeable)
+import { BarReplay } from 'astroneum/replay'              // Headless bar replay/backtesting
+import { MultiChartLayout } from 'astroneum/multichart'   // Multi-symbol comparison
+import { WatchlistManager } from 'astroneum/watchlist'    // Watchlist management
+import { PortfolioTracker } from 'astroneum/portfolio'    // Position & P&L tracking
+import { AlertManager } from 'astroneum/alerts'           // Alert conditions & triggers
+import { ScriptEngine } from 'astroneum/script'           // Sandboxed indicator scripting
+
+// Datafeeds
+import { StandardCryptoDatafeed, STANDARD_CRYPTO_SYMBOLS } from 'astroneum/datafeeds/crypto'
+import { DefaultDatafeed, WebSocketDatafeed } from 'astroneum/datafeeds/polygon'
+```
+
+Each subpath is separately bundled with `'use client'` injected (for Next.js Server Components).
+
 ## How To Use
 
 1. Install `astroneum` and ensure your app already provides `react` and `react-dom`.
@@ -86,32 +110,79 @@ touch DOM globals during module evaluation
 
 This repository includes automated version bumping and npm publishing through GitHub Actions.
 
-- Workflow: `.github/workflows/auto-version-bump.yml`
+- Auto-bump workflow: `.github/workflows/auto-version-bump.yml`
 - Publish workflow: `.github/workflows/npm-publish.yml`
-- Auto trigger: every push to `main`
-- Manual trigger: Actions tab → Auto Version Bump → Run workflow
+- Auto trigger: every push to `main` (auto-bumps to prerelease with `beta` tag)
+- Manual trigger: Actions tab → "Auto Version Bump" → "Run workflow"
 
-Default behavior on push:
+### Auto-bump on push to `main`:
 
-- Runs `npm version prerelease --preid beta --no-git-tag-version`
-- Installs dependencies and runs `pnpm verify`
-- Publishes the package to npmjs from the same workflow run
-- Commits updated version files with a skip-ci commit message
-- Creates and pushes a matching git tag (`v<version>`)
-- Prerelease versions publish to their prerelease dist-tag such as `beta`; stable versions publish to `latest`
+1. Runs `npm version prerelease --preid beta --no-git-tag-version`
+2. Installs dependencies and runs `pnpm verify` (lint → typecheck → build → test)
+3. Publishes the package to npmjs with the prerelease dist-tag
+4. Commits updated version files with a skip-ci message and pushes a git tag (`v<version>`)
 
-The separate tagged publish workflow remains available for manual runs or tags pushed by a human, but the main branch release path no longer depends on a second workflow being triggered by an Actions-created tag.
+Prerelease versions publish to dist-tags like `beta`; stable versions publish to `latest`.
 
-Manual run supports these bump types:
+### Manual version bump:
 
-- prerelease
-- patch
-- minor
-- major
+Supported bump types: `prerelease`, `patch`, `minor`, `major`
 
-Repository secret required:
+### Manual publish (for 2FA-protected tokens):
 
-- `NPM_TOKEN` with publish access to the `astroneum` package on npmjs
+Run the `Publish Tagged Release to npm` workflow and provide:
+- **OTP** (one-time password) from your authenticator if your npm token requires 2FA
+
+The workflow will pass the OTP to npm automatically.
+
+### Repository secrets required:
+
+- `NPM_TOKEN` — with publish access to the `astroneum` package on npmjs
+  - Recommended: Use an **npm automation token** (granular access) to avoid OTP prompts in CI
+  - Alternative: Provide OTP via workflow input for manual runs
+
+---
+
+## Datafeeds
+
+Astroneum provides multiple datafeed implementations. All datafeeds support the same interface: symbol search, historical data fetching, and real-time tick streaming.
+
+### Built-in Datafeeds
+
+#### **StandardCryptoDatafeed** — Recommended for crypto trading
+- **100+ pre-configured symbols** (BTC, ETH, SOL, and 100+ altcoins)
+- **Multi-exchange support** — Binance, Bitget, OKX futures
+- **Real-time tick aggregation** to user-requested timeframe
+- **Error handling** via `DATAFEED_ERROR_EVENT` (feed unavailable, unsupported symbols)
+
+```tsx
+import { createStandardCryptoDatafeed, STANDARD_CRYPTO_SYMBOLS } from 'astroneum/datafeeds/crypto'
+
+const datafeed = createStandardCryptoDatafeed()
+// Use with STANDARD_CRYPTO_SYMBOLS or provide custom symbols
+```
+
+#### **DefaultDatafeed & WebSocketDatafeed** — Polygon.io REST + WebSocket
+- **REST API** for stocks, options, forex, crypto on Polygon.io
+- **Real-time WebSocket** tick streaming with aggregation
+- Requires Polygon.io API key
+
+```tsx
+import { DefaultDatafeed, WebSocketDatafeed } from 'astroneum/datafeeds/polygon'
+
+const datafeed = new DefaultDatafeed({ apiKey: 'YOUR_KEY' })
+// or
+const wsFeed = new WebSocketDatafeed({ apiKey: 'YOUR_KEY', clusterSize: 1000 })
+```
+
+#### **WebTransportDatafeed** — Experimental
+- Low-level WebTransport protocol support (falls back to WebSocket)
+
+### Caching & Persistence
+
+- **OPFS Cache** — Automatically persists historical bars to browser's Origin Private File System for instant repeat loads
+- **Fallback** — In-memory cache on browsers without OPFS support (Safari <17, older Firefox)
+- **Binary Codec** — FlatBuffers-based serialization for efficient storage
 
 ---
 
