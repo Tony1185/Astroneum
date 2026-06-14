@@ -187,7 +187,6 @@ const SNAP_PIXEL_THRESHOLD = 8
  */
 export function snapToOhlc(
   data: CandleData[],
-  barSpace: number,
   targetY: number,
   priceToY: (price: number) => number
 ): { price: number; y: number; type: 'open' | 'high' | 'low' | 'close' } | null {
@@ -229,9 +228,10 @@ export function snapAngle(angleRad: number, thresholdDeg = 5): number | null {
     const diff = Math.abs(normalized - target)
     const wrappedDiff = Math.min(diff, 180 - diff)
     if (wrappedDiff <= thresholdDeg) {
-      // Preserve quadrant
-      const quadrant = Math.round(angleDeg / 180) * 180
-      return ((quadrant > 0 ? target : -target) * Math.PI) / 180
+      // Lines repeat every 180°. Preserve the quadrant of the original angle
+      // so direction is maintained (0-180 → target, 180-360 → target+180)
+      const quadrant = Math.floor(angleDeg / 180)
+      return (((target + quadrant * 180) * Math.PI) / 180)
     }
   }
 

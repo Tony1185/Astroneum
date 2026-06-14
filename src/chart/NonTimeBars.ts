@@ -205,7 +205,6 @@ export function generateRangeBars(data: CandleData[], rangeSize: number): Candle
   let barHigh = data[0].high
   let barLow = data[0].low
   let barOpen = data[0].open
-  let barClose = data[0].close
   let barVol = data[0].volume ?? 0
   let barTurnover = data[0].turnover ?? 0
 
@@ -223,7 +222,7 @@ export function generateRangeBars(data: CandleData[], rangeSize: number): Candle
         open: barOpen,
         high: barHigh,
         low: barLow,
-        close: barHigh - barLow >= rangeSize ? d.close : barClose,
+        close: d.close,
         volume: barVol,
         turnover: barTurnover,
       })
@@ -232,11 +231,9 @@ export function generateRangeBars(data: CandleData[], rangeSize: number): Candle
       barOpen = d.close
       barHigh = d.high
       barLow = d.low
-      barClose = d.close
       barVol = d.volume ?? 0
       barTurnover = d.turnover ?? 0
     } else {
-      barClose = d.close
       barVol += d.volume ?? 0
       barTurnover += d.turnover ?? 0
     }
