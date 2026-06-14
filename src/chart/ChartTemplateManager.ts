@@ -106,10 +106,18 @@ export class ChartTemplateManager {
   private _load(): void {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw) as ChartTemplate[]
-        if (Array.isArray(parsed)) this._templates = parsed
-      }
+      if (!raw) return
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) return
+      // Schema validation — reject corrupted/malicious data
+      this._templates = parsed.filter((t: unknown) => {
+        if (t === null || typeof t !== 'object') return false
+        const obj = t as Record<string, unknown>
+        return typeof obj.id === 'string' &&
+          typeof obj.name === 'string' &&
+          typeof obj.state === 'object' && obj.state !== null &&
+          typeof obj.createdAt === 'string'
+      }) as ChartTemplate[]
     } catch { /* corrupt data */ }
   }
 }

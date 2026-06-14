@@ -171,9 +171,17 @@ export class DrawingTemplates {
   private _loadCustom(): void {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        this._custom = JSON.parse(raw) as OverlayStylePreset[]
-      }
+      if (!raw) { this._custom = []; return }
+      const parsed = JSON.parse(raw)
+      if (!Array.isArray(parsed)) { this._custom = []; return }
+      // Schema validation — reject corrupted/malicious data
+      this._custom = parsed.filter((p: unknown) => {
+        if (p === null || typeof p !== 'object') return false
+        const obj = p as Record<string, unknown>
+        return typeof obj.id === 'string' &&
+          typeof obj.name === 'string' &&
+          typeof obj.styles === 'object' && obj.styles !== null
+      }) as OverlayStylePreset[]
     } catch {
       this._custom = []
     }

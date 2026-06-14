@@ -552,7 +552,7 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
     const priceUnitDom = priceUnitDomRef.current
     if (priceUnitDom) {
       if (symbol?.priceCurrency) {
-        priceUnitDom.innerHTML = symbol.priceCurrency.toLocaleUpperCase()
+        priceUnitDom.textContent = symbol.priceCurrency.toLocaleUpperCase()
         priceUnitDom.style.display = 'flex'
       } else {
         priceUnitDom.style.display = 'none'
