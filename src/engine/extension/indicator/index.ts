@@ -18,8 +18,13 @@ import commodityChannelIndex from './commodityChannelIndex'
 import currentRatio from './currentRatio'
 import differentOfMovingAverage from './differentOfMovingAverage'
 import directionalMovementIndex from './directionalMovementIndex'
+import donchianChannels from './donchianChannels'
+import doubleExponentialMovingAverage from './doubleExponentialMovingAverage'
 import easeOfMovementValue from './easeOfMovementValue'
 import exponentialMovingAverage from './exponentialMovingAverage'
+import historicalVolatility from './historicalVolatility'
+import ichimokuCloud from './ichimokuCloud'
+import keltnerChannels from './keltnerChannels'
 import momentum from './momentum'
 import moneyFlowIndex from './moneyFlowIndex'
 import movingAverage from './movingAverage'
@@ -32,9 +37,14 @@ import relativeStrengthIndex from './relativeStrengthIndex'
 import simpleMovingAverage from './simpleMovingAverage'
 import stoch from './stoch'
 import stopAndReverse from './stopAndReverse'
+import superTrend from './superTrend'
+import tripleExponentialMovingAverage from './tripleExponentialMovingAverage'
 import tripleExponentiallySmoothedAverage from './tripleExponentiallySmoothedAverage'
 import volume from './volume'
 import volumeRatio from './volumeRatio'
+import volumeWeightedAveragePrice from './volumeWeightedAveragePrice'
+import volumeWeightedMovingAverage from './volumeWeightedMovingAverage'
+import weightedMovingAverage from './weightedMovingAverage'
 import williamsR from './williamsR'
 
 const indicators: Record<string, IndicatorConstructor> = {}
@@ -43,11 +53,14 @@ const extensions = [
   accumulationDistribution, averageDirectionalIndex, averagePrice, averageTrueRange,
   awesomeOscillator, bias, bollingerBands, brar,
   bullAndBearIndex, chaikinMoneyFlow, commodityChannelIndex, currentRatio,
-  differentOfMovingAverage, directionalMovementIndex, easeOfMovementValue,
-  exponentialMovingAverage, momentum, moneyFlowIndex,
+  differentOfMovingAverage, directionalMovementIndex, donchianChannels,
+  doubleExponentialMovingAverage, easeOfMovementValue, exponentialMovingAverage,
+  historicalVolatility, ichimokuCloud, keltnerChannels, momentum, moneyFlowIndex,
   movingAverage, movingAverageConvergenceDivergence, onBalanceVolume, priceAndVolumeTrend,
   psychologicalLine, rateOfChange, relativeStrengthIndex, simpleMovingAverage,
-  stoch, stopAndReverse, tripleExponentiallySmoothedAverage, volume, volumeRatio, williamsR
+  stoch, stopAndReverse, superTrend, tripleExponentialMovingAverage,
+  tripleExponentiallySmoothedAverage, volume, volumeRatio, volumeWeightedAveragePrice,
+  volumeWeightedMovingAverage, weightedMovingAverage, williamsR
 ]
 
 extensions.forEach((indicator: IndicatorTemplate) => {
