@@ -74,12 +74,12 @@ const ichimokuCloud: IndicatorTemplate<Ichimoku, number> = {
         ichi.senkouB = (highMax + lowMin) / 2
       }
 
-      // Chikou Span: close shifted 26 periods behind
-      if (i >= kijunPeriod - 1) {
-        ichi.chikou = dataList[i - (kijunPeriod - 1)].close
-      }
-
       result.push(ichi)
+
+      // Chikou Span: current close plotted kijunPeriod bars in the past
+      if (i >= kijunPeriod) {
+        result[i - kijunPeriod].chikou = candleData.close
+      }
     })
 
     // Senkou Span A (shifted forward by kijunPeriod): (tenkan + kijun) / 2
@@ -90,9 +90,6 @@ const ichimokuCloud: IndicatorTemplate<Ichimoku, number> = {
         const targetIdx = i + kijunPeriod
         if (targetIdx < result.length) {
           result[targetIdx].senkouA = sa
-        } else {
-          // Extend beyond available data — store at last position
-          result[result.length - 1].senkouA = sa
         }
       }
     }

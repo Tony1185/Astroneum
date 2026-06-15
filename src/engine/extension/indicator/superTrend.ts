@@ -40,7 +40,8 @@ const superTrend: IndicatorTemplate<SuperTrend, number> = {
     let trSum = 0
     let atr = 0
     let direction = 1
-    let prevSuperTrend = 0
+    let finalUpper = 0
+    let finalLower = 0
     const result: SuperTrend[] = []
 
     dataList.forEach((candleData, i) => {
@@ -65,32 +66,23 @@ const superTrend: IndicatorTemplate<SuperTrend, number> = {
         const lowerBand = hl2 - multiplier * atr
 
         if (i === n - 1) {
-          // First bar with ATR — initialize direction based on close
-          direction = candleData.close > (hl2) ? 1 : -1
-        }
-
-        let superTrendVal
-        if (direction === 1) {
-          // Uptrend: supertrend follows lower band
-          superTrendVal = lowerBand
-          // Flip to downtrend if close crosses below previous supertrend
-          if (candleData.close <= prevSuperTrend) {
-            direction = -1
-            superTrendVal = upperBand
-          }
+          finalUpper = upperBand
+          finalLower = lowerBand
+          direction = 1
         } else {
-          // Downtrend: supertrend follows upper band
-          superTrendVal = upperBand
-          // Flip to uptrend if close crosses above previous supertrend
-          if (candleData.close >= prevSuperTrend) {
+          // Ratchet bands: only tighten in the direction of the trend
+          finalUpper = (upperBand < finalUpper || prev.close > finalUpper) ? upperBand : finalUpper
+          finalLower = (lowerBand > finalLower || prev.close < finalLower) ? lowerBand : finalLower
+
+          if (direction === 1 && candleData.close < finalLower) {
+            direction = -1
+          } else if (direction === -1 && candleData.close > finalUpper) {
             direction = 1
-            superTrendVal = lowerBand
           }
         }
 
-        stResult.superTrend = superTrendVal
+        stResult.superTrend = direction === 1 ? finalLower : finalUpper
         stResult.direction = direction
-        prevSuperTrend = superTrendVal
       }
       result.push(stResult)
     })
