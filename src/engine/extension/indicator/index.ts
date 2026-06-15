@@ -4,12 +4,16 @@ import type Nullable from '../../common/Nullable'
 
 import IndicatorImp, { type IndicatorTemplate, type IndicatorConstructor } from '../../component/Indicator'
 
+import accumulationDistribution from './accumulationDistribution'
+import averageDirectionalIndex from './averageDirectionalIndex'
 import averagePrice from './averagePrice'
+import averageTrueRange from './averageTrueRange'
 import awesomeOscillator from './awesomeOscillator'
 import bias from './bias'
 import bollingerBands from './bollingerBands'
 import brar from './brar'
 import bullAndBearIndex from './bullAndBearIndex'
+import chaikinMoneyFlow from './chaikinMoneyFlow'
 import commodityChannelIndex from './commodityChannelIndex'
 import currentRatio from './currentRatio'
 import differentOfMovingAverage from './differentOfMovingAverage'
@@ -17,6 +21,7 @@ import directionalMovementIndex from './directionalMovementIndex'
 import easeOfMovementValue from './easeOfMovementValue'
 import exponentialMovingAverage from './exponentialMovingAverage'
 import momentum from './momentum'
+import moneyFlowIndex from './moneyFlowIndex'
 import movingAverage from './movingAverage'
 import movingAverageConvergenceDivergence from './movingAverageConvergenceDivergence'
 import onBalanceVolume from './onBalanceVolume'
@@ -35,9 +40,11 @@ import williamsR from './williamsR'
 const indicators: Record<string, IndicatorConstructor> = {}
 
 const extensions = [
-  averagePrice, awesomeOscillator, bias, bollingerBands, brar,
-  bullAndBearIndex, commodityChannelIndex, currentRatio, differentOfMovingAverage,
-  directionalMovementIndex, easeOfMovementValue, exponentialMovingAverage, momentum,
+  accumulationDistribution, averageDirectionalIndex, averagePrice, averageTrueRange,
+  awesomeOscillator, bias, bollingerBands, brar,
+  bullAndBearIndex, chaikinMoneyFlow, commodityChannelIndex, currentRatio,
+  differentOfMovingAverage, directionalMovementIndex, easeOfMovementValue,
+  exponentialMovingAverage, momentum, moneyFlowIndex,
   movingAverage, movingAverageConvergenceDivergence, onBalanceVolume, priceAndVolumeTrend,
   psychologicalLine, rateOfChange, relativeStrengthIndex, simpleMovingAverage,
   stoch, stopAndReverse, tripleExponentiallySmoothedAverage, volume, volumeRatio, williamsR
@@ -47,15 +54,15 @@ extensions.forEach((indicator: IndicatorTemplate) => {
   indicators[indicator.name] = IndicatorImp.extend(indicator)
 })
 
-function registerIndicator<D = unknown, C = unknown, E = unknown> (indicator: IndicatorTemplate<D, C, E>): void {
+function registerIndicator<D = unknown, C = unknown, E = unknown>(indicator: IndicatorTemplate<D, C, E>): void {
   indicators[indicator.name] = IndicatorImp.extend(indicator)
 }
 
-function getIndicatorClass (name: string): Nullable<IndicatorConstructor> {
+function getIndicatorClass(name: string): Nullable<IndicatorConstructor> {
   return indicators[name] ?? null
 }
 
-function getSupportedIndicators (): string[] {
+function getSupportedIndicators(): string[] {
   return Object.keys(indicators)
 }
 
