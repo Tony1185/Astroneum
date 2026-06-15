@@ -14,7 +14,10 @@ interface SuperTrend {
  * Upper Band = (HIGH + LOW) / 2 + Multiplier * ATR
  * Lower Band = (HIGH + LOW) / 2 - Multiplier * ATR
  *
- * SuperTrend follows the upper/lower band based on direction.
+ * SuperTrend follows the lower band in uptrends and the upper band
+ * in downtrends. When price crosses the supertrend line, the trend
+ * reverses.
+ *
  * direction = 1 (uptrend), direction = -1 (downtrend)
  *
  * Default params: [10, 3]
@@ -62,26 +65,26 @@ const superTrend: IndicatorTemplate<SuperTrend, number> = {
         const lowerBand = hl2 - multiplier * atr
 
         if (i === n - 1) {
-          direction = 1
-          prevSuperTrend = upperBand
+          // First bar with ATR — initialize direction based on close
+          direction = candleData.close > (hl2) ? 1 : -1
         }
 
         let superTrendVal
-        if (prevSuperTrend === upperBand) {
-          if (candleData.close > upperBand) {
-            direction = 1
-            superTrendVal = lowerBand
-          } else {
-            direction = -1
-            superTrendVal = Math.min(upperBand, prevSuperTrend)
-          }
-        } else {
-          if (candleData.close < lowerBand) {
+        if (direction === 1) {
+          // Uptrend: supertrend follows lower band
+          superTrendVal = lowerBand
+          // Flip to downtrend if close crosses below previous supertrend
+          if (candleData.close <= prevSuperTrend) {
             direction = -1
             superTrendVal = upperBand
-          } else {
+          }
+        } else {
+          // Downtrend: supertrend follows upper band
+          superTrendVal = upperBand
+          // Flip to uptrend if close crosses above previous supertrend
+          if (candleData.close >= prevSuperTrend) {
             direction = 1
-            superTrendVal = Math.max(lowerBand, prevSuperTrend)
+            superTrendVal = lowerBand
           }
         }
 

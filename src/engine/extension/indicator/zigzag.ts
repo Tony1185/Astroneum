@@ -33,45 +33,49 @@ const zigzag: IndicatorTemplate<Zigzag, number> = {
 
     if (dataList.length < 3) return result
 
-    // Find initial extreme
+    // Determine initial direction and first pivot
+    let direction = dataList[1].close > dataList[0].close ? 1 : -1
     let lastPivotIdx = 0
-    let lastPivotVal = dataList[0].close
-    let isUp = dataList[1].close > dataList[0].close
+    let lastPivotVal = direction === 1 ? dataList[0].low : dataList[0].high
+    let extremeIdx = 0
+    let extremeVal = direction === 1 ? dataList[0].high : dataList[0].low
 
-    for (let i = 2; i < dataList.length; i++) {
-      if (isUp) {
-        // Looking for a peak
-        if (dataList[i].high > dataList[i - 1].high) {
-          // Continue up — update potential peak
-          continue
+    for (let i = 1; i < dataList.length; i++) {
+      if (direction === 1) {
+        // Uptrend — track the highest high
+        if (dataList[i].high >= extremeVal) {
+          extremeIdx = i
+          extremeVal = dataList[i].high
         }
-        // Price dropped — check if it's a significant reversal
-        const peakIdx = i - 1
-        const peakVal = dataList[peakIdx].high
-        const dropPct = (peakVal - dataList[i].low) / peakVal
+        // Check reversal: price drops significantly from the extreme high
+        const dropPct = (extremeVal - dataList[i].low) / extremeVal
         if (dropPct >= deviationPct) {
-          // Mark the peak
-          result[peakIdx].zigzag = peakVal
-          lastPivotIdx = peakIdx
-          lastPivotVal = peakVal
-          isUp = false
+          // Mark the peak at the extreme bar
+          result[extremeIdx].zigzag = extremeVal
+          lastPivotIdx = extremeIdx
+          lastPivotVal = extremeVal
+          // Flip to downtrend — start tracking lows from current bar
+          direction = -1
+          extremeIdx = i
+          extremeVal = dataList[i].low
         }
       } else {
-        // Looking for a trough
-        if (dataList[i].low < dataList[i - 1].low) {
-          // Continue down — continue
-          continue
+        // Downtrend — track the lowest low
+        if (dataList[i].low <= extremeVal) {
+          extremeIdx = i
+          extremeVal = dataList[i].low
         }
-        // Price rose — check if it's a significant reversal
-        const troughIdx = i - 1
-        const troughVal = dataList[troughIdx].low
-        const risePct = (dataList[i].high - troughVal) / troughVal
+        // Check reversal: price rises significantly from the extreme low
+        const risePct = (dataList[i].high - extremeVal) / extremeVal
         if (risePct >= deviationPct) {
-          // Mark the trough
-          result[troughIdx].zigzag = troughVal
-          lastPivotIdx = troughIdx
-          lastPivotVal = troughVal
-          isUp = true
+          // Mark the trough at the extreme bar
+          result[extremeIdx].zigzag = extremeVal
+          lastPivotIdx = extremeIdx
+          lastPivotVal = extremeVal
+          // Flip to uptrend — start tracking highs from current bar
+          direction = 1
+          extremeIdx = i
+          extremeVal = dataList[i].high
         }
       }
     }
