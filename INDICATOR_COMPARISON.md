@@ -1,9 +1,9 @@
 # Indicator Comparison: Astroneum vs TradingView Pro
 
 **Last Updated:** June 15, 2026
-**Astroneum Indicators:** 42 (+15 new)
+**Astroneum Indicators:** 50 (+23 new)
 **TradingView Pro Indicators:** 100+
-**Coverage of comparison table:** 42/50 (84%)
+**Coverage of comparison table:** 50/50 **(100% — Full Parity)**
 
 ---
 
@@ -17,8 +17,8 @@
 | | Triple Exponential Moving Average | TEMA | ✅ | ✅ | Medium |
 | | Weighted Moving Average | WMA | ✅ | ✅ | Medium |
 | | Volume Weighted Moving Average | VWMA | ✅ | ✅ | Medium |
-| | Adaptive Moving Average | AMA | ❌ | ✅ | Low |
-| | Hull Moving Average | HMA | ❌ | ✅ | Low |
+| | Adaptive Moving Average | AMA | ✅ | ✅ | Low |
+| | Hull Moving Average | HMA | ✅ | ✅ | Low |
 | **Trend Indicators** | Moving Average Convergence Divergence | MACD | ✅ | ✅ | - |
 | | Average Directional Index | ADX | ✅ | ✅ | High |
 | | Directional Movement Index | DMI/DI | ✅ | ✅ | - |
@@ -38,13 +38,13 @@
 | | Average True Range | ATR | ✅ | ✅ | High |
 | | Historical Volatility | HV | ✅ | ✅ | Medium |
 | | Donchian Channels | DC | ✅ | ✅ | Medium |
-| | Standard Deviation | STDDEV | ❌ | ✅ | Medium |
+| | Standard Deviation | STDDEV | ✅ | ✅ | Medium |
 | **Volume Indicators** | Volume | VOL | ✅ | ✅ | - |
 | | On Balance Volume | OBV | ✅ | ✅ | - |
 | | Price and Volume Trend | PVT | ✅ | ✅ | - |
 | | Chaikin Money Flow | CMF | ✅ | ✅ | High |
 | | Money Flow Index | MFI | ✅ | ✅ | High |
-| | Volume Rate of Change | VROC | ❌ | ✅ | Medium |
+| | Volume Rate of Change | VROC | ✅ | ✅ | Medium |
 | | Accumulation/Distribution | A/D | ✅ | ✅ | High |
 | | Volume Ratio | VR | ✅ | ✅ | - |
 | **Oscillators & Other** | Bollinger Bands | BOLL | ✅ | ✅ | - |
@@ -56,21 +56,21 @@
 | | Current Ratio | CR | ✅ | ✅ | - |
 | | Ease of Movement Value | EMV | ✅ | ✅ | - |
 | | Difference of Moving Average | DMA | ✅ | ✅ | - |
-| **Correlation & Distribution** | Correlation Coefficient | CORR | ❌ | ✅ | Low |
-| | Linear Regression | LinReg | ❌ | ✅ | Low |
+| **Correlation & Distribution** | Correlation Coefficient | CORR | ✅ | ✅ | Low |
+| | Linear Regression | LinReg | ✅ | ✅ | Low |
 | **Market Profile** | VWAP (Volume Weighted Average Price) | VWAP | ✅ | ✅ | Medium |
-| | Pivot Points | PP | ❌ | ✅ | Medium |
+| | Pivot Points | PP | ✅ | ✅ | Medium |
 | **Advanced** | SuperTrend | ST | ✅ | ✅ | Medium |
-| | ZigZag | ZZ | ❌ | ✅ | Low |
+| | ZigZag | ZZ | ✅ | ✅ | Low |
 
 ---
 
 ## Implementation Progress
 
-All 5 **high-priority** indicators have been implemented (Phase 1 + Phase 2 CMF, MFI).
-The remaining gaps are medium- and low-priority indicators.
+**All 50 indicators from the comparison table are now implemented.**
+Astroneum grew from 27 to 50 indicators — a **85% increase**.
 
-### ✅ Completed (15 new indicators)
+### ✅ Completed — 23 new indicators total
 
 | # | Indicator | File | Phase |
 |---|-----------|------|-------|
@@ -89,44 +89,37 @@ The remaining gaps are medium- and low-priority indicators.
 | 13 | **DC** (Donchian Channels) | `donchianChannels.ts` | Phase 3 |
 | 14 | **KC** (Keltner Channels) | `keltnerChannels.ts` | Phase 3 |
 | 15 | **SuperTrend** | `superTrend.ts` | Phase 3 |
-
----
-
-## Remaining Missing Indicators (8 left)
-
-| Indicator | Priority | Notes |
-|-----------|----------|-------|
-| Standard Deviation (STDDEV) | Medium | Building block used by Bollinger Bands |
-| Volume Rate of Change (VROC) | Medium | Volume momentum |
-| Pivot Points (PP) | Medium | Support/resistance levels |
-| Adaptive Moving Average (AMA) | Low | Kav |
-| Hull Moving Average (HMA) | Low | Smoothing |
-| Correlation Coefficient (CORR) | Low | Statistical |
-| Linear Regression (LinReg) | Low | Statistical |
-| ZigZag (ZZ) | Low | Pattern recognition |
+| 16 | **STDDEV** (Standard Deviation) | `standardDeviation.ts` | Phase 4 |
+| 17 | **VROC** (Volume Rate of Change) | `volumeRateOfChange.ts` | Phase 4 |
+| 18 | **PP** (Pivot Points) | `pivotPoints.ts` | Phase 4 |
+| 19 | **CORR** (Correlation Coefficient) | `correlationCoefficient.ts` | Phase 4 |
+| 20 | **LinReg** (Linear Regression) | `linearRegression.ts` | Phase 4 |
+| 21 | **AMA** (Adaptive Moving Average / KAMA) | `adaptiveMovingAverage.ts` | Phase 4 |
+| 22 | **HMA** (Hull Moving Average) | `hullMovingAverage.ts` | Phase 4 |
+| 23 | **ZZ** (ZigZag) | `zigzag.ts` | Phase 4 |
 
 ---
 
 ## Progress Summary
 
-**84% of the comparison table covered** (42 of 50 indicators).
+**100% of the comparison table covered** — all 50 indicators ✅
 
-| Category | Total | Done | Missing | Coverage |
-|----------|:-----:|:----:|:-------:|:--------:|
-| Moving Averages | 8 | 6 | 2 (AMA, HMA) | 75% |
-| Trend Indicators | 7 | 7 | 0 | **100%** |
-| Momentum Indicators | 8 | 8 | 0 | **100%** |
-| Volatility Indicators | 5 | 4 | 1 (STDDEV) | 80% |
-| Volume Indicators | 8 | 7 | 1 (VROC) | 88% |
-| Oscillators & Other | 9 | 9 | 0 | **100%** |
-| Correlation & Distribution | 2 | 0 | 2 (CORR, LinReg) | 0% |
-| Market Profile | 2 | 1 | 1 (PP) | 50% |
-| Advanced | 2 | 1 | 1 (ZZ) | 50% |
-| **Total** | **50** | **42** | **8** | **84%** |
+| Category | Total | Done | Coverage |
+|----------|:-----:|:----:|:--------:|
+| Moving Averages | 8 | 8 | **100%** |
+| Trend Indicators | 7 | 7 | **100%** |
+| Momentum Indicators | 8 | 8 | **100%** |
+| Volatility Indicators | 5 | 5 | **100%** |
+| Volume Indicators | 8 | 8 | **100%** |
+| Oscillators & Other | 9 | 9 | **100%** |
+| Correlation & Distribution | 2 | 2 | **100%** |
+| Market Profile | 2 | 2 | **100%** |
+| Advanced | 2 | 2 | **100%** |
+| **Total** | **50** | **50** | **100%** |
 
 ---
 
-## Implementation Roadmap Update
+## Implementation Roadmap — ALL COMPLETE ✅
 
 ### ✅ Phase 1 (Critical - MVP) — COMPLETE
 - [x] ATR (Average True Range)
@@ -146,39 +139,38 @@ The remaining gaps are medium- and low-priority indicators.
 - [x] Keltner Channels
 - [x] SuperTrend
 
-### ⬜ Phase 4 (Remaining - Niche Features)
-- [ ] Standard Deviation (STDDEV)
-- [ ] Volume Rate of Change (VROC)
-- [ ] Pivot Points (PP)
-- [ ] Correlation Coefficient (CORR)
-- [ ] Linear Regression (LinReg)
-- [ ] Adaptive Moving Average (AMA)
-- [ ] Hull Moving Average (HMA)
-- [ ] ZigZag (ZZ)
+### ✅ Phase 4 (Advanced - Niche Features) — COMPLETE
+- [x] Standard Deviation (STDDEV)
+- [x] Volume Rate of Change (VROC)
+- [x] Pivot Points (PP)
+- [x] Correlation Coefficient (CORR)
+- [x] Linear Regression (LinReg)
+- [x] Adaptive Moving Average (AMA)
+- [x] Hull Moving Average (HMA)
+- [x] ZigZag (ZZ)
 
 ---
 
 ## Notes
 
-- Astroneum now has **42 indicators** — up from 27, a **56% increase**
-- All **high-priority** indicators from the original roadmap are now implemented
-- **Trend** and **Momentum** categories are at 100% coverage
-- The 8 remaining indicators are all **medium/low priority** niche features
-- Many missing indicators can be built using existing building blocks (e.g., STDDEV is used internally by Bollinger Bands)
-- TradingView Pro has 100+ indicators; Astroneum now covers the vast majority of commonly used ones
+- Astroneum now has **50 indicators** — up from 27, an **85% increase**
+- **Every category** in the comparison table is at **100% coverage**
+- All indicators follow the existing codebase patterns (type interfaces, `IndicatorTemplate`, `figures`, `calc` callbacks)
+- All indicators are registered in `src/engine/extension/indicator/index.ts`
+- 32 existing tests continue to pass; TypeScript compiles cleanly; build succeeds
 
 ---
 
 ## Strategy Notes
 
 **For TradingView Parity:**
-- With 42 of the top ~50 most-used indicators implemented, Astroneum is now at strong competitive parity for technical analysis
-- The 8 remaining indicators are niche features used by advanced traders
+- Astroneum now achieves **full parity** with TradingView Pro for the 50 most-used technical indicators
+- All core categories covered: trend, momentum, volatility, volume, moving averages, market profile, and advanced
 
 **Market Positioning:**
-- Astroneum is now one of the most feature-complete open-source charting libraries
-- All core technical analysis categories are covered: trend, momentum, volatility, volume, and moving averages
+- Astroneum is now one of the most **feature-complete open-source charting libraries** available
+- Every indicator from the original comparison roadmap has been implemented
 
 **Development Effort:**
-- Phase 1-3 completed in a single development session
-- Remaining 8 indicators: ~1-2 days for complete coverage
+- All 23 new indicators completed across two development sessions
+- Zero regressions in existing tests and builds
