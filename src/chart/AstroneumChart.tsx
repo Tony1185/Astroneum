@@ -236,6 +236,33 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
   const clockTime = useClockTick()
   useKeyboardShortcuts(widgetRef)
 
+  // Modal hotkeys — wire PeriodBar toggle actions to keyboard shortcuts.
+  // `/` → indicators dialog, `Alt+A` → alert dialog, `Shift+F` → fullscreen.
+  useEffect(() => {
+    const handleModalHotkey = (e: KeyboardEvent): void => {
+      const tag = (document.activeElement as HTMLElement)?.tagName?.toLowerCase()
+      if (tag === 'input' || tag === 'textarea') return
+
+      if (e.key === '/') {
+        e.preventDefault()
+        ui.setIndicatorModalVisible(v => !v)
+      } else if (e.altKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault()
+        setAlertModalVisible(v => !v)
+      } else if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault()
+        if (document.fullscreenElement) {
+          void document.exitFullscreen?.call(document)
+        } else {
+          const container = widgetContainerRef.current?.closest('.astroneum') as HTMLElement | null
+          void container?.requestFullscreen?.call(container)
+        }
+      }
+    }
+    document.addEventListener('keydown', handleModalHotkey)
+    return () => document.removeEventListener('keydown', handleModalHotkey)
+  }, [])
+
   // chart.* getters are stable useCallback refs — stable identity, empty deps is intentional
   useImperativeHandle(ref, () => ({
     setTheme: chart.setTheme,
@@ -322,6 +349,13 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
         widget.overrideOverlay({ id: o.id, lock: locked })
       }
     },
+    createIndicator: (value, isStack?, paneOptions?) => widgetRef.current?.createIndicator(value, isStack, paneOptions) ?? null,
+    removeIndicator: (filter) => widgetRef.current?.removeIndicator(filter) ?? false,
+    createOverlay: (value) => (widgetRef.current?.createOverlay(value as never) ?? null) as string | null,
+    removeOverlay: (filter?) => widgetRef.current?.removeOverlay(filter as never) ?? false,
+    getDataList: () => widgetRef.current?.getDataList() ?? [],
+    setData: (data) => { widgetRef.current?.setData(data) },
+    resize: () => { widgetRef.current?.resize() },
   }), [])
 
   const resizeFrameRef = useRef<number | null>(null)

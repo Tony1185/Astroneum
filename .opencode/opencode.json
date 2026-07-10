@@ -1,0 +1,66 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+  "references": {
+    "structure": {
+      "path": "docs/STRUCTURE.md",
+      "description": "Where things live — file tree, deploy topology, build flow, maintenance/refresh workflow"
+    },
+    "gaps": {
+      "path": "docs/TODO.md",
+      "description": "Actionable function-gap backlog — one row per gap with status + next action"
+    },
+    "design-gaps": {
+      "path": "docs/TODO-DESIGN.md",
+      "description": "Design/layout gap backlog — TV UI surfaces to Astroneum mirror"
+    },
+    "parity": {
+      "path": "docs/tv-functions-skill.md",
+      "description": "TV to Astroneum function catalog, 6-bucket status authority, build/verify workflow"
+    },
+    "design": {
+      "path": "docs/design-astroneum.md",
+      "description": "Library UX spec — colors, typography, layout, motion, a11y, design tokens"
+    },
+    "api": {
+      "path": "docs/api.md",
+      "description": "API reference — AstroneumChart props, instance methods, exported types, subpath exports"
+    },
+    "datafeed-guide": {
+      "path": "docs/datafeed-guide.md",
+      "description": "How to build a datafeed — 4-method interface, mock/REST/WebSocket patterns"
+    },
+    "plugin-guide": {
+      "path": "docs/plugin-development.md",
+      "description": "Plugin and indicator authoring — IndicatorPlugin, ChartPlugin, ScriptEngine, renderers"
+    },
+    "indicator-parity": {
+      "path": "INDICATOR_COMPARISON.md",
+      "description": "50/50 indicator parity table — Astroneum vs TradingView Pro"
+    },
+    "demo-design": {
+      "path": "demo/DESIGN.md",
+      "description": "Demo app design system — tokens, component specs, terminal layout"
+    },
+    "demo-product": {
+      "path": "demo/PRODUCT.md",
+      "description": "Product framing — users, brand voice, anti-references, design principles"
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "pnpm *": "allow",
+      "git *": "allow",
+      "npm *": "allow",
+      "npx *": "allow",
+      "ssh 72.62.73.180 *": "allow",
+      "scp *72.62.73.180*": "allow",
+      "curl *": "allow",
+      "*": "ask"
+    }
+  }
+}

@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   transpilePackages: ['astroneum'],
   // Silence the workspace-root lockfile warning
   outputFileTracingRoot: path.join(__dirname, '../'),
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
+  trailingSlash: true,
 }
 
 export default nextConfig

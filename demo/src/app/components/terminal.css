@@ -1,0 +1,755 @@
+/* Astroneum Terminal — shell grid.
+   TV terminal layout: topbar (48px) / rail (60px) / chart (flex) /
+   sidebar (300px) / dock (300px) / footer (22px).
+   All colors reference --term-* tokens (which alias --astroneum-*). */
+
+.term-shell {
+  display: grid;
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--term-app-bg);
+  color: var(--term-text);
+  font-family: 'Trebuchet MS', -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif;
+  font-size: 13px;
+  grid-template-areas:
+    "topbar  topbar  topbar"
+    "rail    chart   sidebar"
+    "dock    dock    dock"
+    "footer  footer  footer";
+  grid-template-columns: var(--term-rail-w) 1fr var(--term-sidebar-w);
+  grid-template-rows:
+    var(--term-toolbar-h)
+    1fr
+    var(--term-dock-h)
+    var(--term-footer-h);
+  transition: grid-template-columns var(--term-dur) var(--term-ease),
+              grid-template-rows var(--term-dur) var(--term-ease);
+}
+
+/* Collapsed sidebar — width 0, content hidden */
+.term-shell[data-sidebar="closed"] {
+  --term-sidebar-w: 0px;
+}
+
+/* Collapsed dock — just the tab strip height */
+.term-shell[data-dock="closed"] {
+  --term-dock-h: var(--term-dock-collapsed-h);
+}
+
+/* ── Topbar ── */
+.term-topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  gap: var(--term-sm, 8px);
+  padding: 0 var(--term-md, 12px);
+  background: var(--term-panel-bg);
+  border-bottom: 1px solid var(--term-border);
+  z-index: 20;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ── Left rail ── */
+.term-rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--term-sm, 8px) 0;
+  gap: var(--term-xs, 4px);
+  background: var(--term-app-bg);
+  border-right: 1px solid var(--term-divider);
+  z-index: 20;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.term-rail-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--term-xs, 4px);
+}
+
+.term-rail-divider {
+  width: 32px;
+  height: 1px;
+  background: var(--term-divider);
+  margin: 6px 0;
+  flex-shrink: 0;
+}
+
+.term-rail-spacer { flex: 1; }
+
+/* Rail item — 44px hit area, icon 24px */
+.term-rail-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--term-icon-hit);
+  height: var(--term-icon-hit);
+  background: transparent;
+  color: var(--term-text-2);
+  border: none;
+  border-radius: var(--term-r-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color var(--term-dur-fast) var(--term-ease),
+              color var(--term-dur-fast) var(--term-ease);
+}
+.term-rail-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--term-text);
+}
+.term-rail-item.is-active {
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+}
+.term-rail-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--term-accent);
+}
+
+/* ── Chart cell ── */
+.term-chart {
+  grid-area: chart;
+  display: flex;
+  flex-direction: column;
+  background: var(--term-app-bg);
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Chart strip — temporary container for indicator picker (Phase 2 removes) */
+.term-chart-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--term-panel-bg);
+  border-bottom: 1px solid var(--term-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.term-chart-canvas {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── Right sidebar ── */
+.term-sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: row;
+  background: var(--term-panel-bg);
+  border-left: 1px solid var(--term-border);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.term-sidebar-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 52px;
+  padding: 8px 0;
+  gap: 4px;
+  background: var(--term-panel-bg);
+  border-right: 1px solid var(--term-divider);
+  flex-shrink: 0;
+}
+
+.term-sidebar-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 48px;
+  height: 56px;
+  background: transparent;
+  color: var(--term-text-2);
+  border: none;
+  border-radius: var(--term-r-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color var(--term-dur-fast) var(--term-ease),
+              color var(--term-dur-fast) var(--term-ease);
+}
+.term-sidebar-tab:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--term-text);
+}
+.term-sidebar-tab.is-active {
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+}
+.term-sidebar-tab.is-active::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--term-accent);
+}
+.term-sidebar-tab-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+}
+
+.term-sidebar-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.term-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--term-border);
+  flex-shrink: 0;
+}
+
+.term-sidebar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--term-text);
+  flex: 1;
+}
+
+.term-sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── Bottom dock ── */
+.term-dock {
+  grid-area: dock;
+  display: flex;
+  flex-direction: column;
+  background: var(--term-panel-bg);
+  border-top: 1px solid var(--term-border);
+  z-index: 30;
+  overflow: hidden;
+}
+
+.term-dock-tabs {
+  display: flex;
+  align-items: stretch;
+  height: var(--term-dock-collapsed-h);
+  padding: 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--term-divider);
+}
+
+.term-dock-tab {
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  height: 100%;
+  background: transparent;
+  color: var(--term-text-2);
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color var(--term-dur-fast) var(--term-ease);
+}
+.term-dock-tab:hover {
+  color: var(--term-text);
+}
+.term-dock-tab.is-active {
+  color: var(--term-text);
+  border-bottom-color: var(--term-accent);
+}
+
+.term-dock-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding-right: 8px;
+}
+
+.term-dock-body {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+.term-dock-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--term-text-2);
+  font-size: 13px;
+}
+
+/* ── Footer (date-range navigator) ── */
+.term-footer {
+  grid-area: footer;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  background: var(--term-app-bg);
+  border-top: 1px solid var(--term-divider);
+  font-size: 11px;
+  color: var(--term-text-2);
+  z-index: 10;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.term-daterange {
+  display: flex;
+  align-items: center;
+  gap: var(--term-sm, 8px);
+  width: 100%;
+  height: 100%;
+  padding: 0 8px;
+}
+
+.term-daterange-presets {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-shrink: 0;
+}
+
+.term-daterange-btn {
+  height: 20px;
+  min-width: 30px;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--term-text-2);
+  border: none;
+  border-radius: var(--term-r-sm);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background-color var(--term-dur-fast) var(--term-ease),
+              color var(--term-dur-fast) var(--term-ease);
+}
+.term-daterange-btn:hover {
+  background: var(--term-elevated-bg);
+  color: var(--term-text);
+}
+.term-daterange-btn.is-active {
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+}
+
+.term-daterange-info {
+  display: flex;
+  align-items: center;
+  gap: var(--term-sm, 8px);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.term-daterange-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--term-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.term-daterange-meta {
+  font-size: 10px;
+  color: var(--term-text-2);
+  white-space: nowrap;
+  padding-left: var(--term-sm, 8px);
+  border-left: 1px solid var(--term-divider);
+}
+
+/* ── Command palette (Ctrl+K) ── */
+.term-cmdk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+
+.term-cmdk {
+  width: 480px;
+  max-width: 92vw;
+  max-height: 60vh;
+  background: var(--term-elevated-bg);
+  border: 1px solid var(--term-border);
+  border-radius: var(--term-r-lg);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.term-cmdk-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 44px;
+  border-bottom: 1px solid var(--term-divider);
+  flex-shrink: 0;
+}
+
+.term-cmdk-search-icon {
+  color: var(--term-text-2);
+  flex-shrink: 0;
+}
+
+.term-cmdk-input {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--term-text);
+  font-size: 14px;
+  font-family: inherit;
+}
+.term-cmdk-input::placeholder {
+  color: var(--term-text-2);
+}
+
+.term-cmdk-kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: var(--term-r-sm);
+  border: 1px solid var(--term-border);
+  background: var(--term-app-bg);
+  color: var(--term-text-2);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+.term-cmdk-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.term-cmdk-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--term-text-2);
+  font-size: 13px;
+}
+
+.term-cmdk-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0 12px;
+  height: 34px;
+  background: transparent;
+  border: none;
+  color: var(--term-text);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--term-dur-fast) var(--term-ease);
+}
+.term-cmdk-item.is-active {
+  background: var(--term-accent-tint);
+}
+.term-cmdk-item.is-active .term-cmdk-item-label {
+  color: var(--term-accent);
+}
+
+.term-cmdk-item-label {
+  flex: 1;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.term-cmdk-item-hint {
+  font-size: 11px;
+  color: var(--term-text-2);
+  flex-shrink: 0;
+}
+
+.term-cmdk-item-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--term-accent);
+  padding: 1px 6px;
+  border-radius: var(--term-r-sm);
+  background: var(--term-accent-tint);
+  flex-shrink: 0;
+}
+
+.term-cmdk-footer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px;
+  height: 32px;
+  border-top: 1px solid var(--term-divider);
+  font-size: 11px;
+  color: var(--term-text-2);
+  flex-shrink: 0;
+}
+.term-cmdk-footer kbd {
+  display: inline-block;
+  padding: 0 4px;
+  margin-right: 2px;
+  border-radius: 2px;
+  border: 1px solid var(--term-border);
+  background: var(--term-app-bg);
+  font-size: 10px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+/* ── Shared controls ── */
+
+/* Brand wordmark */
+.term-brand {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--term-accent);
+  margin-right: 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* Toolbar divider */
+.term-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--term-divider);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* Toolbar button (ghost) */
+.term-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--term-text);
+  border: none;
+  border-radius: var(--term-r-md);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color var(--term-dur-fast) var(--term-ease);
+}
+.term-btn:hover {
+  background: var(--term-elevated-bg);
+}
+.term-btn.is-active {
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+}
+
+/* Icon button */
+.term-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  color: var(--term-text-2);
+  border: none;
+  border-radius: var(--term-r-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color var(--term-dur-fast) var(--term-ease),
+              color var(--term-dur-fast) var(--term-ease);
+}
+.term-icon-btn:hover {
+  background: var(--term-elevated-bg);
+  color: var(--term-text);
+}
+.term-icon-btn.is-active {
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+}
+
+/* Period segmented buttons */
+.term-period-group {
+  display: flex;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.term-period-btn {
+  height: 28px;
+  padding: 0 8px;
+  background: transparent;
+  color: var(--term-text-2);
+  border: none;
+  border-radius: var(--term-r-sm);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color var(--term-dur-fast) var(--term-ease),
+              color var(--term-dur-fast) var(--term-ease);
+}
+.term-period-btn:hover {
+  color: var(--term-text);
+}
+.term-period-btn.is-active {
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+  font-weight: 600;
+}
+
+/* Symbol select (temporary — Phase 2 replaces with SymbolSearchModal trigger) */
+.term-symbol-select {
+  height: 30px;
+  padding: 0 8px;
+  background: var(--term-elevated-bg);
+  color: var(--term-text);
+  border: 1px solid var(--term-border);
+  border-radius: var(--term-r-md);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  flex-shrink: 0;
+}
+.term-symbol-select:focus {
+  border-color: var(--term-accent);
+}
+
+/* Source badge */
+.term-source-badge {
+  padding: 2px 8px;
+  border-radius: var(--term-r-md);
+  border: 1px solid var(--term-accent);
+  background: var(--term-accent-tint);
+  color: var(--term-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* Error badge */
+.term-error-badge {
+  padding: 2px 8px;
+  border-radius: var(--term-r-md);
+  border: 1px solid var(--term-down);
+  background: rgba(239, 83, 80, 0.12);
+  color: var(--term-down);
+  font-size: 11px;
+  font-weight: 600;
+  max-width: 460px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+/* Chip (indicator picker) */
+.term-chip {
+  padding: 2px 8px;
+  border-radius: var(--term-r-sm);
+  border: 1px solid var(--term-border);
+  background: transparent;
+  color: var(--term-text-2);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  transition: all var(--term-dur-fast) var(--term-ease);
+}
+.term-chip:hover {
+  color: var(--term-text);
+  border-color: var(--term-text-2);
+}
+.term-chip.is-active {
+  border-color: var(--term-up);
+  background: rgba(38, 166, 154, 0.12);
+  color: var(--term-up);
+}
+.term-chip.is-active.is-overlay {
+  border-color: var(--term-warning);
+  background: rgba(249, 147, 26, 0.12);
+  color: var(--term-warning);
+}
+
+/* Chip label (category) */
+.term-chip-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--term-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+/* Spacer */
+.term-spacer { flex: 1; }
+
+/* Placeholder text */
+.term-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--term-text-2);
+  font-size: 13px;
+  padding: 16px;
+  text-align: center;
+}
+
+/* Responsive — below 1100px, collapse sidebar by default */
+@media (max-width: 1100px) {
+  .term-shell:not([data-sidebar="open"]) {
+    --term-sidebar-w: 0px;
+  }
+}

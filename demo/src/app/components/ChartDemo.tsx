@@ -11,7 +11,9 @@ import {
   type DatafeedErrorDetail,
   type SymbolInfo,
   type Period,
+  type CandleData,
 } from 'astroneum'
+import { AlertManager } from 'astroneum'
 
 interface IndicatorDef {
   name: string
@@ -28,7 +30,7 @@ const PERIODS: Period[] = [
   { multiplier: 1, timespan: 'week', text: 'W' },
 ]
 
-const LIVE_EXCHANGES = new Set(['BINANCE', 'BITGET', 'OKX'])
+const LIVE_EXCHANGES = new Set(['BINANCE', 'BINANCE_SPOT', 'BITGET', 'OKX'])
 
 // ---------------------------------------------------------------------------
 // Indicator catalogue — organised by category for the demo picker
@@ -267,6 +269,12 @@ export default function ChartDemo() {
   const [activeSubIndicators, setActiveSubIndicators] = useState<string[]>(['VOL'])
   const [activeMainIndicators, setActiveMainIndicators] = useState<string[]>(['EMA'])
   const [datafeedError, setDatafeedError] = useState<string | null>(null)
+  const [showAlertDialog, setShowAlertDialog] = useState(false)
+  const [jsActive, setJsActive] = useState(false)
+  const lastPriceRef = useRef<number>(0)
+
+  useEffect(() => { setJsActive(true) }, []
+)
 
   const sourceBadgeText = LIVE_EXCHANGES.has(String(symbol.exchange))
     ? `${String(symbol.exchange)} live feed`
@@ -288,7 +296,25 @@ export default function ChartDemo() {
     setTheme(t => (t === 'dark' ? 'light' : 'dark'))
   }, [])
 
-  const datafeed = useMemo(() => createStandardCryptoDatafeed({ smoothingDuration: 320 }), [])
+  
+
+const datafeed = useMemo(() => {
+    const base = createStandardCryptoDatafeed({ smoothingDuration: 320 })
+    const origSubscribe = base.subscribe.bind(base)
+    base.subscribe = (symbol, period, callback) => {
+      const wrapped = (data: CandleData) => {
+        lastPriceRef.current = data.close
+        AlertManager.getInstance().check({
+          symbol: symbol.ticker,
+          price: data.close,
+          timestamp: data.timestamp as number,
+        })
+        callback(data)
+      }
+      origSubscribe(symbol, period, wrapped)
+    }
+    return base
+  }, [])
 
 
 
@@ -371,6 +397,16 @@ export default function ChartDemo() {
         </div>
 
         <div style={css.spacer} />
+        <button
+          style={{
+            padding: '4px 12px', borderRadius: 6, border: '1px solid #2962ff',
+            background: '#1f3a5f', color: '#58a6ff', fontSize: 12, fontWeight: 600,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+          }}
+          onClick={() => setShowAlertDialog(true)}
+        >
+          {jsActive ? "✅ JS OK" : "❌ NO JS"} 🔔 Create alert
+        </button>
         <button style={css.badge(theme === 'dark')} onClick={toggleTheme}>
           {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
         </button>
@@ -468,11 +504,33 @@ export default function ChartDemo() {
           datafeed={datafeed}
           theme={theme}
           drawingBarVisible
+          initialHistory="all"
           mainIndicators={mainIndicatorDefsFinal}
           subIndicators={subIndicatorChips}
           style={{ width: '100%', height: '100%' }}
         />
       </div>
+      {showAlertDialog && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAlertDialog(false)}>
+          <div style={{ background: '#1d2026', border: '1px solid #2962ff', borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', color: '#d1d4dc', fontFamily: '-apple-system, sans-serif' }} onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 15, color: '#8a8f9c', marginBottom: 12 }}>v3-audit • Create alert on <b style={{ color: '#2962ff' }}>{symbol.ticker}</b></div>
+            <div style={{ fontSize: 13, color: '#8a8f9c', marginBottom: 16 }}>Price: {lastPriceRef.current || 'no ticks yet'}</div>
+            <label style={{ fontSize: 12, color: '#8a8f9c', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Condition</label>
+            <select style={{ width: '100%', padding: 8, background: '#16181d', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, marginBottom: 16 }}>
+              <option>Greater Than</option>
+              <option>Less Than</option>
+              <option>Crossing Up</option>
+              <option>Crossing Down</option>
+            </select>
+            <label style={{ fontSize: 12, color: '#8a8f9c', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Price</label>
+            <input type="text" defaultValue={String(lastPriceRef.current || '')} placeholder="0" style={{ width: '100%', padding: 8, background: '#16181d', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, marginBottom: 16 }} />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+              <button onClick={() => setShowAlertDialog(false)} style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => { try { const mgr = AlertManager.getInstance(); mgr.add({ symbol: symbol.ticker, condition: 'crosses_above', price: lastPriceRef.current || 0, frequency: 'once', soundEnabled: true, notificationEnabled: true }); alert('Alert created!'); setShowAlertDialog(false) } catch(err) { alert('Error: ' + String(err)) } }} style={{ padding: '8px 20px', background: '#2962ff', border: 'none', borderRadius: 6, color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Create</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

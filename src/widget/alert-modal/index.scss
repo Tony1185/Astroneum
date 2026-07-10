@@ -2,29 +2,31 @@
   padding: 0 0 4px;
 
   .astroneum-alert-modal-tabs {
-    display: flex;
-    gap: 8px;
+    display: inline-flex;
+    gap: 2px;
     margin-bottom: 16px;
-    border-bottom: 1px solid var(--astroneum-border-color);
-    padding-bottom: 8px;
+    padding: 2px;
+    background: var(--astroneum-hover-background-color);
+    border-radius: 6px;
 
     .tab-btn {
-      background: none;
+      background: transparent;
       border: none;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--astroneum-text-second-color);
-      padding: 4px 8px;
+      padding: 4px 14px;
       border-radius: 4px;
       transition: color 0.15s, background-color 0.15s;
+      font-weight: 500;
 
       &.active {
-        color: var(--astroneum-primary-color);
+        color: var(--astroneum-text-color);
         font-weight: 600;
+        background-color: var(--astroneum-surface-elevated-color, #2a2e39);
       }
 
-      &:hover {
-        background-color: var(--astroneum-hover-background-color);
+      &:hover:not(.active) {
         color: var(--astroneum-text-color);
       }
     }
@@ -71,8 +73,67 @@
     }
 
     .alert-price-input,
-    .alert-note-input {
+    .alert-note-input,
+    .alert-email-input {
       width: 100%;
+    }
+
+    .alert-dropdown {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid var(--astroneum-border-color);
+      border-radius: 4px;
+      background: var(--astroneum-hover-background-color);
+      color: var(--astroneum-text-color);
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+
+      &:hover {
+        border-color: var(--astroneum-primary-color);
+      }
+
+      .caret {
+        color: var(--astroneum-text-second-color);
+      }
+    }
+
+    .alert-dropdown-block {
+      width: 100%;
+    }
+
+    .alert-message-textarea {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid var(--astroneum-border-color);
+      border-radius: 4px;
+      background: var(--astroneum-hover-background-color);
+      color: var(--astroneum-text-color);
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      min-height: 54px;
+      line-height: 1.4;
+      transition: border-color 0.15s;
+
+      &:focus {
+        border-color: var(--astroneum-primary-color);
+      }
+
+      &::placeholder {
+        color: var(--astroneum-text-second-color);
+      }
+    }
+
+    .alert-message-hint {
+      font-size: 11px;
+      color: var(--astroneum-text-second-color);
+      margin-top: -2px;
+      font-feature-settings: 'tnum' 1;
     }
 
     .alert-submit-btn {
@@ -86,13 +147,97 @@
     }
   }
 
+  /* Notifications sub-view */
+  .alert-notifications {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .alert-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--astroneum-text-second-color);
+      font-size: 12px;
+      padding: 0;
+      border-radius: 3px;
+
+      &:hover {
+        color: var(--astroneum-text-color);
+      }
+    }
+
+    .alert-notif-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .alert-notif-label {
+      font-size: 12px;
+      color: var(--astroneum-text-color);
+    }
+
+    .alert-notif-desc {
+      font-size: 11px;
+      color: var(--astroneum-text-second-color);
+      margin-left: 22px;
+    }
+
+    .alert-notif-expander {
+      margin: 6px 0 0 22px;
+    }
+
+    .alert-sound-selects {
+      display: flex;
+      gap: 6px;
+
+      .alert-dropdown {
+        width: auto;
+      }
+    }
+
+    .alert-webhook-url {
+      width: 100%;
+
+      &.alert-webhook-url-invalid {
+        border-color: #ef5350;
+      }
+      &.alert-webhook-url-valid {
+        border-color: var(--astroneum-border-color);
+      }
+    }
+
+    .alert-webhook-validation {
+      font-size: 11px;
+      margin-top: 4px;
+
+      &.alert-webhook-validation-valid { color: #26a69a; }
+      &.alert-webhook-validation-invalid { color: #ef5350; }
+    }
+
+    .alert-separator {
+      height: 1px;
+      background: var(--astroneum-border-color);
+      margin: 4px 0;
+    }
+
+    .alert-apply-btn {
+      align-self: flex-end;
+      margin-top: 4px;
+    }
+  }
+
   .alert-section-label {
     font-size: 12px;
     font-weight: 600;
     color: var(--astroneum-text-second-color);
     margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    text-transform: none;
+    letter-spacing: normal;
   }
 
   .astroneum-alert-modal-list {
@@ -141,6 +286,16 @@
         color: var(--astroneum-text-second-color);
       }
 
+      .alert-webhook-badge {
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-weight: 600;
+        white-space: nowrap;
+        flex-shrink: 0;
+        font-feature-settings: 'tnum' 1;
+      }
+
       .alert-price {
         font-family: 'Trebuchet MS', monospace;
         font-size: 13px;
@@ -176,6 +331,218 @@
         padding: 0 4px;
         flex-shrink: 0;
         border-radius: 3px;
+
+        &:hover {
+          color: var(--astroneum-text-color);
+          background-color: var(--astroneum-hover-background-color);
+        }
+      }
+    }
+  }
+
+  /* Alert Log panel — mirrors TradingView alert log */
+  .alert-log {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .alert-log-subheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    min-height: 24px;
+
+    .alert-log-subheader-left,
+    .alert-log-subheader-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .alert-log-clear-btn,
+    .alert-log-actions-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--astroneum-text-second-color);
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s, background-color 0.15s;
+
+      &:hover {
+        color: var(--astroneum-text-color);
+        background-color: var(--astroneum-hover-background-color);
+      }
+    }
+  }
+
+  .alert-log-list {
+    max-height: 340px;
+    overflow-y: auto;
+  }
+
+  .alert-log-date-group {
+    .alert-log-date-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--astroneum-text-second-color);
+      padding: 8px 0 4px;
+      position: sticky;
+      top: 0;
+      background: var(--astroneum-bg-color, #131722);
+      z-index: 1;
+    }
+  }
+
+  .alert-log-item {
+    position: relative;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--astroneum-border-color);
+    cursor: default;
+    transition: background-color 0.12s;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: var(--astroneum-hover-background-color);
+
+      .alert-log-item-overlay {
+        opacity: 1;
+      }
+    }
+
+    .alert-log-item-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--astroneum-text-color);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .alert-log-item-message {
+      font-size: 11px;
+      font-family: ui-monospace, 'SF Mono', Menlo, 'Cascadia Code', monospace;
+      color: var(--astroneum-text-second-color);
+      white-space: pre-wrap;
+      word-break: break-all;
+      line-height: 1.35;
+      max-height: 60px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+
+    .alert-log-item-attrs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+
+      .alert-log-item-symbol-letter,
+      .alert-log-item-logo {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .alert-log-item-symbol-letter {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--astroneum-hover-background-color);
+        color: var(--astroneum-text-second-color);
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .alert-log-item-logo {
+        object-fit: contain;
+      }
+
+      .alert-log-item-ticker {
+        font-size: 11px;
+        color: var(--astroneum-text-second-color);
+        font-weight: 500;
+      }
+
+      .alert-log-item-time {
+        font-size: 11px;
+        color: var(--astroneum-text-second-color);
+        font-feature-settings: 'tnum' 1;
+      }
+    }
+
+    .alert-log-webhook-status {
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      margin-top: 4px;
+
+      .alert-log-webhook-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+      }
+
+      .alert-log-webhook-text {
+        font-size: 11px;
+        line-height: 1.35;
+        color: var(--astroneum-text-second-color);
+
+        .alert-log-learn-more {
+          color: var(--astroneum-primary-color);
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      &.alert-log-webhook-delivered .alert-log-webhook-text {
+        color: #26a69a;
+      }
+
+      &.alert-log-webhook-failed .alert-log-webhook-text {
+        color: #ef5350;
+      }
+
+      &.alert-log-webhook-pending .alert-log-webhook-text {
+        color: #f89d3e;
+      }
+    }
+
+    .alert-log-item-overlay {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      display: flex;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity 0.12s;
+
+      .alert-log-item-delete {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--astroneum-text-second-color);
+        padding: 4px;
+        border-radius: 4px;
+        transition: color 0.12s, background-color 0.12s;
 
         &:hover {
           color: var(--astroneum-text-color);
