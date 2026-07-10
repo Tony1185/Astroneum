@@ -10,4 +10,7 @@ export type {
   AlertCreate,
   AlertCheckInput,
   AlertTriggeredCallback,
+  SoundTitle,
+  SoundDuration,
+  NotificationSchedule,
 } from '../chart/AlertManager'

@@ -132,7 +132,7 @@ export type {
 export type { MultiChartCount, MultiChartSlot, MultiChartLayoutOptions } from './chart/MultiChartLayout'
 export type { BarReplayOptions, BarReplayState } from './chart/BarReplay'
 export type { OverlayStylePreset, DrawingStyleTemplate } from './chart/DrawingTemplates'
-export type { Alert, AlertCondition, AlertStatus, AlertFrequency, AlertCreate, AlertCheckInput, AlertTriggeredCallback } from './chart/AlertManager'
+export type { Alert, AlertCondition, AlertStatus, AlertFrequency, AlertCreate, AlertCheckInput, AlertTriggeredCallback, SoundTitle, SoundDuration, NotificationSchedule } from './chart/AlertManager'
 export type { FormatPriceOptions, DateFormatStyle, TimeFormatStyle } from './i18n/format'
 export type { CompiledIndicator, StudyOptions, PlotOptions, InputOptions } from './scripting/ScriptEngine'
 export type { Watchlist, WatchSymbol } from './chart/WatchlistManager'
