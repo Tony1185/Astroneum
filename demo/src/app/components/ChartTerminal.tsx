@@ -443,7 +443,7 @@ export default function ChartTerminal() {
   }, [])
 
   const handleReplayBars = useCallback((bars: CandleData[]) => {
-    chartRef.current?.setData(bars)
+    chartRef.current?.resetData()
   }, [])
 
   const togglePattern = useCallback((index: number) => {
