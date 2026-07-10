@@ -38,9 +38,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
           registry-url: https://registry.npmjs.org/
+
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Determine bump type
         id: bump
@@ -84,9 +87,7 @@ jobs:
           echo "dist_tag=$DIST_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Publish package
-        run: pnpm publish --no-git-checks --access public --tag "${{ steps.npm_tag.outputs.dist_tag }}" --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --tag "${{ steps.npm_tag.outputs.dist_tag }}" --provenance
 
       - name: Commit and tag
         run: |

@@ -2,9 +2,9 @@
 
 import './panels.css'
 import { useState, useCallback } from 'react'
-import { ScriptEngine } from 'astroneum/script'
+import { ScriptEngine } from '@tony1185/astroneum/script'
 
-const PLACEHOLDER = `// Astroneum Pine — JavaScript indicator
+const PLACEHOLDER = `// Astroneum Pine â€” JavaScript indicator
 // Available: ta.sma, ta.ema, ta.rsi, ta.macd, ta.bbands, ...
 
 study('My SMA', { overlay: true })
@@ -65,7 +65,7 @@ export function StrategyTesterPanel() {
   return (
     <div className="term-strategy">
       <div className="term-strategy-empty">
-        <div className="term-strategy-empty-icon">📊</div>
+        <div className="term-strategy-empty-icon">ðŸ“Š</div>
         <div className="term-strategy-empty-text">No strategy running</div>
         <div className="term-strategy-empty-hint">
           Write a strategy() in the Pine Editor and add it to the chart to see backtest results here
@@ -79,7 +79,7 @@ export function TradingPanel() {
   return (
     <div className="term-trading">
       <div className="term-trading-empty">
-        <div className="term-trading-empty-icon">💼</div>
+        <div className="term-trading-empty-icon">ðŸ’¼</div>
         <div className="term-trading-empty-text">No broker connected</div>
         <div className="term-trading-empty-hint">
           Connect a broker to place orders and track positions from the terminal

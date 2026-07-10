@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, type RefObject } from 'react'
-import { ChartTemplateManager, type AstroneumHandle } from 'astroneum'
+import { ChartTemplateManager, type AstroneumHandle } from '@tony1185/astroneum'
 
 interface SaveLoadMenuProps {
   chartRef: RefObject<AstroneumHandle | null>
@@ -90,7 +90,7 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
       {open && (
         <div className="term-menu" role="menu">
           <button type="button" className="term-menu-item" role="menuitem" onClick={save}>
-            Save as…
+            Save asâ€¦
           </button>
           <button type="button" className="term-menu-item" role="menuitem" onClick={clearChart}>
             Clear drawings
@@ -116,7 +116,7 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
                     aria-label={`Delete ${n}`}
                     onClick={() => remove(n)}
                   >
-                    ×
+                    Ã—
                   </button>
                 </div>
               ))}

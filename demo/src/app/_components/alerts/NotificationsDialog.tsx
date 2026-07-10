@@ -1,7 +1,7 @@
 'use client'
 
 import type { NotificationConfig } from './AlertDialog'
-import type { SoundTitle, SoundDuration, NotificationSchedule } from 'astroneum'
+import type { SoundTitle, SoundDuration, NotificationSchedule } from '@tony1185/astroneum'
 import './alert-dialog.css'
 
 const SOUND_TITLES: SoundTitle[] = ['Thin', 'Classic', 'Alert', 'Bell', 'Chime']
@@ -9,7 +9,7 @@ const SOUND_DURATIONS: SoundDuration[] = ['once', 'repeating']
 const SCHEDULE_PRESETS: { value: NotificationSchedule['preset']; label: string }[] = [
   { value: '24/7', label: '24/7' },
   { value: 'weekdays', label: 'Weekdays' },
-  { value: 'working_hours', label: 'Working hours (Mon–Fri 09:00–18:00)' },
+  { value: 'working_hours', label: 'Working hours (Monâ€“Fri 09:00â€“18:00)' },
   { value: 'custom', label: 'Custom' },
 ]
 
@@ -118,7 +118,7 @@ export default function NotificationsDialog({ config, onChange, onBack, onClose 
             <HintLink href="https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/" title="Learn more about webhooks" />
           </div>
           <div className="ad-notif-desc">
-            Sends a POST request to your URL when the alert triggers. The alert message is sent as the body — use JSON for <code>application/json</code> content-type.
+            Sends a POST request to your URL when the alert triggers. The alert message is sent as the body â€” use JSON for <code>application/json</code> content-type.
           </div>
           <div className="ad-notif-expander">
             <input
@@ -133,7 +133,7 @@ export default function NotificationsDialog({ config, onChange, onBack, onClose 
             />
             {urlTone === 'invalid' && (
               <div className="ad-webhook-validation ad-webhook-validation-invalid">
-                Invalid URL — use http(s)://, no private or localhost hosts
+                Invalid URL â€” use http(s)://, no private or localhost hosts
               </div>
             )}
             {urlTone === 'valid' && (
@@ -156,14 +156,14 @@ export default function NotificationsDialog({ config, onChange, onBack, onClose 
                 update({ soundTitle: SOUND_TITLES[(idx + 1) % SOUND_TITLES.length] })
               }}>
                 <span>{config.soundTitle}</span>
-                <span className="caret">▾</span>
+                <span className="caret">â–¾</span>
               </div>
               <div className="ad-dropdown" style={{ width: 100 }} onClick={() => {
                 const idx = SOUND_DURATIONS.indexOf(config.soundDuration)
                 update({ soundDuration: SOUND_DURATIONS[(idx + 1) % SOUND_DURATIONS.length] })
               }}>
                 <span>{config.soundDuration === 'once' ? 'Once' : 'Repeating'}</span>
-                <span className="caret">▾</span>
+                <span className="caret">â–¾</span>
               </div>
             </div>
           )}
@@ -201,7 +201,7 @@ export default function NotificationsDialog({ config, onChange, onBack, onClose 
           <div className="ad-notif-expander">
             <div className="ad-dropdown" onClick={cycleSchedule}>
               <span>{SCHEDULE_PRESETS[scheduleIdx]?.label ?? '24/7'}</span>
-              <span className="caret">▾</span>
+              <span className="caret">â–¾</span>
             </div>
           </div>
           <div className="ad-notif-desc">Notifications are muted outside this schedule.</div>

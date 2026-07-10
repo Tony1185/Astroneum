@@ -7,14 +7,14 @@ This guide shows how to extend Astroneum with custom indicators, WebGL renderers
 ## Table of Contents
 
 1. [Concepts overview](#concepts-overview)
-2. [IndicatorPlugin — typed TypeScript indicator](#indicatorplugin--typed-typescript-indicator)
+2. [IndicatorPlugin â€” typed TypeScript indicator](#indicatorplugin--typed-typescript-indicator)
    - [Simple scalar output](#simple-scalar-output)
    - [Multi-series output](#multi-series-output)
    - [Canvas 2D renderer (render2D)](#canvas-2d-renderer-render2d)
    - [WebGL2 renderer (renderGL)](#webgl2-renderer-rendergl)
-3. [ChartPlugin — per-chart lifecycle](#chartplugin--per-chart-lifecycle)
+3. [ChartPlugin â€” per-chart lifecycle](#chartplugin--per-chart-lifecycle)
 4. [Raw engine indicator (IndicatorTemplate)](#raw-engine-indicator-indicatortemplate)
-5. [ScriptEngine — runtime scripting](#scriptengine--runtime-scripting)
+5. [ScriptEngine â€” runtime scripting](#scriptengine--runtime-scripting)
 6. [Built-in indicator reference](#built-in-indicator-reference)
 7. [Full API reference](#full-api-reference)
 
@@ -31,13 +31,13 @@ This guide shows how to extend Astroneum with custom indicators, WebGL renderers
 
 ---
 
-## IndicatorPlugin — typed TypeScript indicator
+## IndicatorPlugin â€” typed TypeScript indicator
 
 ### Interface
 
 ```typescript
 interface IndicatorPlugin<TOutput> {
-  name: string               // unique registry key — used in createIndicator()
+  name: string               // unique registry key â€” used in createIndicator()
   shortName?: string         // display name in chart legend (defaults to name)
   calcParams?: number[]      // default params, overridable by user
   calc(data: CandleData[], params: number[]): TOutput[]
@@ -58,7 +58,7 @@ If WebGL2 is unavailable in the browser, `render2D` is used as fallback when ava
 Each `calc` return element maps to one candle bar. Return a plain `number` (or `null`) per bar.
 
 ```typescript
-import { registerIndicatorPlugin, type IndicatorPlugin, type CandleData } from 'astroneum'
+import { registerIndicatorPlugin, type IndicatorPlugin, type CandleData } from '@tony1185/astroneum'
 
 const spreadIndicator: IndicatorPlugin<number> = {
   name: 'SPREAD',
@@ -143,7 +143,7 @@ import {
   type IndicatorPlugin,
   type CandleData,
   type Viewport
-} from 'astroneum'
+} from '@tony1185/astroneum'
 
 interface PivotOutput {
   pivot: number | null
@@ -185,7 +185,7 @@ registerIndicatorPlugin(pivotLines)
 ```
 
 > **Important:** always call `ctx.save()` / `ctx.restore()` around your draw code.  
-> Do not clear the canvas — Astroneum composites multiple layers.
+> Do not clear the canvas â€” Astroneum composites multiple layers.
 
 ---
 
@@ -193,7 +193,7 @@ registerIndicatorPlugin(pivotLines)
 
 Use `renderGL` for high-density data, smooth anti-aliased lines, or GPU-intensive effects.
 
-Astroneum provides a stable `vbo` (vertex buffer object) that persists across frames — upload new data only when your output changes, not every frame.
+Astroneum provides a stable `vbo` (vertex buffer object) that persists across frames â€” upload new data only when your output changes, not every frame.
 
 ```typescript
 import {
@@ -201,7 +201,7 @@ import {
   type IndicatorPlugin,
   type CandleData,
   type Viewport
-} from 'astroneum'
+} from '@tony1185/astroneum'
 
 const VERT_SHADER = `#version 300 es
   in vec2 a_pos;
@@ -258,7 +258,7 @@ const smaGL: IndicatorPlugin<SMAOutput> = {
     const priceRange = vp.priceMax - vp.priceMin
     const timeRange  = vp.timeMax - vp.timeMin
 
-    // Build vertex array — one x,y pair per visible bar
+    // Build vertex array â€” one x,y pair per visible bar
     const vertices: number[] = []
     output.forEach((row, i) => {
       if (row.value === null) return
@@ -295,12 +295,12 @@ registerIndicatorPlugin(smaGL)
 
 > **Tips:**
 > - Compile shaders once and cache them outside the render function.
-> - The `vbo` is created per indicator and destroyed when the indicator is removed — never delete it manually.
+> - The `vbo` is created per indicator and destroyed when the indicator is removed â€” never delete it manually.
 > - `gl.clear()` is called by Astroneum before your pass; do not call it yourself.
 
 ---
 
-## ChartPlugin — per-chart lifecycle
+## ChartPlugin â€” per-chart lifecycle
 
 Use `ChartPlugin` when you want to:
 - Bundle one or more indicators that auto-create when a chart mounts
@@ -312,7 +312,7 @@ import {
   type ChartPlugin,
   type ChartPluginContext,
   type IndicatorPlugin
-} from 'astroneum'
+} from '@tony1185/astroneum'
 
 const vwapIndicator: IndicatorPlugin<number | null> = {
   name: 'VWAP',
@@ -336,7 +336,7 @@ const vwapPlugin: ChartPlugin = {
   onInit({ chart }: ChartPluginContext) {
     chart.createIndicator('VWAP', true)   // true = overlay on main pane
 
-    // Return a disposer — called when the chart unmounts
+    // Return a disposer â€” called when the chart unmounts
     return () => {
       chart.removeIndicator({ name: 'VWAP' })
     }
@@ -369,11 +369,11 @@ Multiple plugins are supported and executed in order. Disposers run in **reverse
 
 ## Raw engine indicator (IndicatorTemplate)
 
-For full control — custom figure types, tooltip labels, drawing primitives — use `registerIndicator` directly.
+For full control â€” custom figure types, tooltip labels, drawing primitives â€” use `registerIndicator` directly.
 
 ```typescript
-import { registerIndicator, type CandleData } from 'astroneum'
-import type { IndicatorTemplate } from 'astroneum'  // re-exported from engine
+import { registerIndicator, type CandleData } from '@tony1185/astroneum'
+import type { IndicatorTemplate } from '@tony1185/astroneum'  // re-exported from engine
 
 const myTemplate: IndicatorTemplate = {
   name: 'MY_INDICATOR',
@@ -401,14 +401,14 @@ registerIndicator(myTemplate)
 
 ---
 
-## ScriptEngine — runtime scripting
+## ScriptEngine â€” runtime scripting
 
 `ScriptEngine` lets end-users write Pine-Script-inspired indicator logic in plain JavaScript without a build step. Scripts run in a strict sandbox with no access to `window`, `document`, `fetch`, or `eval`.
 
 ### Usage
 
 ```typescript
-import { ScriptEngine, AstroneumChart } from 'astroneum'
+import { ScriptEngine, AstroneumChart } from '@tony1185/astroneum'
 
 const engine = ScriptEngine.getInstance()
 
@@ -475,7 +475,7 @@ Inside a script the following arrays are automatically available, each with one 
 | `close` | Close prices |
 | `volume` | Volume values |
 
-#### `ta` — technical analysis helpers
+#### `ta` â€” technical analysis helpers
 
 | Function | Signature | Description |
 |---|---|---|
@@ -484,18 +484,18 @@ Inside a script the following arrays are automatically available, each with one 
 | `ta.rma` | `(src, len)` | Wilder's moving average (used in RSI) |
 | `ta.wma` | `(src, len)` | Weighted moving average |
 | `ta.rsi` | `(src, len)` | Relative Strength Index |
-| `ta.bbands` | `(src, len, mult?)` | Bollinger Bands → `{ upper, middle, lower }` |
-| `ta.macd` | `(src, fast?, slow?, signal?)` | MACD → `{ macd, signal, histogram }` |
+| `ta.bbands` | `(src, len, mult?)` | Bollinger Bands â†’ `{ upper, middle, lower }` |
+| `ta.macd` | `(src, fast?, slow?, signal?)` | MACD â†’ `{ macd, signal, histogram }` |
 | `ta.highest` | `(src, len)` | Rolling maximum |
 | `ta.lowest` | `(src, len)` | Rolling minimum |
 | `ta.stdev` | `(src, len)` | Rolling standard deviation |
-| `ta.cross` | `(a, b)` | Cross in either direction → `boolean[]` |
-| `ta.crossover` | `(a, b)` | Cross upward → `boolean[]` |
-| `ta.crossunder` | `(a, b)` | Cross downward → `boolean[]` |
+| `ta.cross` | `(a, b)` | Cross in either direction â†’ `boolean[]` |
+| `ta.crossover` | `(a, b)` | Cross upward â†’ `boolean[]` |
+| `ta.crossunder` | `(a, b)` | Cross downward â†’ `boolean[]` |
 
 `math` is also available as an alias for `Math`.
 
-### Complete script example — MACD
+### Complete script example â€” MACD
 
 ```javascript
 study('MACD', { overlay: false })

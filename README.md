@@ -1,6 +1,6 @@
 # Astroneum
 
-Professional financial charting library for React applications — now with
+Professional financial charting library for React applications â€” now with
 TradingView-class features, zero licensing fees, and MIT license.
 
 [![npm version](https://img.shields.io/npm/v/astroneum?label=npm)](https://www.npmjs.com/package/astroneum)
@@ -10,64 +10,64 @@ TradingView-class features, zero licensing fees, and MIT license.
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
-![Astroneum chart — dark theme with EMA, MACD, RSI and volume indicators](screenshort-1.png)
+![Astroneum chart â€” dark theme with EMA, MACD, RSI and volume indicators](screenshort-1.png)
 
-![Astroneum chart — dark theme with multi-pane indicators](screenshort-2.png)
+![Astroneum chart â€” dark theme with multi-pane indicators](screenshort-2.png)
 
 ## Features
 
 ### Chart Types
-- **Candlestick, OHLC, bar, area, line, Heikin-Ashi** — rendered via Canvas2D / WebGL2 with GPU acceleration
-- **Non-time-based bars** — Renko, Kagi, Tick, Range, and Point & Figure generators
+- **Candlestick, OHLC, bar, area, line, Heikin-Ashi** â€” rendered via Canvas2D / WebGL2 with GPU acceleration
+- **Non-time-based bars** â€” Renko, Kagi, Tick, Range, and Point & Figure generators
 - **Multi-chart grid** (2/4/8/16 panes) and **multi-period stacked layout** (e.g. 4H + 1H + 15m)
 
 ### Indicators & Analysis
-- **28 built-in indicators** — SMA, EMA, MACD, RSI, KDJ, Bollinger Bands, TRIX, SAR, and more
-- **Volume Profile** — horizontal histogram with POC, Value Area, and price-level bucketing
-- **ZigZag + auto pattern detection** — swing highs/lows, support/resistance clustering
-- **Depth of Market** — bid/ask volume ladder visualization
-- **Compare/Overlay** — second symbol normalized to percentage on same pane
-- **Multi-timeframe indicators** — resample any TF, forward-fill to lower TF bars
+- **28 built-in indicators** â€” SMA, EMA, MACD, RSI, KDJ, Bollinger Bands, TRIX, SAR, and more
+- **Volume Profile** â€” horizontal histogram with POC, Value Area, and price-level bucketing
+- **ZigZag + auto pattern detection** â€” swing highs/lows, support/resistance clustering
+- **Depth of Market** â€” bid/ask volume ladder visualization
+- **Compare/Overlay** â€” second symbol normalized to percentage on same pane
+- **Multi-timeframe indicators** â€” resample any TF, forward-fill to lower TF bars
 - **Custom indicator plugins** via `registerIndicatorPlugin()` with Canvas2D or WebGL2 render path
-- **Script editor** — sandboxed Pine-Script–inspired JS environment for custom indicators
+- **Script editor** â€” sandboxed Pine-Scriptâ€“inspired JS environment for custom indicators
 
 ### Drawing Tools
-- **18 drawing tools** — trend lines, Fibonacci (circle, spiral, extension, segment, fan), Gann boxes, pitchforks, Elliott waves, harmonic patterns (ABCD, XABCD), and **measure/ruler tool**
-- **Magnet/Snap** — snap to bar OHLC within 8px, angle snap to 0°/30°/45°/60°/90°
+- **18 drawing tools** â€” trend lines, Fibonacci (circle, spiral, extension, segment, fan), Gann boxes, pitchforks, Elliott waves, harmonic patterns (ABCD, XABCD), and **measure/ruler tool**
+- **Magnet/Snap** â€” snap to bar OHLC within 8px, angle snap to 0Â°/30Â°/45Â°/60Â°/90Â°
 - **Drawing style presets** (7 built-in + custom) with live preview and per-drawing color
-- **Undo/Redo** — `UndoManager` with 50-entry depth via Ctrl+Z / Ctrl+Y
-- **Copy/Paste drawings** — Ctrl+C/V across charts via clipboard
+- **Undo/Redo** â€” `UndoManager` with 50-entry depth via Ctrl+Z / Ctrl+Y
+- **Copy/Paste drawings** â€” Ctrl+C/V across charts via clipboard
 - **Lock all drawings** toggle
-- **Session visualizer** — auto session high/low/open/close lines
+- **Session visualizer** â€” auto session high/low/open/close lines
 
 ### Navigation & UX
-- **Keyboard shortcuts** — arrows pan, Page/Home/End scroll/jump, mouse wheel zoom at cursor
+- **Keyboard shortcuts** â€” arrows pan, Page/Home/End scroll/jump, mouse wheel zoom at cursor
 - **Crosshair sync** across multi-chart and multi-period layouts
-- **Price axis scaling** — linear, log, percentage, indexed-to-100
-- **Chart templates** — save/load named configurations to localStorage
-- **Accessibility** — `accessible` prop with aria-live OHLCV announcement
-- **State serialization** — full chart state persistence & recovery via `serializeState()`/`loadState()`
+- **Price axis scaling** â€” linear, log, percentage, indexed-to-100
+- **Chart templates** â€” save/load named configurations to localStorage
+- **Accessibility** â€” `accessible` prop with aria-live OHLCV announcement
+- **State serialization** â€” full chart state persistence & recovery via `serializeState()`/`loadState()`
 
 ### Data & Performance
-- **Off-main-thread indicator pool** — Web Workers + TypedArray column store
-- **OPFS historical cache** — binary bar data persisted to Origin Private File System
-- **FlatBuffers binary codec** (`BarsCodec`) — 40 bytes per bar, efficient storage & transfer
-- **TickAnimator** — smooth close/high/low interpolation at 60fps
+- **Off-main-thread indicator pool** â€” Web Workers + TypedArray column store
+- **OPFS historical cache** â€” binary bar data persisted to Origin Private File System
+- **FlatBuffers binary codec** (`BarsCodec`) â€” 40 bytes per bar, efficient storage & transfer
+- **TickAnimator** â€” smooth close/high/low interpolation at 60fps
 - **TaskScheduler** with priority queue (data > indicator > overlay)
 - **SharedArrayBuffer** ring buffer when `crossOriginIsolated`
 
 ### Datafeeds
-- **StandardCryptoDatafeed** — 100+ symbols, Binance/Bitget/OKX futures, real-time WebSocket
-- **DefaultDatafeed & WebSocketDatafeed** — Polygon.io REST + WebSocket
-- **WebTransportDatafeed** — experimental HTTP/3 QUIC support
-- **BYO datafeed** — 4-method interface (`searchSymbols`, `getHistoryData`, `subscribe`, `unsubscribe`)
+- **StandardCryptoDatafeed** â€” 100+ symbols, Binance/Bitget/OKX futures, real-time WebSocket
+- **DefaultDatafeed & WebSocketDatafeed** â€” Polygon.io REST + WebSocket
+- **WebTransportDatafeed** â€” experimental HTTP/3 QUIC support
+- **BYO datafeed** â€” 4-method interface (`searchSymbols`, `getHistoryData`, `subscribe`, `unsubscribe`)
 
 ### Developer Experience
-- **Fully typed TypeScript** — branded financial types (`Price`, `Volume`, `Timestamp`)
-- **8 tree-shakeable subpath exports** — import only what you need
-- **19 locales** — lazy-loaded on demand, dark/light/high-contrast themes
-- **SSR-safe** — `'use client'` on every entry, Next.js App Router compatible
-- **MIT license** — no usage limits, no watermark, no "Powered by" branding
+- **Fully typed TypeScript** â€” branded financial types (`Price`, `Volume`, `Timestamp`)
+- **8 tree-shakeable subpath exports** â€” import only what you need
+- **19 locales** â€” lazy-loaded on demand, dark/light/high-contrast themes
+- **SSR-safe** â€” `'use client'` on every entry, Next.js App Router compatible
+- **MIT license** â€” no usage limits, no watermark, no "Powered by" branding
 
 ---
 
@@ -77,7 +77,7 @@ TradingView-class features, zero licensing fees, and MIT license.
 npm install astroneum
 ```
 
-`react` and `react-dom` ≥ 18 are peer dependencies.
+`react` and `react-dom` â‰¥ 18 are peer dependencies.
 
 ## Quick Start
 
@@ -90,7 +90,7 @@ import {
   type AstroneumHandle,
   type Period,
   type SymbolInfo,
-} from 'astroneum'
+} from '@tony1185/astroneum'
 import 'astroneum/style.css'
 
 export default function App() {
@@ -135,37 +135,37 @@ export default function App() {
 
 ```tsx
 // Main entry
-import { AstroneumChart, DefaultDatafeed } from 'astroneum'
+import { AstroneumChart, DefaultDatafeed } from '@tony1185/astroneum'
 
 // Tree-shakeable subpaths
-import { BarReplay }            from 'astroneum/replay'
-import { MultiChartLayout }     from 'astroneum/multichart'
-import { MultiPeriodLayout }    from 'astroneum'              // same symbol, stacked periods
-import { WatchlistManager }     from 'astroneum/watchlist'
-import { PortfolioTracker }     from 'astroneum/portfolio'
-import { AlertManager }         from 'astroneum/alerts'
-import { ScriptEngine }         from 'astroneum/script'
-import { UndoManager }          from 'astroneum'
-import { ChartTemplateManager } from 'astroneum'
-import { SessionVisualizer }    from 'astroneum'
+import { BarReplay }            from '@tony1185/astroneum/replay'
+import { MultiChartLayout }     from '@tony1185/astroneum/multichart'
+import { MultiPeriodLayout }    from '@tony1185/astroneum'              // same symbol, stacked periods
+import { WatchlistManager }     from '@tony1185/astroneum/watchlist'
+import { PortfolioTracker }     from '@tony1185/astroneum/portfolio'
+import { AlertManager }         from '@tony1185/astroneum/alerts'
+import { ScriptEngine }         from '@tony1185/astroneum/script'
+import { UndoManager }          from '@tony1185/astroneum'
+import { ChartTemplateManager } from '@tony1185/astroneum'
+import { SessionVisualizer }    from '@tony1185/astroneum'
 
 // Datafeeds
-import { createStandardCryptoDatafeed, STANDARD_CRYPTO_SYMBOLS } from 'astroneum/datafeeds/crypto'
-import { DefaultDatafeed, WebSocketDatafeed }                     from 'astroneum/datafeeds/polygon'
+import { createStandardCryptoDatafeed, STANDARD_CRYPTO_SYMBOLS } from '@tony1185/astroneum/datafeeds/crypto'
+import { DefaultDatafeed, WebSocketDatafeed }                     from '@tony1185/astroneum/datafeeds/polygon'
 
 // Utilities
-import { heikinAshi }                     from 'astroneum'  // OHLC → Heikin-Ashi transform
-import { zigzag, detectSupportResistance } from 'astroneum' // pattern detection
-import { resampleBars, forwardFill }      from 'astroneum'  // multi-TF resampling
+import { heikinAshi }                     from '@tony1185/astroneum'  // OHLC â†’ Heikin-Ashi transform
+import { zigzag, detectSupportResistance } from '@tony1185/astroneum' // pattern detection
+import { resampleBars, forwardFill }      from '@tony1185/astroneum'  // multi-TF resampling
 import { generateRenko, generateKagi,
          generateTickBars, generateRangeBars,
-         generatePointAndFigure }         from 'astroneum'  // non-time-based bars
-import { transformCandles, untransformPrice } from 'astroneum' // price scale transforms
+         generatePointAndFigure }         from '@tony1185/astroneum'  // non-time-based bars
+import { transformCandles, untransformPrice } from '@tony1185/astroneum' // price scale transforms
 
 // Plugins
 import { volumeProfilePlugin, domPlugin, zigzagPlugin,
-         pointAndFigurePlugin }           from 'astroneum'  // registerIndicatorPlugin(...)
-import { createCompareIndicator }         from 'astroneum'  // compare symbols overlay
+         pointAndFigurePlugin }           from '@tony1185/astroneum'  // registerIndicatorPlugin(...)
+import { createCompareIndicator }         from '@tony1185/astroneum'  // compare symbols overlay
 ```
 
 ## Browser Support
@@ -177,7 +177,7 @@ import { createCompareIndicator }         from 'astroneum'  // compare symbols o
 | Safari | 16.4+ | Full WebGL2, OPFS on 17+ |
 | iOS Safari | 16.4+ | Touch + pinch |
 
-Graceful fallback: no WebGL2 → Canvas2D, no OPFS → in-memory cache, no OffscreenCanvas → main-thread calc.
+Graceful fallback: no WebGL2 â†’ Canvas2D, no OPFS â†’ in-memory cache, no OffscreenCanvas â†’ main-thread calc.
 
 ## Next.js Usage
 
@@ -191,8 +191,8 @@ const nextConfig = { transpilePackages: ['astroneum'] }
 import 'astroneum/style.css'
 ```
 
-The library ships with `'use client'` built in — no extra directive needed.
+The library ships with `'use client'` built in â€” no extra directive needed.
 
 ## License
 
-MIT — use it anywhere, no fees, no limits, no branding requirement.
+MIT â€” use it anywhere, no fees, no limits, no branding requirement.

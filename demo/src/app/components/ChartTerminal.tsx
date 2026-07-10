@@ -19,8 +19,8 @@ import {
   type SymbolInfo,
   type Period,
   type CandleData,
-} from 'astroneum'
-import { AlertManager } from 'astroneum'
+} from '@tony1185/astroneum'
+import { AlertManager } from '@tony1185/astroneum'
 import TerminalShell, { useTerminalShell } from './TerminalShell'
 import WatchlistPanel, { AlertsPanel } from './panels/WatchlistPanel'
 import PineEditorPanel, { StrategyTesterPanel, TradingPanel, StubPanel } from './panels/PineEditorPanel'
@@ -128,7 +128,7 @@ function isOverlay(name: string): boolean {
   return OVERLAY_INDICATORS.has(name)
 }
 
-// ── Icons (inline SVG, 24px) ──
+// â”€â”€ Icons (inline SVG, 24px) â”€â”€
 const Icon = {
   Cursor: () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -195,7 +195,7 @@ const Icon = {
   ),
 }
 
-// ── Rail content (Phase 1 placeholder — Phase 3 fills with DrawingBar + toggles) ──
+// â”€â”€ Rail content (Phase 1 placeholder â€” Phase 3 fills with DrawingBar + toggles) â”€â”€
 function RailContent() {
   const [active, setActive] = useState('cursor')
   return (
@@ -230,7 +230,7 @@ function RailContent() {
   )
 }
 
-// ── Sidebar content (Phase 1 placeholder — Phase 3 fills with WatchlistWidget etc.) ──
+// â”€â”€ Sidebar content (Phase 1 placeholder â€” Phase 3 fills with WatchlistWidget etc.) â”€â”€
 const SIDEBAR_TABS = [
   { id: 'watchlist', label: 'Watchlist', icon: Icon.Watchlist },
   { id: 'details', label: 'Details', icon: Icon.Details },
@@ -252,15 +252,15 @@ function SidebarContent({ onSymbolSelect, selectedTicker, symbol, getCurrentPric
       case 'alerts':
         return <AlertsPanel symbol={symbol} getCurrentPrice={getCurrentPrice} />
       case 'details':
-        return <StubPanel title="Details" icon="ℹ" hint="Fundamentals for the active symbol — wired when a fundamentals datafeed is connected" />
+        return <StubPanel title="Details" icon="â„¹" hint="Fundamentals for the active symbol â€” wired when a fundamentals datafeed is connected" />
       case 'calendar':
-        return <StubPanel title="Calendar" icon="📅" hint="Economic calendar events — wired when an economic data feed is connected" />
+        return <StubPanel title="Calendar" icon="ðŸ“…" hint="Economic calendar events â€” wired when an economic data feed is connected" />
       case 'news':
-        return <StubPanel title="News" icon="📰" hint="News feed filtered to the active symbol — wired when a news feed is connected" />
+        return <StubPanel title="News" icon="ðŸ“°" hint="News feed filtered to the active symbol â€” wired when a news feed is connected" />
       case 'ideas':
-        return <StubPanel title="Ideas" icon="💡" hint="Published community ideas — wired when an ideas API is connected" />
+        return <StubPanel title="Ideas" icon="ðŸ’¡" hint="Published community ideas â€” wired when an ideas API is connected" />
       case 'trading':
-        return <StubPanel title="Trading" icon="💼" hint="Connect a broker to place orders and track positions" />
+        return <StubPanel title="Trading" icon="ðŸ’¼" hint="Connect a broker to place orders and track positions" />
       default:
         return null
     }
@@ -296,7 +296,7 @@ function SidebarContent({ onSymbolSelect, selectedTicker, symbol, getCurrentPric
   )
 }
 
-// ── Dock content (Phase 1 placeholder — Phase 3 fills with Pine Editor etc.) ──
+// â”€â”€ Dock content (Phase 1 placeholder â€” Phase 3 fills with Pine Editor etc.) â”€â”€
 const DOCK_TABS = ['Pine Editor', 'Strategy Tester', 'Trading Panel'] as const
 
 function DockContent({ onPineCompiled }: { onPineCompiled?: (name: string) => void }) {
@@ -351,14 +351,14 @@ function DockContent({ onPineCompiled }: { onPineCompiled?: (name: string) => vo
   )
 }
 
-// ── Chart engine bridge ──
+// â”€â”€ Chart engine bridge â”€â”€
 // <AstroneumChart> exposes AstroneumHandle, but the date-range navigator needs
 // the full engine (scrollToRealTime / zoomAtDataIndex / getVisibleRange). A
 // ChartPlugin captures it in onInit and hands it to React state. This is the
-// library-blessed extension path — no forking (see design-astroneum.md §9).
+// library-blessed extension path â€” no forking (see design-astroneum.md Â§9).
 type ChartEngine = ChartPluginContext['chart']
 
-// ── Main terminal component ──
+// â”€â”€ Main terminal component â”€â”€
 export default function ChartTerminal() {
   const chartRef = useRef<AstroneumHandle>(null)
   const symbols = STANDARD_CRYPTO_SYMBOLS
@@ -409,7 +409,7 @@ export default function ChartTerminal() {
       // Heikin-Ashi is a barStyle prop change (data transform), not a styles change
       // The chart re-renders with barStyle='heikin_ashi' via the prop below
     } else {
-      // Standard candle types are styles changes — apply via handle
+      // Standard candle types are styles changes â€” apply via handle
       chartRef.current?.setStyles({ candle: { type } as never })
     }
   }, [])
@@ -529,7 +529,7 @@ export default function ChartTerminal() {
     [mainIndicatorChips]
   )
 
-  // ── Topbar content (brand bar — the chart's own PeriodBar owns symbol/period/indicators/alert/screenshot/settings) ──
+  // â”€â”€ Topbar content (brand bar â€” the chart's own PeriodBar owns symbol/period/indicators/alert/screenshot/settings) â”€â”€
   const topbar = (
     <>
       <span className="term-brand">Astroneum</span>
@@ -630,7 +630,7 @@ export default function ChartTerminal() {
     </>
   )
 
-  // ── Chart cell — single or multi-chart depending on layout selection ──
+  // â”€â”€ Chart cell â€” single or multi-chart depending on layout selection â”€â”€
   const chartCell = (
     <div className="term-chart-canvas">
       {replayActive && layoutCount === 1 && (
@@ -652,7 +652,7 @@ export default function ChartTerminal() {
           theme={theme}
           drawingBarVisible
           initialHistory="all"
-          watermark={`${symbol.ticker} · ${period.text}`}
+          watermark={`${symbol.ticker} Â· ${period.text}`}
           barStyle={chartType === 'heikin_ashi' ? 'heikin_ashi' : 'candle'}
           mainIndicators={mainIndicatorDefsFinal}
           subIndicators={subIndicatorChips}
@@ -692,7 +692,7 @@ export default function ChartTerminal() {
     void name
   }, [])
 
-  // Ctrl+K — toggle command palette (demo-level hotkey)
+  // Ctrl+K â€” toggle command palette (demo-level hotkey)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {

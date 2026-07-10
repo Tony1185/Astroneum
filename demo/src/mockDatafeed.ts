@@ -5,7 +5,7 @@ import {
   type DatafeedErrorDetail,
   type DatafeedErrorType,
   type SymbolInfo,
-} from 'astroneum'
+} from '@tony1185/astroneum'
 
 export const MOCK_SYMBOLS: readonly SymbolInfo[] = STANDARD_CRYPTO_SYMBOLS
 

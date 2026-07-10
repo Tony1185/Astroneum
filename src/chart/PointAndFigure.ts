@@ -12,7 +12,7 @@
  * block (open=low, close=high for X, open=high, close=low for O).
  *
  * Usage:
- *   import { generatePointAndFigure } from 'astroneum'
+ *   import { generatePointAndFigure } from '@tony1185/astroneum'
  *   const pfBars = generatePointAndFigure(bars, 10, 3) // $10 box, 3-box reversal
  *   // Feed to chart as regular candles
  *
@@ -75,7 +75,7 @@ export function computePFColumns(
       const roundedPrice = Math.round(price / boxSize) * boxSize
 
       if (currentColumn === null) {
-        // First column — determine direction from first move
+        // First column â€” determine direction from first move
         if (roundedPrice > prevPrice) {
           currentColumn = { type: 'X', top: roundedPrice, bottom: prevPrice, boxes: 1, columnIndex: columns.length }
         } else if (roundedPrice < prevPrice) {
@@ -92,7 +92,7 @@ export function computePFColumns(
           currentColumn.top = roundedPrice
           currentColumn.boxes += newBoxes
         } else if (roundedPrice <= currentColumn.top - reversal * boxSize) {
-          // Reversal — start O column
+          // Reversal â€” start O column
           columns.push(currentColumn)
           const bottom = roundedPrice
           const boxes = Math.round((currentColumn.top - bottom) / boxSize)
@@ -105,7 +105,7 @@ export function computePFColumns(
           currentColumn.bottom = roundedPrice
           currentColumn.boxes += newBoxes
         } else if (roundedPrice >= currentColumn.bottom + reversal * boxSize) {
-          // Reversal — start X column
+          // Reversal â€” start X column
           columns.push(currentColumn)
           const top = roundedPrice
           const boxes = Math.round((top - currentColumn.bottom) / boxSize)
@@ -139,7 +139,7 @@ export function pfColumnsToBars(columns: PFColumn[]): CandleData[] {
       const ts = baseTimestamp + col.columnIndex * barSpacing * 2 + b * barSpacing
 
       if (col.type === 'X') {
-        // Rising — green block
+        // Rising â€” green block
         bars.push({
           timestamp: ts,
           open: boxBottom,
@@ -149,7 +149,7 @@ export function pfColumnsToBars(columns: PFColumn[]): CandleData[] {
           volume: 1,
         })
       } else {
-        // Falling — red block
+        // Falling â€” red block
         bars.push({
           timestamp: ts,
           open: boxTop,
@@ -177,7 +177,7 @@ export function generatePointAndFigure(
 }
 
 /**
- * Point & Figure IndicatorPlugin — renders true X/O grid on the chart
+ * Point & Figure IndicatorPlugin â€” renders true X/O grid on the chart
  * via Canvas2D custom render path.
  */
 export const pointAndFigurePlugin: IndicatorPlugin<number> = {
@@ -197,8 +197,8 @@ export const pointAndFigurePlugin: IndicatorPlugin<number> = {
     _output: number[],
     _viewport: Viewport
   ): void {
-    // This render path is a stub — true P&F grid rendering with
-    // X/O glyphs and 45° trend lines requires access to raw data.
+    // This render path is a stub â€” true P&F grid rendering with
+    // X/O glyphs and 45Â° trend lines requires access to raw data.
     // The generatePointAndFigure() function above provides the
     // data transform that renders P&F via standard candlesticks.
   },

@@ -6,13 +6,13 @@ import type { IndicatorPlugin, Viewport, CandleData } from '@/types'
  * Renders a ladder-style order book on the right side of the chart showing
  * cumulative bid/ask volume at each price level.
  *
- * This is a client-side approximation — a real DOM requires Level 2 market
+ * This is a client-side approximation â€” a real DOM requires Level 2 market
  * data from the exchange. This implementation uses the visible candle data
  * to visualize historical volume distribution at price levels, which is
  * useful for identifying support/resistance and liquidity zones.
  *
  * Usage:
- *   import { domPlugin } from 'astroneum'
+ *   import { domPlugin } from '@tony1185/astroneum'
  *   registerIndicatorPlugin(domPlugin)
  *   chart.createIndicator({ name: 'dom', calcParams: [20] }) // 20 price levels
  */
@@ -125,13 +125,13 @@ export const domPlugin: IndicatorPlugin<DOMLevel> = {
       const bidWidth = (row.bidVolume / maxVol) * barMaxWidth
       const askWidth = (row.askVolume / maxVol) * barMaxWidth
 
-      // Bid volume (buyers) — green
+      // Bid volume (buyers) â€” green
       if (bidWidth > 0) {
         ctx.fillStyle = 'rgba(76, 175, 80, 0.5)'
         ctx.fillRect(barX, y, bidWidth, rowHeight)
       }
 
-      // Ask volume (sellers) — red
+      // Ask volume (sellers) â€” red
       if (askWidth > 0) {
         ctx.fillStyle = 'rgba(244, 67, 54, 0.5)'
         ctx.fillRect(barX + bidWidth, y, askWidth, rowHeight)

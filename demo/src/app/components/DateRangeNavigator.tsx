@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { type ChartPluginContext } from 'astroneum'
+import { type ChartPluginContext } from '@tony1185/astroneum'
 
 type ChartEngine = ChartPluginContext['chart']
 
@@ -63,11 +63,11 @@ export default function DateRangeNavigator({ engine, symbol, timezone }: DateRan
     const from = data[fromIdx]
     const to = data[toIdx]
     if (from && to) {
-      setRangeLabel(`${formatRangeDate(from.timestamp)} → ${formatRangeDate(to.timestamp)}`)
+      setRangeLabel(`${formatRangeDate(from.timestamp)} â†’ ${formatRangeDate(to.timestamp)}`)
     }
   }, [engine])
 
-  // Live readout — re-read the visible window whenever the user scrolls or zooms.
+  // Live readout â€” re-read the visible window whenever the user scrolls or zooms.
   useEffect(() => {
     if (!engine) {
       setRangeLabel('')
@@ -128,7 +128,7 @@ export default function DateRangeNavigator({ engine, symbol, timezone }: DateRan
         {rangeLabel && (
           <span className="term-daterange-label" data-numeric>{rangeLabel}</span>
         )}
-        <span className="term-daterange-meta">{symbol} · {timezone}</span>
+        <span className="term-daterange-meta">{symbol} Â· {timezone}</span>
       </div>
     </div>
   )

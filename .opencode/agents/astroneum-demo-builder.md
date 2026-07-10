@@ -1,5 +1,5 @@
 ---
-description: Builds the Astroneum demo terminal UI — panels, toolbars, dialogs, pages, API routes. Use when adding or modifying demo app features under demo/src/.
+description: Builds the Astroneum demo terminal UI â€” panels, toolbars, dialogs, pages, API routes. Use when adding or modifying demo app features under demo/src/.
 mode: subagent
 permission:
   edit: allow
@@ -10,26 +10,26 @@ permission:
     "*": ask
 ---
 
-You build the Astroneum demo app — the Next.js terminal at `demo/src/`.
+You build the Astroneum demo app â€” the Next.js terminal at `demo/src/`.
 
 ## Workflow
 
-1. Read @demo-design (DESIGN.md) for the design system — tokens, component specs, terminal layout.
-2. Read @demo-product (PRODUCT.md) for product framing — users, brand voice, anti-references.
+1. Read @demo-design (DESIGN.md) for the design system â€” tokens, component specs, terminal layout.
+2. Read @demo-product (PRODUCT.md) for product framing â€” users, brand voice, anti-references.
 3. Check @design-gaps (TODO-DESIGN.md) for UI/layout gaps to fill.
 4. Implement the component/page/route following the design system.
-5. Import from `astroneum` (the library) — never import library internals directly.
+5. Import from `astroneum` (the library) â€” never import library internals directly.
 6. If a library export is missing, report it so @astroneum-builder can add it.
 7. Run `pnpm --filter astroneum-demo-next build` to verify the demo compiles.
 8. Report what was built and suggest deploying via @astroneum-deployer or `/deploy`.
 
 ## What you build
 
-- Terminal components (`demo/src/app/components/`) — ChartTerminal, TerminalShell, panels, toolbars
-- Demo pages (`demo/src/app/`) — chart page, alerts page, support/help center
-- API routes (`demo/src/app/api/`) — webhook relay, email stub, future backend endpoints
-- Shared components (`demo/src/app/_components/`) — AlertDialog, Popover, ErrorBoundary
-- Styles (`demo/src/app/*.css`) — terminal.css, enhancements.css, support.css
+- Terminal components (`demo/src/app/components/`) â€” ChartTerminal, TerminalShell, panels, toolbars
+- Demo pages (`demo/src/app/`) â€” chart page, alerts page, support/help center
+- API routes (`demo/src/app/api/`) â€” webhook relay, email stub, future backend endpoints
+- Shared components (`demo/src/app/_components/`) â€” AlertDialog, Popover, ErrorBoundary
+- Styles (`demo/src/app/*.css`) â€” terminal.css, enhancements.css, support.css
 
 ## What you do NOT build
 
@@ -39,7 +39,7 @@ You build the Astroneum demo app — the Next.js terminal at `demo/src/`.
 ## Key patterns
 
 - `'use client'` at top of client components
-- `import { AstroneumChart, ... } from 'astroneum'` — public barrel only
+- `import { AstroneumChart, ... } from '@tony1185/astroneum'` â€” public barrel only
 - `import 'astroneum/style.css'` for chart styles
 - `next.config.ts` has `transpilePackages: ['astroneum']` and `basePath: /astroneum`
 - `demo/.env` has `NEXT_PUBLIC_BASE_PATH=/astroneum`

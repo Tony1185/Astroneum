@@ -2,7 +2,7 @@
 
 import './enhancements.css'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { BarReplay, type BarReplayState, type CandleData, type Datafeed, type SymbolInfo, type Period } from 'astroneum'
+import { BarReplay, type BarReplayState, type CandleData, type Datafeed, type SymbolInfo, type Period } from '@tony1185/astroneum'
 
 interface ReplayToolbarProps {
   datafeed: Datafeed
@@ -123,7 +123,7 @@ export default function ReplayToolbar({ datafeed, symbol, period, onReplayBars, 
     return (
       <div className="term-replay-bar">
         <span className="term-replay-badge">Replay</span>
-        <span style={{ fontSize: 12, color: 'var(--term-text-2)' }}>Loading historical data…</span>
+        <span style={{ fontSize: 12, color: 'var(--term-text-2)' }}>Loading historical dataâ€¦</span>
       </div>
     )
   }
@@ -134,7 +134,7 @@ export default function ReplayToolbar({ datafeed, symbol, period, onReplayBars, 
     <div className="term-replay-bar">
       <span className="term-replay-badge">Replay</span>
       <span className="term-replay-date">
-        {currentBar ? formatDate(currentBar.timestamp as number) : '—'}
+        {currentBar ? formatDate(currentBar.timestamp as number) : 'â€”'}
       </span>
       <button
         className="term-replay-btn"
@@ -179,7 +179,7 @@ export default function ReplayToolbar({ datafeed, symbol, period, onReplayBars, 
       </div>
       <div className="term-dropdown" ref={speedRef}>
         <button className="term-replay-speed" onClick={() => setSpeedOpen(v => !v)}>
-          {SPEEDS[speedIdx].label} ▾
+          {SPEEDS[speedIdx].label} â–¾
         </button>
         {speedOpen && (
           <div className="term-dropdown-menu" style={{ minWidth: 80, top: 'calc(100% + 4px)', right: 0, left: 'auto' }}>

@@ -10,9 +10,9 @@
 
 | Property | Type | Required | Default | Description |
 |---|---|---|---|---|
-| `symbol` | `SymbolInfo` | ✓ | — | Symbol to display on load |
-| `period` | `Period` | ✓ | — | Initial timeframe |
-| `datafeed` | `Datafeed` | ✓ | — | Data source implementation |
+| `symbol` | `SymbolInfo` | âœ“ | â€” | Symbol to display on load |
+| `period` | `Period` | âœ“ | â€” | Initial timeframe |
+| `datafeed` | `Datafeed` | âœ“ | â€” | Data source implementation |
 | `theme` | `'light' \| 'dark'` | | `getSystemTheme()` | UI theme. Omit to auto-detect OS color scheme. |
 | `locale` | `string` | | `'en-US'` | UI locale key |
 | `timezone` | `string` | | `'Asia/Shanghai'` | IANA timezone identifier for the X-axis |
@@ -107,8 +107,8 @@ serializeState(): SerializedChartState
 loadState(state: SerializedChartState): void
 ```
 
-Capture and restore the chart's user-visible state — theme, locale,
-timezone, symbol, period, styles, indicators, and drawing overlays —
+Capture and restore the chart's user-visible state â€” theme, locale,
+timezone, symbol, period, styles, indicators, and drawing overlays â€”
 as a JSON-safe object.
 
 ```ts
@@ -164,7 +164,7 @@ Only `en-US` is bundled with the main entry. Load any other built-in
 locale on demand:
 
 ```ts
-import { loadLocale, BUILTIN_LOCALES } from 'astroneum'
+import { loadLocale, BUILTIN_LOCALES } from '@tony1185/astroneum'
 
 await loadLocale('ja-JP')
 chartRef.current?.setLocale('ja-JP')
@@ -201,12 +201,12 @@ but the root re-exports for these modules will be removed in **v1.0**
 import to be forward-compatible.
 
 ```ts
-// recommended — forward-compatible with v1.0
-import { BarReplay } from 'astroneum/replay'
-import { createStandardCryptoDatafeed } from 'astroneum/datafeeds/crypto'
+// recommended â€” forward-compatible with v1.0
+import { BarReplay } from '@tony1185/astroneum/replay'
+import { createStandardCryptoDatafeed } from '@tony1185/astroneum/datafeeds/crypto'
 
-// legacy — works today, will be removed in v1.0
-import { BarReplay, createStandardCryptoDatafeed } from 'astroneum'
+// legacy â€” works today, will be removed in v1.0
+import { BarReplay, createStandardCryptoDatafeed } from '@tony1185/astroneum'
 ```
 
 ---
@@ -216,7 +216,7 @@ import { BarReplay, createStandardCryptoDatafeed } from 'astroneum'
 ### Brand cast helpers
 
 ```typescript
-import { asPrice, asVolume, asTimestamp } from 'astroneum'
+import { asPrice, asVolume, asTimestamp } from '@tony1185/astroneum'
 
 const p: Price = asPrice(100.50)
 const v: Volume = asVolume(1_250_000)
@@ -228,10 +228,10 @@ These are type-safe cast functions. They assert that a plain `number` belongs to
 ### `rafCoalesce`
 
 ```typescript
-import { rafCoalesce } from 'astroneum'
+import { rafCoalesce } from '@tony1185/astroneum'
 
 const dispatch = rafCoalesce((tick: CandleData) => chart.updateBar(tick))
-webSocket.onmessage = e => dispatch(parse(e.data)) // safe to call 100×/s
+webSocket.onmessage = e => dispatch(parse(e.data)) // safe to call 100Ã—/s
 ```
 
 Returns a dispatcher that schedules `fn` on the next `requestAnimationFrame`, coalescing rapid calls so only the **last** value is delivered per frame. Use this when you only care about the latest state (e.g. price display). For financial accuracy across bursts, use `rafMergeTick` instead.
@@ -239,7 +239,7 @@ Returns a dispatcher that schedules `fn` on the next `requestAnimationFrame`, co
 ### `rafMergeTick`
 
 ```typescript
-import { rafMergeTick } from 'astroneum'
+import { rafMergeTick } from '@tony1185/astroneum'
 
 const cancel = rafMergeTick(incomingTick, (merged) => {
   chart.updateBar(merged)
@@ -257,8 +257,8 @@ OHLCV-aware frame coalescer for WebSocket burst handling. Merges all ticks arriv
 ### `EventBus`
 
 ```typescript
-import { EventBus } from 'astroneum'
-import type { ChartEventMap } from 'astroneum'
+import { EventBus } from '@tony1185/astroneum'
+import type { ChartEventMap } from '@tony1185/astroneum'
 
 const bus = new EventBus<ChartEventMap>()
 
@@ -272,8 +272,8 @@ Zero-dependency, type-safe synchronous event bus.
 ### `TickAnimator`
 
 ```typescript
-import { TickAnimator } from 'astroneum'
-import type { TickAnimatorOptions } from 'astroneum'
+import { TickAnimator } from '@tony1185/astroneum'
+import type { TickAnimatorOptions } from '@tony1185/astroneum'
 
 const opts: TickAnimatorOptions = { duration: 120 } // ms
 const animator = new TickAnimator(opts, (frame) => {
@@ -289,11 +289,11 @@ Smooth ease-out cubic interpolation of the last bar's `close`/`high`/`low` over 
 ### `RingBuffer`
 
 ```typescript
-import { RingBuffer } from 'astroneum'
+import { RingBuffer } from '@tony1185/astroneum'
 
 const buf = new RingBuffer<CandleData>(1000) // fixed capacity
 buf.push(candle)
-const arr = buf.toArray() // oldest → newest
+const arr = buf.toArray() // oldest â†’ newest
 ```
 
 Fixed-capacity O(1) circular buffer designed for streaming time-series data.
@@ -386,7 +386,7 @@ import type {
 
   // PerformanceMode
   PerformanceBar,
-} from 'astroneum'
+} from '@tony1185/astroneum'
 ```
 
 ### `IndicatorDef`

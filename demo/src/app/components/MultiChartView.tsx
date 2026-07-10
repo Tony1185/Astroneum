@@ -2,7 +2,7 @@
 
 import './enhancements.css'
 import { useState, useRef, useEffect } from 'react'
-import { MultiChartLayout, type MultiChartCount, type AstroneumHandle, type SymbolInfo, type Period, type Datafeed } from 'astroneum'
+import { MultiChartLayout, type MultiChartCount, type AstroneumHandle, type SymbolInfo, type Period, type Datafeed } from '@tony1185/astroneum'
 
 interface MultiChartViewProps {
   datafeed: Datafeed
@@ -56,8 +56,8 @@ interface LayoutPickerProps {
 const LAYOUT_OPTIONS: { value: MultiChartCount | 1; cols: number; rows: number; label: string }[] = [
   { value: 1, cols: 1, rows: 1, label: 'Single' },
   { value: 2, cols: 2, rows: 1, label: '2 columns' },
-  { value: 4, cols: 2, rows: 2, label: '2×2 grid' },
-  { value: 8, cols: 4, rows: 2, label: '2×4 grid' },
+  { value: 4, cols: 2, rows: 2, label: '2Ã—2 grid' },
+  { value: 8, cols: 4, rows: 2, label: '2Ã—4 grid' },
 ]
 
 function GridIcon({ cols, rows }: { cols: number; rows: number }) {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { AlertManager } from 'astroneum'
+import { AlertManager } from '@tony1185/astroneum'
 import AlertDialog from '../_components/alerts/AlertDialog'
 import '../_components/alerts/alert-dialog.css'
 
@@ -44,7 +44,7 @@ function WebhookStatusBadge({ status, httpStatus, at }: { status?: string; httpS
       ? { color: '#EF5350', bg: 'rgba(239,83,80,0.12)', border: 'rgba(239,83,80,0.40)' }
       : { color: '#F89D3E', bg: 'rgba(249,157,62,0.12)', border: 'rgba(249,157,62,0.40)' }
   const label = status === 'delivered' ? 'Delivered' : status === 'failed' ? 'Failed' : 'Sending'
-  const titleText = `Webhook ${label.toLowerCase()}${typeof httpStatus === 'number' ? ` · HTTP ${httpStatus}` : ''}${at ? ` · ${new Date(at).toLocaleString()}` : ''}`
+  const titleText = `Webhook ${label.toLowerCase()}${typeof httpStatus === 'number' ? ` Â· HTTP ${httpStatus}` : ''}${at ? ` Â· ${new Date(at).toLocaleString()}` : ''}`
   return (
     <span
       title={titleText}
@@ -54,7 +54,7 @@ function WebhookStatusBadge({ status, httpStatus, at }: { status?: string; httpS
         fontFeatureSettings: "'tnum' 1", whiteSpace: 'nowrap',
       }}
     >
-      Webhook {label}{typeof httpStatus === 'number' ? ` · ${httpStatus}` : ''}
+      Webhook {label}{typeof httpStatus === 'number' ? ` Â· ${httpStatus}` : ''}
     </span>
   )
 }
@@ -94,7 +94,7 @@ export default function AlertsPage() {
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Alert Manager</h1>
             <p style={{ fontSize: 13, color: '#8a8f9c' }}>
-              {active.length} active · {history.length} in history
+              {active.length} active Â· {history.length} in history
             </p>
           </div>
           <button
@@ -130,11 +130,11 @@ export default function AlertsPage() {
                     <WebhookStatusBadge status={a.webhookStatus} httpStatus={a.webhookHttpStatus} at={a.webhookStatusAt} />
                   )}
                   <span style={{ flex: 1 }} />
-                  {a.soundEnabled && <span style={{ fontSize: 16 }} title="Sound">🔊</span>}
-                  {a.notificationEnabled && <span style={{ fontSize: 16 }} title="App notification">📱</span>}
+                  {a.soundEnabled && <span style={{ fontSize: 16 }} title="Sound">ðŸ”Š</span>}
+                  {a.notificationEnabled && <span style={{ fontSize: 16 }} title="App notification">ðŸ“±</span>}
                   <button onClick={() => handleDelete(a.id)} style={{
                     border: 'none', background: 'transparent', color: '#8a8f9c', cursor: 'pointer', fontSize: 18,
-                  }}>×</button>
+                  }}>Ã—</button>
                 </div>
               ))}
             </div>
@@ -167,10 +167,10 @@ export default function AlertsPage() {
                   <span style={{ flex: 1 }} />
                   <button onClick={() => handleReactivate(a.id)} style={{
                     border: 'none', background: 'transparent', color: '#2962ff', cursor: 'pointer', fontSize: 14,
-                  }}>↺ Reactivate</button>
+                  }}>â†º Reactivate</button>
                   <button onClick={() => handleDelete(a.id)} style={{
                     border: 'none', background: 'transparent', color: '#8a8f9c', cursor: 'pointer', fontSize: 18,
-                  }}>×</button>
+                  }}>Ã—</button>
                 </div>
               ))}
             </div>

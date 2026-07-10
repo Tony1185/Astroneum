@@ -1,10 +1,10 @@
 import type { CandleData, IndicatorPlugin, Viewport } from '@/types'
 
 /**
- * Volume Profile indicator — horizontal histogram of volume at each price level.
+ * Volume Profile indicator â€” horizontal histogram of volume at each price level.
  *
  * Usage:
- *   import { volumeProfilePlugin } from 'astroneum'
+ *   import { volumeProfilePlugin } from '@tony1185/astroneum'
  *   registerIndicatorPlugin(volumeProfilePlugin)
  *   chart.createIndicator({ name: 'volume_profile' })
  *
@@ -15,7 +15,7 @@ import type { CandleData, IndicatorPlugin, Viewport } from '@/types'
 export interface VolumeProfileRow {
   price: number
   volume: number
-  /** Cumulative volume from top → this level */
+  /** Cumulative volume from top â†’ this level */
   cumulative: number
 }
 
@@ -133,10 +133,10 @@ export const volumeProfilePlugin: IndicatorPlugin<VolumeProfileRow> = {
         row.cumulative <= totalVol - (totalVol - vaThreshold) / 2
 
       ctx.fillStyle = row === pocRow
-        ? 'rgba(255, 235, 59, 0.7)'     // POC — amber
+        ? 'rgba(255, 235, 59, 0.7)'     // POC â€” amber
         : inValueArea
-          ? 'rgba(76, 175, 80, 0.5)'    // Value Area — green
-          : 'rgba(158, 158, 158, 0.4)'  // Outside — gray
+          ? 'rgba(76, 175, 80, 0.5)'    // Value Area â€” green
+          : 'rgba(158, 158, 158, 0.4)'  // Outside â€” gray
 
       ctx.fillRect(barX, y - 1, barWidth, Math.max(1, height / output.length - 1))
     }

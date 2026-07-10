@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
-import { STANDARD_CRYPTO_SYMBOLS, type SymbolInfo, type Period } from 'astroneum'
+import { STANDARD_CRYPTO_SYMBOLS, type SymbolInfo, type Period } from '@tony1185/astroneum'
 
 interface CommandAction {
   id: string
@@ -139,7 +139,7 @@ export default function CommandPalette({
               else if (e.key === 'Enter') { e.preventDefault(); selectItem(activeIndex) }
               else if (e.key === 'Escape') { e.preventDefault(); onClose() }
             }}
-            placeholder="Search symbols, actions…"
+            placeholder="Search symbols, actionsâ€¦"
             spellCheck={false}
           />
           <kbd className="term-cmdk-kbd">Esc</kbd>
@@ -167,8 +167,8 @@ export default function CommandPalette({
           ))}
         </div>
         <div className="term-cmdk-footer">
-          <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-          <span><kbd>↵</kbd> select</span>
+          <span><kbd>â†‘</kbd><kbd>â†“</kbd> navigate</span>
+          <span><kbd>â†µ</kbd> select</span>
           <span><kbd>Esc</kbd> close</span>
         </div>
       </div>

@@ -7,7 +7,7 @@ import type { CandleData, IndicatorPlugin, Viewport } from '@/types'
  * Patterns are grouped: single-bar, two-bar, three-bar.
  *
  * Usage:
- *   import { patternRecognitionPlugin, registerIndicatorPlugin } from 'astroneum'
+ *   import { patternRecognitionPlugin, registerIndicatorPlugin } from '@tony1185/astroneum'
  *   registerIndicatorPlugin(patternRecognitionPlugin)
  *   chart.createIndicator({ name: 'patterns', calcParams: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] })
  */
@@ -55,7 +55,7 @@ function avgBody(data: CandleData[], i: number, lookback: number): number {
   return count > 0 ? sum / count : 0
 }
 
-// ── Single-bar patterns ──
+// â”€â”€ Single-bar patterns â”€â”€
 
 function doji(data: CandleData[], i: number): PatternMatch | null {
   if (i < 0 || i >= data.length) return null
@@ -127,7 +127,7 @@ function spinningTop(data: CandleData[], i: number): PatternMatch | null {
   return null
 }
 
-// ── Two-bar patterns ──
+// â”€â”€ Two-bar patterns â”€â”€
 
 function bullishEngulfing(data: CandleData[], i: number): PatternMatch | null {
   if (i < 1 || i >= data.length) return null
@@ -191,7 +191,7 @@ function bearishHarami(data: CandleData[], i: number): PatternMatch | null {
   return null
 }
 
-// ── Three-bar patterns ──
+// â”€â”€ Three-bar patterns â”€â”€
 
 function morningStar(data: CandleData[], i: number): PatternMatch | null {
   if (i < 2 || i >= data.length) return null
@@ -243,7 +243,7 @@ function threeInsideDown(data: CandleData[], i: number): PatternMatch | null {
   return null
 }
 
-// ── Pattern catalogue ──
+// â”€â”€ Pattern catalogue â”€â”€
 
 export interface PatternDef {
   id: string

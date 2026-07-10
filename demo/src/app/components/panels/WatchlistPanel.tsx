@@ -3,7 +3,7 @@
 import './panels.css'
 import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
-import { WatchlistManager, AlertManager, type Watchlist } from 'astroneum'
+import { WatchlistManager, AlertManager, type Watchlist } from '@tony1185/astroneum'
 import AlertDialog from '../../_components/alerts/AlertDialog'
 
 const manager = WatchlistManager.getInstance()
@@ -12,8 +12,8 @@ const alertMgr = AlertManager.getInstance()
 const CONDITION_LABELS: Record<string, string> = {
   above: '>',
   below: '<',
-  crosses_above: '↗',
-  crosses_below: '↘',
+  crosses_above: 'â†—',
+  crosses_below: 'â†˜',
 }
 
 interface WatchlistPanelProps {
@@ -52,10 +52,10 @@ export default function WatchlistPanel({ onSymbolSelect, selectedTicker }: Watch
         {lists.map(list => (
           <div key={list.id} className="term-wl-group">
             <div className="term-wl-group-header" onClick={() => toggleList(list.id)}>
-              <span className={`term-wl-arrow ${expandedId === list.id ? 'expanded' : ''}`}>▶</span>
+              <span className={`term-wl-arrow ${expandedId === list.id ? 'expanded' : ''}`}>â–¶</span>
               <span className="term-wl-group-name">{list.name}</span>
               <span className="term-wl-group-count">{list.symbols.length}</span>
-              <button className="term-wl-list-btn" onClick={e => { e.stopPropagation(); manager.deleteList(list.id) }} title="Delete list">×</button>
+              <button className="term-wl-list-btn" onClick={e => { e.stopPropagation(); manager.deleteList(list.id) }} title="Delete list">Ã—</button>
             </div>
             {expandedId === list.id && (
               <div className="term-wl-symbols">
@@ -82,7 +82,7 @@ export default function WatchlistPanel({ onSymbolSelect, selectedTicker }: Watch
                         className="term-wl-remove"
                         onClick={e => { e.stopPropagation(); manager.removeSymbol(list.id, sym.ticker) }}
                         title="Remove"
-                      >×</button>
+                      >Ã—</button>
                     </div>
                   )
                 })}
@@ -162,7 +162,7 @@ export function AlertsPanel({ symbol = 'BTCUSDT', getCurrentPrice }: AlertsPanel
     return (
       <>
         <div className="term-alerts-empty">
-          <div className="term-alerts-empty-icon">🔔</div>
+          <div className="term-alerts-empty-icon">ðŸ””</div>
           <div className="term-alerts-empty-text">No alerts yet</div>
           <button
             className="term-alert-create"
@@ -208,9 +208,9 @@ export function AlertsPanel({ symbol = 'BTCUSDT', getCurrentPrice }: AlertsPanel
             </div>
             <div className="term-alert-actions">
               {alert.status === 'triggered' && (
-                <button className="term-alert-btn" onClick={() => { alertMgr.reactivate(alert.id); refresh() }} title="Reactivate">↻</button>
+                <button className="term-alert-btn" onClick={() => { alertMgr.reactivate(alert.id); refresh() }} title="Reactivate">â†»</button>
               )}
-              <button className="term-alert-btn delete" onClick={() => { alertMgr.delete(alert.id); refresh() }} title="Delete">×</button>
+              <button className="term-alert-btn delete" onClick={() => { alertMgr.delete(alert.id); refresh() }} title="Delete">Ã—</button>
             </div>
           </div>
         ))}

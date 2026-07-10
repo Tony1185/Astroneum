@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import { AlertManager, type AlertCondition, type AlertFrequency, type NotificationSchedule, type SoundTitle, type SoundDuration } from 'astroneum'
+import { AlertManager, type AlertCondition, type AlertFrequency, type NotificationSchedule, type SoundTitle, type SoundDuration } from '@tony1185/astroneum'
 import NotificationsDialog from './NotificationsDialog'
 import './alert-dialog.css'
 
@@ -97,7 +97,7 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
   const expirationLabel = formatExpiration(expiration)
 
   const defaultMessage = useMemo(() => {
-    return `${symbol} ${conditionLabel} ${price || '—'}`
+    return `${symbol} ${conditionLabel} ${price || 'â€”'}`
   }, [symbol, conditionLabel, price])
 
   const [message, setMessage] = useState(defaultMessage)
@@ -193,7 +193,7 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
             <div className="ad-condition-row">
               <div className="ad-dropdown ad-condition-select">
                 <span className="ad-dropdown-label">Price</span>
-                <span className="caret">▾</span>
+                <span className="caret">â–¾</span>
               </div>
               <div className="ad-dropdown ad-operator" onClick={() => {
                 const idx = CONDITIONS.findIndex(c => c.value === condition)
@@ -205,13 +205,13 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
                   </svg>
                   {conditionLabel}
                 </span>
-                <span className="caret">▾</span>
+                <span className="caret">â–¾</span>
               </div>
             </div>
             <div className="ad-bands">
               <div className="ad-dropdown ad-bands-select">
                 <span>Value</span>
-                <span className="caret">▾</span>
+                <span className="caret">â–¾</span>
               </div>
               <div className="ad-number-input">
                 <input
@@ -221,8 +221,8 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
                   placeholder={currentPrice ? String(currentPrice) : '0'}
                 />
                 <div className="ad-steppers">
-                  <button className="ad-stepper" onClick={() => adjustPrice(1)}>▲</button>
-                  <button className="ad-stepper" onClick={() => adjustPrice(-1)}>▼</button>
+                  <button className="ad-stepper" onClick={() => adjustPrice(1)}>â–²</button>
+                  <button className="ad-stepper" onClick={() => adjustPrice(-1)}>â–¼</button>
                 </div>
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
               setTrigger(t => t === 'once' ? 'every_bar' : 'once')
             }}>
               <span>{triggerLabel}</span>
-              <span className="caret">▾</span>
+              <span className="caret">â–¾</span>
             </div>
           </fieldset>
 
@@ -264,7 +264,7 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
               setExpirationChoice(EXPIRATION_OPTIONS[(idx + 1) % EXPIRATION_OPTIONS.length].value)
             }}>
               <span>{expirationLabel}</span>
-              <span className="caret">▾</span>
+              <span className="caret">â–¾</span>
             </div>
           </fieldset>
 
@@ -281,7 +281,7 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
             />
             <div className="ad-webhook-hint">
               {notifConfig.webhookUrl
-                ? `Webhook body · ${isValidJson(message) ? 'application/json' : 'text/plain'}`
+                ? `Webhook body Â· ${isValidJson(message) ? 'application/json' : 'text/plain'}`
                 : 'Sent as the webhook body when a webhook URL is set.'}
             </div>
           </fieldset>
@@ -291,7 +291,7 @@ export default function AlertDialog({ symbol, symbolLogo, currentPrice, onClose,
             <legend className="ad-legend">Notifications</legend>
             <div className="ad-dropdown" onClick={() => setShowNotifs(true)}>
               <span>{notifSummary}</span>
-              <span className="caret">▾</span>
+              <span className="caret">â–¾</span>
             </div>
           </fieldset>
         </div>

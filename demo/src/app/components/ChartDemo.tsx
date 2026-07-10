@@ -12,8 +12,8 @@ import {
   type SymbolInfo,
   type Period,
   type CandleData,
-} from 'astroneum'
-import { AlertManager } from 'astroneum'
+} from '@tony1185/astroneum'
+import { AlertManager } from '@tony1185/astroneum'
 
 interface IndicatorDef {
   name: string
@@ -33,7 +33,7 @@ const PERIODS: Period[] = [
 const LIVE_EXCHANGES = new Set(['BINANCE', 'BINANCE_SPOT', 'BITGET', 'OKX'])
 
 // ---------------------------------------------------------------------------
-// Indicator catalogue — organised by category for the demo picker
+// Indicator catalogue â€” organised by category for the demo picker
 // ---------------------------------------------------------------------------
 interface IndicatorCatalogueEntry {
   name: string
@@ -380,7 +380,7 @@ const datafeed = useMemo(() => {
           }}
         >
           {symbols.map(s => (
-            <option key={s.ticker} value={s.ticker}>{s.ticker} — {s.name}</option>
+            <option key={s.ticker} value={s.ticker}>{s.ticker} â€” {s.name}</option>
           ))}
         </select>
 
@@ -405,14 +405,14 @@ const datafeed = useMemo(() => {
           }}
           onClick={() => setShowAlertDialog(true)}
         >
-          {jsActive ? "✅ JS OK" : "❌ NO JS"} 🔔 Create alert
+          {jsActive ? "âœ… JS OK" : "âŒ NO JS"} ðŸ”” Create alert
         </button>
         <button style={css.badge(theme === 'dark')} onClick={toggleTheme}>
-          {theme === 'dark' ? '☀ Light' : '🌙 Dark'}
+          {theme === 'dark' ? 'â˜€ Light' : 'ðŸŒ™ Dark'}
         </button>
       </div>
 
-      {/* Indicator picker — category rows */}
+      {/* Indicator picker â€” category rows */}
       <div style={{
         ...css.toolbar,
         background: theme === 'dark' ? '#0d1117' : '#f0f3f9',
@@ -428,7 +428,7 @@ const datafeed = useMemo(() => {
               return (
                 <button
                   key={e.name}
-                  title={`${e.description}${overlay ? ' (overlay → main pane)' : ''}`}
+                  title={`${e.description}${overlay ? ' (overlay â†’ main pane)' : ''}`}
                   style={{
                     ...css.chip(isActive),
                     borderColor: isActive ? (overlay ? '#d29922' : '#3fb950') : undefined,
@@ -471,7 +471,7 @@ const datafeed = useMemo(() => {
           Active:
         </span>
         {mainIndicatorChips.length === 0 && subIndicatorChips.length === 0 && (
-          <span style={{ color: '#484f58', fontStyle: 'italic' }}>none — click any indicator above to enable</span>
+          <span style={{ color: '#484f58', fontStyle: 'italic' }}>none â€” click any indicator above to enable</span>
         )}
         {mainIndicatorChips.map(name => (
           <span key={name} style={{
@@ -490,7 +490,7 @@ const datafeed = useMemo(() => {
           </span>
         ))}
         <span style={css.count}>
-          ({mainIndicatorChips.length + subIndicatorChips.length} active · 50 total)
+          ({mainIndicatorChips.length + subIndicatorChips.length} active Â· 50 total)
         </span>
       </div>
 
@@ -513,7 +513,7 @@ const datafeed = useMemo(() => {
       {showAlertDialog && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAlertDialog(false)}>
           <div style={{ background: '#1d2026', border: '1px solid #2962ff', borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', color: '#d1d4dc', fontFamily: '-apple-system, sans-serif' }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: 15, color: '#8a8f9c', marginBottom: 12 }}>v3-audit • Create alert on <b style={{ color: '#2962ff' }}>{symbol.ticker}</b></div>
+            <div style={{ fontSize: 15, color: '#8a8f9c', marginBottom: 12 }}>v3-audit â€¢ Create alert on <b style={{ color: '#2962ff' }}>{symbol.ticker}</b></div>
             <div style={{ fontSize: 13, color: '#8a8f9c', marginBottom: 16 }}>Price: {lastPriceRef.current || 'no ticks yet'}</div>
             <label style={{ fontSize: 12, color: '#8a8f9c', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Condition</label>
             <select style={{ width: '100%', padding: 8, background: '#16181d', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, marginBottom: 16 }}>

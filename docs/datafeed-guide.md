@@ -25,10 +25,10 @@ interface Datafeed {
 ```
 
 **Key methods:**
-- `searchSymbols(search)` — Return matching symbols (used in symbol search bar).
-- `getHistoryData(symbol, period, from, to)` — Fetch bars between timestamps (Unix ms).
-- `subscribe(symbol, period, callback)` — Stream real-time ticks; call `callback(tick)` on each update.
-- `unsubscribe(symbol, period)` — Stop streaming for this symbol/period pair.
+- `searchSymbols(search)` â€” Return matching symbols (used in symbol search bar).
+- `getHistoryData(symbol, period, from, to)` â€” Fetch bars between timestamps (Unix ms).
+- `subscribe(symbol, period, callback)` â€” Stream real-time ticks; call `callback(tick)` on each update.
+- `unsubscribe(symbol, period)` â€” Stop streaming for this symbol/period pair.
 
 ---
 
@@ -43,7 +43,7 @@ import type {
   Period,
   CandleData,
   DatafeedSubscribeCallback
-} from 'astroneum'
+} from '@tony1185/astroneum'
 
 const SYMBOLS: SymbolInfo[] = [
   {
@@ -272,7 +272,7 @@ const myDatafeed: Datafeed = {
 ## Using a Datafeed in AstroneumChart
 
 ```tsx
-import { AstroneumChart } from 'astroneum'
+import { AstroneumChart } from '@tony1185/astroneum'
 import { myDatafeed } from './datafeed'
 
 export function Chart() {
@@ -292,20 +292,20 @@ export function Chart() {
 
 ## Tips
 
-1. **Start simple** — Begin with a REST API; add WebSocket if you need real-time.
-2. **Handle errors gracefully** — Return empty arrays if data fetches fail; reconnect on socket close.
-3. **Cache symbols** — Don't re-fetch the symbol list on every search.
-4. **Timestamp precision** — Use milliseconds (Unix ms) throughout; ensure `from` and `to` are in ms.
-5. **Smooth real-time** — Emit ticks smoothly at ~100–200 ms intervals instead of burst updates.
-6. **Use TickAnimator** — The library exports `TickAnimator` to interpolate ticks smoothly across frames (see `../src/engine/common/TickAnimator.ts`).
+1. **Start simple** â€” Begin with a REST API; add WebSocket if you need real-time.
+2. **Handle errors gracefully** â€” Return empty arrays if data fetches fail; reconnect on socket close.
+3. **Cache symbols** â€” Don't re-fetch the symbol list on every search.
+4. **Timestamp precision** â€” Use milliseconds (Unix ms) throughout; ensure `from` and `to` are in ms.
+5. **Smooth real-time** â€” Emit ticks smoothly at ~100â€“200 ms intervals instead of burst updates.
+6. **Use TickAnimator** â€” The library exports `TickAnimator` to interpolate ticks smoothly across frames (see `../src/engine/common/TickAnimator.ts`).
 
 ---
 
 ## Advanced: Mock with Smooth Animation
 
 For testing, the demo `mockDatafeed.ts` uses:
-- **Seeded random generation** — Reproducible fake data across reloads
-- **TickAnimator** — Smooth frame-based interpolation of real-time ticks
-- **Fallback simulation** — Local bar generation if Binance fails
+- **Seeded random generation** â€” Reproducible fake data across reloads
+- **TickAnimator** â€” Smooth frame-based interpolation of real-time ticks
+- **Fallback simulation** â€” Local bar generation if Binance fails
 
 See `demo/src/mockDatafeed.ts` for the full implementation.
