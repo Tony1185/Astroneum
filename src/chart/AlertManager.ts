@@ -144,12 +144,12 @@ function playBeep(title: SoundTitle = 'Thin', duration: SoundDuration = 'once'):
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
       osc.start(ctx.currentTime)
       osc.stop(ctx.currentTime + 0.4)
-      osc.onended = () => { if (duration !== 'repeating') ctx.close() }
+      osc.onended = () => { if (duration !== 'repeating') void ctx.close() }
     }
     playOnce()
     if (duration === 'repeating') {
       const interval = setInterval(playOnce, 600)
-      setTimeout(() => { clearInterval(interval); ctx.close() }, 5000)
+      setTimeout(() => { clearInterval(interval); void ctx.close() }, 5000)
     }
   } catch { /* SSR */ }
 }

@@ -63,7 +63,7 @@ function doji(data: CandleData[], i: number): PatternMatch | null {
   const r = range(bar)
   if (r === 0) return null
   const b = body(bar)
-  if (b / r < 0.05) return { index: i, pattern: 'Doji', type: 'neutral', timestamp: bar.timestamp as number, high: bar.high, low: bar.low }
+  if (b / r < 0.05) return { index: i, pattern: 'Doji', type: 'neutral', timestamp: bar.timestamp, high: bar.high, low: bar.low }
   return null
 }
 
@@ -75,7 +75,7 @@ function hammer(data: CandleData[], i: number): PatternMatch | null {
   const ls = lowerShadow(bar)
   const us = upperShadow(bar)
   const b = body(bar)
-  if (ls > 2 * b && us < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Hammer', type: 'bullish', timestamp: bar.timestamp as number, high: bar.high, low: bar.low }
+  if (ls > 2 * b && us < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Hammer', type: 'bullish', timestamp: bar.timestamp, high: bar.high, low: bar.low }
   return null
 }
 
@@ -87,7 +87,7 @@ function invertedHammer(data: CandleData[], i: number): PatternMatch | null {
   const us = upperShadow(bar)
   const ls = lowerShadow(bar)
   const b = body(bar)
-  if (us > 2 * b && ls < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Inverted Hammer', type: 'bullish', timestamp: bar.timestamp as number, high: bar.high, low: bar.low }
+  if (us > 2 * b && ls < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Inverted Hammer', type: 'bullish', timestamp: bar.timestamp, high: bar.high, low: bar.low }
   return null
 }
 
@@ -99,7 +99,7 @@ function shootingStar(data: CandleData[], i: number): PatternMatch | null {
   const us = upperShadow(bar)
   const ls = lowerShadow(bar)
   const b = body(bar)
-  if (isBearish(bar) && us > 2 * b && ls < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Shooting Star', type: 'bearish', timestamp: bar.timestamp as number, high: bar.high, low: bar.low }
+  if (isBearish(bar) && us > 2 * b && ls < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Shooting Star', type: 'bearish', timestamp: bar.timestamp, high: bar.high, low: bar.low }
   return null
 }
 
@@ -111,7 +111,7 @@ function hangingMan(data: CandleData[], i: number): PatternMatch | null {
   const ls = lowerShadow(bar)
   const us = upperShadow(bar)
   const b = body(bar)
-  if (isBullish(bar) && ls > 2 * b && us < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Hanging Man', type: 'bearish', timestamp: bar.timestamp as number, high: bar.high, low: bar.low }
+  if (isBullish(bar) && ls > 2 * b && us < b * 0.3 && b / r < 0.4) return { index: i, pattern: 'Hanging Man', type: 'bearish', timestamp: bar.timestamp, high: bar.high, low: bar.low }
   return null
 }
 
@@ -123,7 +123,7 @@ function spinningTop(data: CandleData[], i: number): PatternMatch | null {
   const b = body(bar)
   const us = upperShadow(bar)
   const ls = lowerShadow(bar)
-  if (b / r < 0.3 && us > b && ls > b) return { index: i, pattern: 'Spinning Top', type: 'neutral', timestamp: bar.timestamp as number, high: bar.high, low: bar.low }
+  if (b / r < 0.3 && us > b && ls > b) return { index: i, pattern: 'Spinning Top', type: 'neutral', timestamp: bar.timestamp, high: bar.high, low: bar.low }
   return null
 }
 
@@ -134,7 +134,7 @@ function bullishEngulfing(data: CandleData[], i: number): PatternMatch | null {
   const prev = data[i - 1]
   const curr = data[i]
   if (isBearish(prev) && isBullish(curr) && curr.close >= prev.open && curr.open <= prev.close) {
-    if (body(curr) > body(prev)) return { index: i, pattern: 'Bullish Engulfing', type: 'bullish', timestamp: curr.timestamp as number, high: curr.high, low: curr.low }
+    if (body(curr) > body(prev)) return { index: i, pattern: 'Bullish Engulfing', type: 'bullish', timestamp: curr.timestamp, high: curr.high, low: curr.low }
   }
   return null
 }
@@ -144,7 +144,7 @@ function bearishEngulfing(data: CandleData[], i: number): PatternMatch | null {
   const prev = data[i - 1]
   const curr = data[i]
   if (isBullish(prev) && isBearish(curr) && curr.open >= prev.close && curr.close <= prev.open) {
-    if (body(curr) > body(prev)) return { index: i, pattern: 'Bearish Engulfing', type: 'bearish', timestamp: curr.timestamp as number, high: curr.high, low: curr.low }
+    if (body(curr) > body(prev)) return { index: i, pattern: 'Bearish Engulfing', type: 'bearish', timestamp: curr.timestamp, high: curr.high, low: curr.low }
   }
   return null
 }
@@ -155,7 +155,7 @@ function piercingLine(data: CandleData[], i: number): PatternMatch | null {
   const curr = data[i]
   const mid = (prev.open + prev.close) / 2
   if (isBearish(prev) && isBullish(curr) && curr.open < prev.low && curr.close > mid && curr.close < prev.open) {
-    return { index: i, pattern: 'Piercing Line', type: 'bullish', timestamp: curr.timestamp as number, high: curr.high, low: curr.low }
+    return { index: i, pattern: 'Piercing Line', type: 'bullish', timestamp: curr.timestamp, high: curr.high, low: curr.low }
   }
   return null
 }
@@ -166,7 +166,7 @@ function darkCloudCover(data: CandleData[], i: number): PatternMatch | null {
   const curr = data[i]
   const mid = (prev.open + prev.close) / 2
   if (isBullish(prev) && isBearish(curr) && curr.open > prev.high && curr.close < mid && curr.close > prev.open) {
-    return { index: i, pattern: 'Dark Cloud Cover', type: 'bearish', timestamp: curr.timestamp as number, high: curr.high, low: curr.low }
+    return { index: i, pattern: 'Dark Cloud Cover', type: 'bearish', timestamp: curr.timestamp, high: curr.high, low: curr.low }
   }
   return null
 }
@@ -176,7 +176,7 @@ function bullishHarami(data: CandleData[], i: number): PatternMatch | null {
   const prev = data[i - 1]
   const curr = data[i]
   if (isBearish(prev) && isBullish(curr) && curr.open > prev.close && curr.close < prev.open) {
-    if (body(curr) < body(prev) * 0.6) return { index: i, pattern: 'Bullish Harami', type: 'bullish', timestamp: curr.timestamp as number, high: curr.high, low: curr.low }
+    if (body(curr) < body(prev) * 0.6) return { index: i, pattern: 'Bullish Harami', type: 'bullish', timestamp: curr.timestamp, high: curr.high, low: curr.low }
   }
   return null
 }
@@ -186,7 +186,7 @@ function bearishHarami(data: CandleData[], i: number): PatternMatch | null {
   const prev = data[i - 1]
   const curr = data[i]
   if (isBullish(prev) && isBearish(curr) && curr.open < prev.close && curr.close > prev.open) {
-    if (body(curr) < body(prev) * 0.6) return { index: i, pattern: 'Bearish Harami', type: 'bearish', timestamp: curr.timestamp as number, high: curr.high, low: curr.low }
+    if (body(curr) < body(prev) * 0.6) return { index: i, pattern: 'Bearish Harami', type: 'bearish', timestamp: curr.timestamp, high: curr.high, low: curr.low }
   }
   return null
 }
@@ -198,7 +198,7 @@ function morningStar(data: CandleData[], i: number): PatternMatch | null {
   const b1 = data[i - 2], b2 = data[i - 1], b3 = data[i]
   const avg = avgBody(data, i, 10)
   if (isBearish(b1) && body(b1) > avg * 0.7 && body(b2) < avg * 0.3 && isBullish(b3) && b3.close > (b1.open + b1.close) / 2)
-    return { index: i, pattern: 'Morning Star', type: 'bullish', timestamp: b3.timestamp as number, high: b3.high, low: b3.low }
+    return { index: i, pattern: 'Morning Star', type: 'bullish', timestamp: b3.timestamp, high: b3.high, low: b3.low }
   return null
 }
 
@@ -207,7 +207,7 @@ function eveningStar(data: CandleData[], i: number): PatternMatch | null {
   const b1 = data[i - 2], b2 = data[i - 1], b3 = data[i]
   const avg = avgBody(data, i, 10)
   if (isBullish(b1) && body(b1) > avg * 0.7 && body(b2) < avg * 0.3 && isBearish(b3) && b3.close < (b1.open + b1.close) / 2)
-    return { index: i, pattern: 'Evening Star', type: 'bearish', timestamp: b3.timestamp as number, high: b3.high, low: b3.low }
+    return { index: i, pattern: 'Evening Star', type: 'bearish', timestamp: b3.timestamp, high: b3.high, low: b3.low }
   return null
 }
 
@@ -215,7 +215,7 @@ function threeWhiteSoldiers(data: CandleData[], i: number): PatternMatch | null 
   if (i < 2 || i >= data.length) return null
   const b1 = data[i - 2], b2 = data[i - 1], b3 = data[i]
   if (isBullish(b1) && isBullish(b2) && isBullish(b3) && b2.close > b1.close && b3.close > b2.close && b2.open > b1.open && b3.open > b2.open)
-    return { index: i, pattern: 'Three White Soldiers', type: 'bullish', timestamp: b3.timestamp as number, high: b3.high, low: b3.low }
+    return { index: i, pattern: 'Three White Soldiers', type: 'bullish', timestamp: b3.timestamp, high: b3.high, low: b3.low }
   return null
 }
 
@@ -223,7 +223,7 @@ function threeBlackCrows(data: CandleData[], i: number): PatternMatch | null {
   if (i < 2 || i >= data.length) return null
   const b1 = data[i - 2], b2 = data[i - 1], b3 = data[i]
   if (isBearish(b1) && isBearish(b2) && isBearish(b3) && b2.close < b1.close && b3.close < b2.close && b2.open < b1.open && b3.open < b2.open)
-    return { index: i, pattern: 'Three Black Crows', type: 'bearish', timestamp: b3.timestamp as number, high: b3.high, low: b3.low }
+    return { index: i, pattern: 'Three Black Crows', type: 'bearish', timestamp: b3.timestamp, high: b3.high, low: b3.low }
   return null
 }
 
@@ -231,7 +231,7 @@ function threeInsideUp(data: CandleData[], i: number): PatternMatch | null {
   if (i < 2 || i >= data.length) return null
   const b1 = data[i - 2], b2 = data[i - 1], b3 = data[i]
   if (isBearish(b1) && isBullish(b2) && b2.open > b1.close && b2.close < b1.open && isBullish(b3) && b3.close > b2.close)
-    return { index: i, pattern: 'Three Inside Up', type: 'bullish', timestamp: b3.timestamp as number, high: b3.high, low: b3.low }
+    return { index: i, pattern: 'Three Inside Up', type: 'bullish', timestamp: b3.timestamp, high: b3.high, low: b3.low }
   return null
 }
 
@@ -239,7 +239,7 @@ function threeInsideDown(data: CandleData[], i: number): PatternMatch | null {
   if (i < 2 || i >= data.length) return null
   const b1 = data[i - 2], b2 = data[i - 1], b3 = data[i]
   if (isBullish(b1) && isBearish(b2) && b2.open < b1.close && b2.close > b1.open && isBearish(b3) && b3.close < b2.close)
-    return { index: i, pattern: 'Three Inside Down', type: 'bearish', timestamp: b3.timestamp as number, high: b3.high, low: b3.low }
+    return { index: i, pattern: 'Three Inside Down', type: 'bearish', timestamp: b3.timestamp, high: b3.high, low: b3.low }
   return null
 }
 
