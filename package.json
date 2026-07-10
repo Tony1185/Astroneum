@@ -73,12 +73,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kowito/astroneum.git"
+    "url": "git+https://github.com/Tony1185/Astroneum.git"
   },
   "bugs": {
-    "url": "https://github.com/kowito/astroneum/issues"
+    "url": "https://github.com/Tony1185/Astroneum/issues"
   },
-  "homepage": "https://github.com/kowito/astroneum#readme",
+  "homepage": "https://github.com/Tony1185/Astroneum#readme",
   "keywords": [
     "astroneum",
     "candlestick",
