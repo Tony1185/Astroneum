@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradingView — Create Alert Dialog (Reference)</title>
+<style>
+  :root {
+    --tv-bg: #131722;
+    --tv-panel: #1e222d;
+    --tv-panel-hover: #2a2e39;
+    --tv-border: #2a2e39;
+    --tv-border-light: #363a45;
+    --tv-text: #d1d4dc;
+    --tv-text-secondary: #787b86;
+    --tv-accent: #2962ff;
+    --tv-accent-hover: #1e53e5;
+    --tv-success: #26a69a;
+    --tv-danger: #ef5350;
+    --tv-radius: 8px;
+    --tv-radius-sm: 4px;
+    --tv-font: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+    --tv-font-size: 14px;
+    --tv-font-size-sm: 12px;
+    --tv-font-size-xs: 11px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--tv-bg);
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    color: var(--tv-text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  /* Dialog */
+  .dialog-qyCw0PaN {
+    background: var(--tv-panel);
+    border-radius: var(--tv-radius);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    width: 440px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--tv-border);
+  }
+
+  /* Header */
+  .headerWrapper-L1hbvk7h {
+    border-bottom: 1px solid var(--tv-border);
+  }
+  .container-BZKENkhT {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .titleText-AxRz6hfm {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .textPrefix-AxRz6hfm {
+    color: var(--tv-text-secondary);
+    font-weight: 400;
+  }
+  .symbolPill-AxRz6hfm {
+    display: inline-flex;
+    align-items: center;
+  }
+  .pill-c7mhnUnO {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+  }
+  .pill-c7mhnUnO:hover { background: var(--tv-panel-hover); }
+  .symbolName-ylA6FKvx {
+    font-weight: 600;
+    color: var(--tv-accent);
+  }
+  .logo-m0C6Ivpo {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+  }
+  .headerActions-AxRz6hfm {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .headerActionItem-AxRz6hfm {
+    display: flex;
+  }
+
+  /* Light buttons */
+  .lightButton-Mym3My5x {
+    background: transparent;
+    border: none;
+    color: var(--tv-text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: var(--tv-radius-sm);
+    display: flex;
+    align-items: center;
+  }
+  .lightButton-Mym3My5x:hover { background: var(--tv-panel-hover); color: var(--tv-text); }
+
+  /* Nav button (close) */
+  .navButton-JwteAiHB {
+    background: transparent;
+    border: none;
+    color: var(--tv-text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--tv-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .navButton-JwteAiHB:hover .background-JwteAiHB {
+    opacity: 1;
+  }
+  .background-JwteAiHB {
+    position: absolute;
+    inset: 0;
+    background: var(--tv-panel-hover);
+    border-radius: var(--tv-radius-sm);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .icon-JwteAiHB { position: relative; z-index: 1; display: flex; }
+
+  /* Form */
+  .form-h6NNXQD2 { display: block; }
+  .contentWrapper-HQliu1dK {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .content-HQliu1dK { display: flex; flex-direction: column; gap: 0; }
+
+  /* Fieldset */
+  .container-sFcMHof4 {
+    border: none;
+    padding: 8px 0;
+  }
+  .legendWrapper-sFcMHof4 {
+    margin-bottom: 6px;
+  }
+  .legend-sFcMHof4 {
+    font-size: var(--tv-font-size-sm);
+    color: var(--tv-text-secondary);
+    font-weight: 400;
+  }
+
+  /* Condition row */
+  .condition-Q92ASNAn { margin-bottom: 0; }
+  .row-Owh62aJE {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .operatorRow-Q92ASNAn {
+    margin-bottom: 8px;
+  }
+  .bandsRow-Q92ASNAn {
+    margin-bottom: 8px;
+  }
+
+  /* Dropdown / select */
+  .container-I_wdwnnu {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    height: 32px;
+    background: var(--tv-bg);
+    border: 1px solid var(--tv-border-light);
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .container-I_wdwnnu:hover { border-color: var(--tv-text-secondary); }
+  .fullWidth-UkzauqCm { flex: 1; }
+  .inner-slot-YQwsvlHo { display: flex; align-items: center; }
+  .inner-middle-slot-YQwsvlHo { flex: 1; padding: 0 4px; }
+  .button-children-MoISipdk { display: flex; align-items: center; width: 100%; }
+  .itemContent-VfhgWFqC { display: flex; align-items: center; gap: 4px; }
+  .itemTitle-VfhgWFqC { font-size: var(--tv-font-size); }
+  .label-VfhgWFqC { white-space: nowrap; }
+  .interactive-YQwsvlHo { display: flex; align-items: center; }
+  .button-xhaByQvK {
+    display: flex;
+    color: var(--tv-text-secondary);
+  }
+  .caret-a8bbdOgw { display: flex; color: var(--tv-text-secondary); }
+
+  /* Select dropdown button */
+  .button-a8bbdOgw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 32px;
+    background: var(--tv-bg);
+    border: 1px solid var(--tv-border-light);
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    color: var(--tv-text);
+    font-size: var(--tv-font-size);
+    transition: border-color 0.15s;
+  }
+  .button-a8bbdOgw:hover { border-color: var(--tv-text-secondary); }
+  .stretch-a8bbdOgw { width: 100%; justify-content: space-between; }
+  .content-a8bbdOgw { display: flex; align-items: center; gap: 6px; flex: 1; }
+  .middleSlot-a8bbdOgw { flex: 1; }
+  .dropdownButton-lFPR_Qij { display: flex; align-items: center; gap: 6px; }
+  .operatorIcon-SmXSg5VK { display: flex; color: var(--tv-text-secondary); }
+  .ellipsis-lFPR_Qij { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Bands */
+  .row-Ur64z4gH { display: flex; gap: 8px; }
+  .bandsSelect-rNHjswTO { flex: 0 0 auto; }
+  .bandsSelectInput-rNHjswTO { width: 80px; }
+  .range-psXzrU7t { flex: 1; }
+  .bandsRange-rNHjswTO { flex: 1; }
+
+  /* Input */
+  .input-gr1VjUfr {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--tv-text);
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    outline: none;
+  }
+  .with-end-slot-gr1VjUfr { padding-right: 4px; }
+
+  /* Steppers */
+  .endSlot-x4YF3jkg { display: flex; align-items: center; }
+  .controlWrapper-PtHQ6HcW { display: flex; flex-direction: column; }
+  .control-PtHQ6HcW {
+    background: transparent;
+    border: none;
+    color: var(--tv-text-secondary);
+    cursor: pointer;
+    padding: 0;
+    height: 14px;
+    display: flex;
+    align-items: center;
+  }
+  .control-PtHQ6HcW:hover { color: var(--tv-text); }
+
+  /* Add condition */
+  .wrapper-uuRFxErV {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+  }
+  .textButton-H0Qx6L7S {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    padding: 4px 0;
+  }
+  .brand-H0Qx6L7S { color: var(--tv-accent); }
+  .brand-H0Qx6L7S:hover { color: var(--tv-accent-hover); }
+  .start-icon-H0Qx6L7S { display: flex; }
+  .hintButton-uuRFxErV {
+    display: flex;
+    color: var(--tv-text-secondary);
+    text-decoration: none;
+  }
+  .hintButton-uuRFxErV:hover { color: var(--tv-text); }
+  .iconWrapper-A5Aio7eI {
+    display: flex;
+    padding: 2px;
+    cursor: pointer;
+  }
+
+  /* Separator */
+  .spacer-n6vUJlGl { height: 8px; }
+  .separator-n6vUJlGl { border-top: 1px solid var(--tv-border); margin: 8px 0; }
+
+  /* Trigger / Expiration / Message / Notifications rows */
+  .textButtonSection-Q92ASNAn { padding: 4px 0; }
+  .alertButton-eXomZZxS {
+    background: transparent;
+    border: 1px solid var(--tv-border-light);
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 32px;
+    width: 100%;
+    color: var(--tv-text);
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    justify-content: space-between;
+    transition: border-color 0.15s;
+  }
+  .alertButton-eXomZZxS:hover { border-color: var(--tv-text-secondary); }
+  .content-H0Qx6L7S { display: flex; align-items: center; gap: 4px; }
+  .end-icon-H0Qx6L7S { display: flex; color: var(--tv-text-secondary); }
+  .background-H0Qx6L7S { display: none; }
+
+  /* Message button variant */
+  .button-KijOUKJc {
+    background: transparent;
+    border: 1px solid var(--tv-border-light);
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 32px;
+    width: 100%;
+    color: var(--tv-text);
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    justify-content: space-between;
+    transition: border-color 0.15s;
+    overflow: hidden;
+  }
+  .button-KijOUKJc:hover { border-color: var(--tv-text-secondary); }
+
+  /* Footer */
+  .footerWrapper-Rytf0znw {
+    border-top: 1px solid var(--tv-border);
+    padding: 12px 16px;
+  }
+  .buttons-m9pp3wEB {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .button-KoxY3d86 {
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    font-weight: 500;
+    padding: 6px 16px;
+    border: none;
+    transition: opacity 0.15s;
+  }
+  .small-KoxY3d86 { height: 32px; }
+  .gray-KoxY3d86 {
+    background: var(--tv-panel-hover);
+    color: var(--tv-text);
+    border: 1px solid var(--tv-border-light);
+  }
+  .gray-KoxY3d86:hover { background: var(--tv-border-light); }
+  .secondary-KoxY3d86 { }
+  .black-KoxY3d86 {
+    background: var(--tv-accent);
+    color: #fff;
+  }
+  .black-KoxY3d86:hover { background: var(--tv-accent-hover); }
+  .primary-KoxY3d86 { }
+  .submitBtn-m9pp3wEB { }
+  .content-KoxY3d86 { display: flex; align-items: center; gap: 4px; }
+
+  /* Visually hidden */
+  .visuallyHidden-JwteAiHB {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+  }
+
+  /* SVG color */
+  svg { fill: currentColor; }
+  .blockIcon-H9ynsmpY { display: flex; }
+
+  /* Info label */
+  .ref-info {
+    color: var(--tv-text-secondary);
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+  <div class="ref-info">TradingView "Create Alert" Dialog — UI/UX Reference Capture</div>
+
+  <div data-qa-id="alerts-create-edit-dialog" class="dialog-qyCw0PaN" tabindex="-1" style="z-index: 150;">
+    <div class="headerWrapper-L1hbvk7h withDivider-L1hbvk7h">
+      <div data-qa-id="dialog-header" class="container-BZKENkhT header-AxRz6hfm">
+        <div class="title-BZKENkhT" data-dragg-area="true">
+          <div class="ellipsis-BZKENkhT title-AxRz6hfm">
+            <div class="titleText-AxRz6hfm screenTitleText-AxRz6hfm" data-qa-id="alerts-editor-header-title" style="--header-actions-width: 78px;">
+              <span class="textPrefix-AxRz6hfm">Create alert on</span>
+              <span class="container-ylA6FKvx symbolPill-AxRz6hfm" data-disable-drag="true">
+                <div class="wrapper-c7mhnUnO small-c7mhnUnO square-c7mhnUnO">
+                  <div class="pill-c7mhnUnO ghost-c7mhnUnO">
+                    <button aria-expanded="false" aria-disabled="false" class="activeArea-FO6FKsU5" tabindex="0" data-qa-id="symbols-button">
+                      <div class="activeAreaContent-FO6FKsU5">
+                        <div class="children-FO6FKsU5">
+                          <div class="content-Jim4mibS">
+                            <div class="activeText-FHIny5n9 active-Jim4mibS">
+                              <span class="activeSlot-ylA6FKvx">
+                                <span style="display:inline-flex;align-items:center;gap:4px;">
+                                  <span style="display:inline-flex;width:16px;height:16px;border-radius:50%;background:#f7931a;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">B</span>
+                                  <span class="symbolName-ylA6FKvx">BTCUSDT</span>
+                                </span>
+                              </span>
+                            </div>
+                            <div class="primaryText-wDRj22My arrow-Jim4mibS">
+                              <span aria-hidden="true" role="img" class="blockIcon-H9ynsmpY">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </span>
+              <div class="headerActions-AxRz6hfm" data-disable-drag="true">
+                <div class="headerActionItem-AxRz6hfm">
+                  <button data-qa-id="header-alert-presets-menu-button" class="lightButton-Mym3My5x" style="padding:6px;" title="Alert presets">
+                    <span class="slot-Mym3My5x">
+                      <span role="img" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none"><path fill="currentcolor" fill-rule="evenodd" clip-rule="evenodd" d="M8 6a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V8a2 2 0 00-2-2H8zm3 1H8a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V8a1 1 0 00-1-1zM8 15a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2H8zm3 1H8a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1v-3a1 1 0 00-1-1zM15 8a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V8zm2-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V8a1 1 0 011-1z"></path><path fill="currentcolor" d="M18 19h-3v-1h3v-3h1v3h3v1h-3v3h-1v-3z"></path></svg>
+                      </span>
+                    </span>
+                  </button>
+                </div>
+                <button data-qa-id="close" class="navButton-JwteAiHB" type="button">
+                  <span class="background-JwteAiHB"></span>
+                  <span aria-hidden="true" role="img" class="icon-JwteAiHB">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path stroke="currentColor" stroke-width="1.2" d="m1.5 1.5 11 11m0-11-11 11" vector-effect="non-scaling-stroke"></path></svg>
+                  </span>
+                  <span class="visuallyHidden-JwteAiHB">Close menu</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form class="form-h6NNXQD2" novalidate="">
+      <div class="contentWrapper-HQliu1dK" tabindex="-1">
+        <div class="content-HQliu1dK">
+          <div style="--condition-section-row-width: 305px;">
+            <div class="condition-Q92ASNAn">
+              <fieldset class="container-sFcMHof4">
+                <div class="legendWrapper-sFcMHof4">
+                  <legend class="legend-sFcMHof4">Condition</legend>
+                </div>
+                <div class="fieldsWrapper-sFcMHof4">
+                  <div class="row-Owh62aJE">
+                    <div class="container-I_wdwnnu fullWidth-UkzauqCm" style="height:32px;">
+                      <span class="inner-slot-YQwsvlHo inner-middle-slot-YQwsvlHo">
+                        <span style="display:flex;align-items:center;width:100%;">
+                          <div style="display:flex;align-items:center;gap:4px;">
+                            <div style="font-size:14px;"><span class="label-VfhgWFqC">Price</span></div>
+                          </div>
+                        </span>
+                      </span>
+                      <span class="inner-slot-YQwsvlHo interactive-YQwsvlHo">
+                        <span class="button-xhaByQvK">
+                          <span role="img" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+                          </span>
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="operatorRow-Q92ASNAn">
+                    <div class="dropdownBlock-lFPR_Qij">
+                      <button type="button" class="button-a8bbdOgw stretch-a8bbdOgw" data-qa-id="operator-dropdown">
+                        <div class="content-a8bbdOgw">
+                          <div class="middleSlot-a8bbdOgw">
+                            <div class="dropdownButton-lFPR_Qij">
+                              <span role="img" class="operatorIcon-SmXSg5VK" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor"><path d="M16 5h5.3L5 21.3l.7.7L22 5.7V11h1V4h-7zM5.7 6l6.23 6.22-.7.7L5 6.7zm15.6 17-7.25-7.24.7-.7L22 22.28V17h1v7h-7v-1z"></path></svg>
+                              </span>
+                              <p class="ellipsis-lFPR_Qij">Crossing</p>
+                            </div>
+                          </div>
+                          <span class="button-xhaByQvK caret-a8bbdOgw">
+                            <span role="img" aria-hidden="true">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+                            </span>
+                          </span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="bandsRow-Q92ASNAn">
+                    <div class="row-Ur64z4gH">
+                      <div class="container-I_wdwnnu" style="width:80px;height:32px;">
+                        <span class="inner-slot-YQwsvlHo inner-middle-slot-YQwsvlHo">
+                          <span style="display:flex;align-items:center;">
+                            <div style="font-size:14px;"><span class="label-VfhgWFqC">Value</span></div>
+                          </div>
+                        </span>
+                        <span class="inner-slot-YQwsvlHo interactive-YQwsvlHo">
+                          <span class="button-xhaByQvK">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+                          </span>
+                        </span>
+                      </div>
+                      <div class="range-psXzrU7t" style="flex:1;">
+                        <span class="container-I_wdwnnu" style="height:32px;">
+                          <span class="inner-slot-YQwsvlHo inner-middle-slot-YQwsvlHo" style="flex:1;">
+                            <input tabindex="-1" type="text" class="input-gr1VjUfr" data-qa-id="end-band-range-input" value="63,208.66" readonly>
+                          </span>
+                          <span class="inner-slot-YQwsvlHo interactive-YQwsvlHo endSlot-x4YF3jkg">
+                            <div class="controlWrapper-PtHQ6HcW">
+                              <button type="button" data-qa-id="number-input-control-increase" class="control-PtHQ6HcW" aria-label="Increase">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+                              </button>
+                              <button type="button" data-qa-id="number-input-control-decrease" class="control-PtHQ6HcW" aria-label="Decrease" style="transform:rotate(180deg);">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+                              </button>
+                            </div>
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="spacer-n6vUJlGl"></div>
+
+          <div class="wrapper-uuRFxErV addConditionButton-Q92ASNAn">
+            <button data-qa-id="add-condition-button" class="textButton-H0Qx6L7S brand-H0Qx6L7S">
+              <span class="start-icon-H0Qx6L7S" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M9.5 4.5h-1v4h-4v1h4v4h1v-4h4v-1h-4v-4Z"></path></svg>
+              </span>
+              <span class="content-H0Qx6L7S">Add condition</span>
+            </button>
+            <a class="hintButton-uuRFxErV" title="Click here to learn more about multi-condition alerts" tabindex="0" href="javascript:void(0)">
+              <span role="img" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg>
+              </span>
+            </a>
+          </div>
+
+          <div class="spacer-n6vUJlGl separator-n6vUJlGl"></div>
+
+          <fieldset class="container-sFcMHof4 textButtonSection-Q92ASNAn">
+            <div class="legendWrapper-sFcMHof4">
+              <legend class="legend-sFcMHof4">Trigger</legend>
+            </div>
+            <div class="fieldsWrapper-sFcMHof4">
+              <button data-qa-id="trigger-dropdown-button" class="alertButton-eXomZZxS">
+                <span class="content-H0Qx6L7S">Once only</span>
+                <span role="img" class="end-icon-H0Qx6L7S" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m14.078 7.827-.99-1.128L9 10.29 4.911 6.7l-.99 1.128L9 12.285z"></path></svg>
+                </span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="container-sFcMHof4 textButtonSection-Q92ASNAn">
+            <div class="legendWrapper-sFcMHof4">
+              <legend class="legend-sFcMHof4">Expiration</legend>
+            </div>
+            <div class="fieldsWrapper-sFcMHof4">
+              <button data-qa-id="expiration-time-dropdown-button" class="alertButton-eXomZZxS">
+                <span class="content-H0Qx6L7S">August 9, 2026 at 08:18</span>
+                <span role="img" class="end-icon-H0Qx6L7S" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m14.078 7.827-.99-1.128L9 10.29 4.911 6.7l-.99 1.128L9 12.285z"></path></svg>
+                </span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="container-sFcMHof4 textButtonSection-Q92ASNAn">
+            <div class="legendWrapper-sFcMHof4">
+              <legend class="legend-sFcMHof4">Message</legend>
+            </div>
+            <div class="fieldsWrapper-sFcMHof4">
+              <button data-qa-id="alert-message-button" class="button-KijOUKJc">
+                <span class="content-H0Qx6L7S" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">BTCUSDT Crossing 63,208.66</span>
+                <span role="img" class="end-icon-H0Qx6L7S" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m7.827 14.078-1.128-.99L10.29 9 6.7 4.911l1.128-.99L12.285 9z"></path></svg>
+                </span>
+              </button>
+            </div>
+          </fieldset>
+
+          <fieldset class="container-sFcMHof4 textButtonSection-Q92ASNAn">
+            <div class="legendWrapper-sFcMHof4">
+              <legend class="legend-sFcMHof4">Notifications</legend>
+            </div>
+            <div class="fieldsWrapper-sFcMHof4">
+              <button data-qa-id="alert-notifications-button" class="button-KijOUKJc">
+                <span class="content-H0Qx6L7S">App, Toasts</span>
+                <span role="img" class="end-icon-H0Qx6L7S" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m7.827 14.078-1.128-.99L10.29 9 6.7 4.911l1.128-.99L12.285 9z"></path></svg>
+                </span>
+              </button>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+
+      <div class="footerWrapper-Rytf0znw">
+        <div class="buttons-m9pp3wEB">
+          <div style="display:flex;gap:8px;">
+            <button type="button" data-qa-id="cancel" class="button-KoxY3d86 small-KoxY3d86 gray-KoxY3d86 secondary-KoxY3d86">
+              <span class="content-KoxY3d86">Cancel</span>
+            </button>
+            <button type="submit" data-qa-id="submit" class="submitBtn-m9pp3wEB button-KoxY3d86 small-KoxY3d86 black-KoxY3d86 primary-KoxY3d86">
+              <span class="content-KoxY3d86">Create</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

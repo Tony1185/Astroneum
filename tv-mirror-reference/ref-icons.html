@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradingView — SVG Icons Gallery (Reference)</title>
+<style>
+  :root {
+    --tv-bg: #131722;
+    --tv-panel: #1e222d;
+    --tv-panel-hover: #2a2e39;
+    --tv-border: #2a2e39;
+    --tv-text: #d1d4dc;
+    --tv-text-secondary: #787b86;
+    --tv-accent: #2962ff;
+    --tv-radius: 8px;
+    --tv-font: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--tv-bg);
+    font-family: var(--tv-font);
+    color: var(--tv-text);
+    padding: 40px 20px;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--tv-text-secondary);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+  }
+  .card {
+    background: var(--tv-panel);
+    border: 1px solid var(--tv-border);
+    border-radius: var(--tv-radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--tv-accent); }
+  .icon-box {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--tv-bg);
+    border-radius: var(--tv-radius);
+    color: var(--tv-text);
+  }
+  .icon-box svg { fill: currentColor; }
+  .icon-name {
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+  }
+  .icon-meta {
+    font-size: 11px;
+    color: var(--tv-text-secondary);
+    text-align: center;
+  }
+  .icon-qa-id {
+    font-size: 10px;
+    color: var(--tv-accent);
+    font-family: monospace;
+    background: rgba(41,98,255,0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .icon-svg-code {
+    font-size: 10px;
+    color: var(--tv-text-secondary);
+    font-family: monospace;
+    background: var(--tv-bg);
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border: 1px solid var(--tv-border);
+  }
+  .section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--tv-text-secondary);
+    margin: 32px 0 16px;
+    border-bottom: 1px solid var(--tv-border);
+    padding-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+  <h1>TradingView Alert Dialog — SVG Icons</h1>
+  <div class="subtitle">All icons extracted from the Create Alert &amp; Notifications dialogs</div>
+
+  <div class="section-label">Create Alert Dialog</div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="none"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8 6a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V8a2 2 0 00-2-2H8zm3 1H8a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V8a1 1 0 00-1-1zM8 15a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2H8zm3 1H8a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1v-3a1 1 0 00-1-1zM15 8a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V8zm2-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V8a1 1 0 011-1z"></path><path fill="currentColor" d="M18 19h-3v-1h3v-3h1v3h3v1h-3v3h-1v-3z"></path></svg>
+      </div>
+      <div class="icon-name">Alert Presets</div>
+      <div class="icon-meta">28x28 · viewBox 0 0 28 28</div>
+      <div class="icon-qa-id">header-alert-presets-menu-button</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path stroke="currentColor" stroke-width="1.2" d="m1.5 1.5 11 11m0-11-11 11" vector-effect="non-scaling-stroke"></path></svg>
+      </div>
+      <div class="icon-name">Close (X)</div>
+      <div class="icon-meta">14x14 · stroke 1.2</div>
+      <div class="icon-qa-id">close</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg>
+      </div>
+      <div class="icon-name">Chevron Down</div>
+      <div class="icon-meta">18x18 · used in dropdowns</div>
+      <div class="icon-qa-id">dropdown caret</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor"><path d="M16 5h5.3L5 21.3l.7.7L22 5.7V11h1V4h-7zM5.7 6l6.23 6.22-.7.7L5 6.7zm15.6 17-7.25-7.24.7-.7L22 22.28V17h1v7h-7v-1z"></path></svg>
+      </div>
+      <div class="icon-name">Crossing (Operator)</div>
+      <div class="icon-meta">28x28 · diagonal arrows</div>
+      <div class="icon-qa-id">operator-dropdown</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M9.5 4.5h-1v4h-4v1h4v4h1v-4h4v-1h-4v-4Z"></path></svg>
+      </div>
+      <div class="icon-name">Plus (Add Condition)</div>
+      <div class="icon-meta">18x18</div>
+      <div class="icon-qa-id">add-condition-button</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg>
+      </div>
+      <div class="icon-name">Info / Help</div>
+      <div class="icon-meta">18x18 · circle with ?</div>
+      <div class="icon-qa-id">hint link</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m14.078 7.827-.99-1.128L9 10.29 4.911 6.7l-.99 1.128L9 12.285z"></path></svg>
+      </div>
+      <div class="icon-name">Chevron Down (Bold)</div>
+      <div class="icon-meta">18x18 · filled, used in trigger/expiration</div>
+      <div class="icon-qa-id">trigger/expiration dropdown</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m7.827 14.078-1.128-.99L10.29 9 6.7 4.911l1.128-.99L12.285 9z"></path></svg>
+      </div>
+      <div class="icon-name">Chevron Right</div>
+      <div class="icon-meta">18x18 · filled, used in message/notifications</div>
+      <div class="icon-qa-id">message/notifications dropdown</div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Notifications Dialog</div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M12.92 1.92 5.85 9l7.07 7.08-.84.84-7.5-7.5L4.15 9l.43-.42 7.5-7.5z"></path></svg>
+      </div>
+      <div class="icon-name">Back Arrow</div>
+      <div class="icon-meta">18x18 · left chevron</div>
+      <div class="icon-qa-id">back</div>
+    </div>
+
+    <div class="card">
+      <div class="icon-box">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 9" width="11" height="9" fill="none"><path stroke="currentColor" stroke-width="2" d="M0.999878 4L3.99988 7L9.99988 1"></path></svg>
+      </div>
+      <div class="icon-name">Checkmark</div>
+      <div class="icon-meta">11x9 · stroke 2 · inside checkbox</div>
+      <div class="icon-qa-id">checkbox checked state</div>
+    </div>
+
+  </div>
+
+  <div class="section-label">Raw SVG Source</div>
+  <div style="max-width:1200px;display:flex;flex-direction:column;gap:8px;">
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="none"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8 6a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2V8a2 2 0 00-2-2H8zm3 1H8a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V8a1 1 0 00-1-1zM8 15a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2H8zm3 1H8a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1v-3a1 1 0 00-1-1zM15 8a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V8zm2-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V8a1 1 0 011-1z"></path><path fill="currentColor" d="M18 19h-3v-1h3v-3h1v3h3v1h-3v3h-1v-3z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Alert Presets</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 28 28" fill="none"&gt;&lt;path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M8 6a2 2 0 00-2 2v3a2 2 0 002 2h3..." /&gt;&lt;path fill="currentColor" d="M18 19h-3v-1h3v-3h1v3h3v1h-3v3h-1v-3z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" width="14" height="14"><path stroke="currentColor" stroke-width="1.2" d="m1.5 1.5 11 11m0-11-11 11" vector-effect="non-scaling-stroke"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Close (X)</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 14 14"&gt;&lt;path stroke="currentColor" stroke-width="1.2" d="m1.5 1.5 11 11m0-11-11 11" vector-effect="non-scaling-stroke" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Chevron Down</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 18 18"&gt;&lt;path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28" fill="currentColor"><path d="M16 5h5.3L5 21.3l.7.7L22 5.7V11h1V4h-7zM5.7 6l6.23 6.22-.7.7L5 6.7zm15.6 17-7.25-7.24.7-.7L22 22.28V17h1v7h-7v-1z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Crossing (Operator)</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 28 28" fill="currentColor"&gt;&lt;path d="M16 5h5.3L5 21.3l.7.7L22 5.7V11h1V4h-7zM5.7 6l6.23 6.22-.7.7L5 6.7zm15.6 17-7.25-7.24.7-.7L22 22.28V17h1v7h-7v-1z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M9.5 4.5h-1v4h-4v1h4v4h1v-4h4v-1h-4v-4Z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Plus (Add Condition)</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 18 18"&gt;&lt;path fill="currentColor" d="M9.5 4.5h-1v4h-4v1h4v4h1v-4h4v-1h-4v-4Z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Info / Help Circle</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 18 18"&gt;&lt;path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0..." /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m14.078 7.827-.99-1.128L9 10.29 4.911 6.7l-.99 1.128L9 12.285z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Chevron Down (Bold)</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 18 18" fill="none"&gt;&lt;path fill="currentColor" d="m14.078 7.827-.99-1.128L9 10.29 4.911 6.7l-.99 1.128L9 12.285z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18" fill="none"><path fill="currentColor" d="m7.827 14.078-1.128-.99L10.29 9 6.7 4.911l1.128-.99L12.285 9z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Chevron Right</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 18 18" fill="none"&gt;&lt;path fill="currentColor" d="m7.827 14.078-1.128-.99L10.29 9 6.7 4.911l1.128-.99L12.285 9z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M12.92 1.92 5.85 9l7.07 7.08-.84.84-7.5-7.5L4.15 9l.43-.42 7.5-7.5z"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Back Arrow</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 18 18"&gt;&lt;path fill="currentColor" d="M12.92 1.92 5.85 9l7.07 7.08-.84.84-7.5-7.5L4.15 9l.43-.42 7.5-7.5z" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+    <div class="card" style="flex-direction:row;align-items:flex-start;gap:16px;">
+      <div class="icon-box" style="flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 9" width="11" height="9" fill="none"><path stroke="currentColor" stroke-width="2" d="M0.999878 4L3.99988 7L9.99988 1"></path></svg></div>
+      <div style="flex:1;">
+        <div class="icon-name" style="text-align:left;margin-bottom:4px;">Checkmark (Checkbox)</div>
+        <div class="icon-svg-code" style="white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 11 9" fill="none"&gt;&lt;path stroke="currentColor" stroke-width="2" d="M0.999878 4L3.99988 7L9.99988 1" /&gt;&lt;/svg&gt;</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

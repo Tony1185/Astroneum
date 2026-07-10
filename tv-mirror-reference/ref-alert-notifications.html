@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradingView — Notifications Dialog (Reference)</title>
+<style>
+  :root {
+    --tv-bg: #131722;
+    --tv-panel: #1e222d;
+    --tv-panel-hover: #2a2e39;
+    --tv-border: #2a2e39;
+    --tv-border-light: #363a45;
+    --tv-text: #d1d4dc;
+    --tv-text-secondary: #787b86;
+    --tv-accent: #2962ff;
+    --tv-accent-hover: #1e53e5;
+    --tv-success: #26a69a;
+    --tv-danger: #ef5350;
+    --tv-radius: 8px;
+    --tv-radius-sm: 4px;
+    --tv-font: -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+    --tv-font-size: 14px;
+    --tv-font-size-sm: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--tv-bg);
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    color: var(--tv-text);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .dialog-qyCw0PaN {
+    background: var(--tv-panel);
+    border-radius: var(--tv-radius);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    width: 440px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--tv-border);
+  }
+
+  .headerWrapper-L1hbvk7h { border-bottom: 1px solid var(--tv-border); }
+  .container-BZKENkhT {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .title-BZKENkhT { flex: 1; }
+  .ellipsis-BZKENkhT { display: flex; align-items: center; }
+  .title-AxRz6hfm { display: flex; align-items: center; gap: 6px; }
+  .titleText-AxRz6hfm {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .secondaryTitleText-AxRz6hfm { font-weight: 500; }
+  .headerActions-AxRz6hfm { display: flex; align-items: center; gap: 4px; }
+
+  .navButton-JwteAiHB {
+    background: transparent;
+    border: none;
+    color: var(--tv-text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--tv-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .navButton-JwteAiHB:hover .background-JwteAiHB { opacity: 1; }
+  .background-JwteAiHB {
+    position: absolute; inset: 0;
+    background: var(--tv-panel-hover);
+    border-radius: var(--tv-radius-sm);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .icon-JwteAiHB { position: relative; z-index: 1; display: flex; }
+  .visuallyHidden-JwteAiHB {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0,0,0,0);
+  }
+
+  .backButton-AxRz6hfm { margin-right: 4px; }
+
+  .form-h6NNXQD2 { display: block; }
+  .contentWrapper-HQliu1dK {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .content-HQliu1dK { display: flex; flex-direction: column; }
+
+  .container-r1gd9t4j {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .checkbox-r1gd9t4j {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+  .checkbox-jT3yIbx6 { display: flex; align-items: center; gap: 8px; }
+  .wrapper-C5jbOtb_ { display: flex; align-items: center; position: relative; }
+  .view-C5jbOtb_ { display: flex; align-items: center; }
+  .box-NqYuLwbg {
+    width: 18px;
+    height: 18px;
+    border-radius: var(--tv-radius-sm);
+    border: 1px solid var(--tv-border-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .checked-NqYuLwbg {
+    background: var(--tv-accent);
+    border-color: var(--tv-accent);
+  }
+  .unchecked-NqYuLwbg {
+    background: transparent;
+  }
+  .checkedMark-NqYuLwbg {
+    display: flex;
+    color: #fff;
+  }
+  .input-C5jbOtb_ { position: absolute; opacity: 0; width: 18px; height: 18px; cursor: pointer; }
+  .label-jT3yIbx6 { font-size: var(--tv-font-size); cursor: pointer; }
+  .primary-jT3yIbx6 { color: var(--tv-text); }
+
+  .hintButton-r1gd9t4j {
+    display: flex;
+    color: var(--tv-text-secondary);
+    text-decoration: none;
+    margin-top: 1px;
+  }
+  .hintButton-r1gd9t4j:hover { color: var(--tv-text); }
+
+  .description-r1gd9t4j {
+    font-size: var(--tv-font-size-sm);
+    color: var(--tv-text-secondary);
+    padding-left: 26px;
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .description-r1gd9t4j a { color: var(--tv-accent); text-decoration: none; }
+  .description-r1gd9t4j a:hover { text-decoration: underline; }
+
+  .spacer-n6vUJlGl { height: 12px; }
+  .separator-n6vUJlGl { border-top: 1px solid var(--tv-border); margin: 12px 0; }
+
+  .expander-DE3XEJA6 {
+    padding-left: 26px;
+    margin-top: 8px;
+  }
+  .inputWrap-wkaWHl9F {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    height: 32px;
+    background: var(--tv-bg);
+    border: 1px solid var(--tv-border-light);
+    border-radius: var(--tv-radius-sm);
+  }
+  .input-wkaWHl9F {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--tv-text);
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    outline: none;
+  }
+  .input-wkaWHl9F::placeholder { color: var(--tv-text-secondary); }
+  .input-wkaWHl9F:disabled { opacity: 0.4; }
+
+  .selectGroup-nyxe3wzq {
+    display: flex;
+    gap: 8px;
+  }
+  .button-a8bbdOgw {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 32px;
+    background: var(--tv-bg);
+    border: 1px solid var(--tv-border-light);
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    color: var(--tv-text);
+    font-size: var(--tv-font-size);
+    transition: border-color 0.15s;
+  }
+  .button-a8bbdOgw:hover { border-color: var(--tv-text-secondary); }
+  .disabled-a8bbdOgw { opacity: 0.4; cursor: not-allowed; }
+  .marginLeft-JEQeD8F2 { margin-left: 8px; }
+  .select-fnEF3F6k { min-width: 100px; }
+  .content-a8bbdOgw { display: flex; align-items: center; gap: 6px; }
+  .middleSlot-a8bbdOgw { flex: 1; }
+  .caret-a8bbdOgw { display: flex; color: var(--tv-text-secondary); }
+
+  .container-f82XTZjR {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .label-f82XTZjR {
+    font-size: var(--tv-font-size);
+    color: var(--tv-text);
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .hint-f82XTZjR a {
+    color: var(--tv-text-secondary);
+    text-decoration: none;
+    display: flex;
+  }
+  .hint-f82XTZjR a:hover { color: var(--tv-text); }
+  .dropdown-f82XTZjR { flex: 0 0 auto; }
+  .dropdownButton-ZhEj1oR_ {
+    min-width: 120px;
+    justify-content: space-between;
+  }
+  .description-f82XTZjR {
+    font-size: var(--tv-font-size-sm);
+    color: var(--tv-text-secondary);
+    margin-top: 4px;
+  }
+
+  .footerWrapper-Rytf0znw {
+    border-top: 1px solid var(--tv-border);
+    padding: 12px 16px;
+  }
+  .buttons-m9pp3wEB {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .button-KoxY3d86 {
+    border-radius: var(--tv-radius-sm);
+    cursor: pointer;
+    font-family: var(--tv-font);
+    font-size: var(--tv-font-size);
+    font-weight: 500;
+    padding: 6px 16px;
+    border: none;
+    transition: opacity 0.15s;
+  }
+  .small-KoxY3d86 { height: 32px; }
+  .gray-KoxY3d86 {
+    background: var(--tv-panel-hover);
+    color: var(--tv-text);
+    border: 1px solid var(--tv-border-light);
+  }
+  .gray-KoxY3d86:hover { background: var(--tv-border-light); }
+  .black-KoxY3d86 { background: var(--tv-accent); color: #fff; }
+  .black-KoxY3d86:hover { background: var(--tv-accent-hover); }
+  .content-KoxY3d86 { display: flex; align-items: center; gap: 4px; }
+
+  svg { fill: currentColor; }
+  .blockIcon-H9ynsmpY { display: flex; }
+  .iconWrapper-A5Aio7eI { display: flex; padding: 2px; cursor: pointer; }
+  .icon-A5Aio7eI { display: flex; }
+
+  .ref-info {
+    color: var(--tv-text-secondary);
+    font-size: 12px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+<div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+  <div class="ref-info">TradingView "Notifications" Dialog — UI/UX Reference Capture</div>
+
+  <div data-qa-id="alerts-notifications-edit-dialog" class="dialog-qyCw0PaN" tabindex="-1" style="z-index: 150;">
+    <div class="headerWrapper-L1hbvk7h withDivider-L1hbvk7h">
+      <div data-qa-id="dialog-header" class="container-BZKENkhT header-AxRz6hfm">
+        <button data-qa-id="back" class="navButton-JwteAiHB backButton-AxRz6hfm" type="button">
+          <span class="background-JwteAiHB"></span>
+          <span aria-hidden="true" role="img" class="icon-JwteAiHB">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><path fill="currentColor" d="M12.92 1.92 5.85 9l7.07 7.08-.84.84-7.5-7.5L4.15 9l.43-.42 7.5-7.5z"></path></svg>
+          </span>
+        </button>
+        <div class="title-BZKENkhT" data-dragg-area="true">
+          <div class="ellipsis-BZKENkhT title-AxRz6hfm">
+            <div class="titleText-AxRz6hfm screenTitleText-AxRz6hfm" data-qa-id="alerts-editor-header-title" style="--header-actions-width: 34px;">
+              <div class="secondaryTitleText-AxRz6hfm">Notifications</div>
+              <div class="headerActions-AxRz6hfm">
+                <button data-qa-id="close" class="navButton-JwteAiHB" type="button">
+                  <span class="background-JwteAiHB"></span>
+                  <span aria-hidden="true" role="img" class="icon-JwteAiHB">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"><path stroke="currentColor" stroke-width="1.2" d="m1.5 1.5 11 11m0-11-11 11" vector-effect="non-scaling-stroke"></path></svg>
+                  </span>
+                  <span class="visuallyHidden-JwteAiHB">Close menu</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form class="form-h6NNXQD2" novalidate="">
+      <div class="contentWrapper-HQliu1dK" tabindex="-1">
+        <div class="content-HQliu1dK">
+
+          <!-- Notify in app -->
+          <div class="container-r1gd9t4j">
+            <div>
+              <label class="checkbox-r1gd9t4j checkbox-jT3yIbx6" data-qa-id="notify-on-app">
+                <span class="wrapper-C5jbOtb_">
+                  <span class="view-C5jbOtb_">
+                    <div class="box-NqYuLwbg checked-NqYuLwbg">
+                      <span class="checkedMark-NqYuLwbg blockIcon-H9ynsmpY">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 9" width="11" height="9" fill="none"><path stroke="currentColor" stroke-width="2" d="M0.999878 4L3.99988 7L9.99988 1"></path></svg>
+                      </span>
+                    </div>
+                  </span>
+                  <input class="input-C5jbOtb_" type="checkbox" checked disabled>
+                </span>
+                <span class="label-jT3yIbx6 primary-jT3yIbx6">Notify in app</span>
+              </label>
+            </div>
+            <a class="hintButton-r1gd9t4j" title="Click here to learn more about phone notifications" href="javascript:void(0)">
+              <span role="img" aria-hidden="true" class="icon-A5Aio7eI">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg>
+              </span>
+            </a>
+          </div>
+          <div class="description-r1gd9t4j"><p>Provides a push notification <a href="javascript:void(0)">in the mobile app</a>.</p></div>
+
+          <div class="spacer-n6vUJlGl"></div>
+
+          <!-- Show toast -->
+          <div class="container-r1gd9t4j">
+            <div>
+              <label class="checkbox-r1gd9t4j checkbox-jT3yIbx6" data-qa-id="show-popup">
+                <span class="wrapper-C5jbOtb_">
+                  <span class="view-C5jbOtb_">
+                    <div class="box-NqYuLwbg checked-NqYuLwbg">
+                      <span class="checkedMark-NqYuLwbg blockIcon-H9ynsmpY">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 9" width="11" height="9" fill="none"><path stroke="currentColor" stroke-width="2" d="M0.999878 4L3.99988 7L9.99988 1"></path></svg>
+                      </span>
+                    </div>
+                  </span>
+                  <input class="input-C5jbOtb_" type="checkbox" checked disabled>
+                </span>
+                <span class="label-jT3yIbx6 primary-jT3yIbx6">Show toast notification</span>
+              </label>
+            </div>
+          </div>
+          <div class="description-r1gd9t4j">Displays an onsite notification in the page corner.</div>
+
+          <div class="spacer-n6vUJlGl"></div>
+
+          <!-- Send email -->
+          <div class="container-r1gd9t4j">
+            <div>
+              <label class="checkbox-r1gd9t4j checkbox-jT3yIbx6" data-qa-id="send-email">
+                <span class="wrapper-C5jbOtb_">
+                  <span class="view-C5jbOtb_">
+                    <div class="box-NqYuLwbg unchecked-NqYuLwbg"></div>
+                  </span>
+                  <input class="input-C5jbOtb_" type="checkbox" disabled>
+                </span>
+                <span class="label-jT3yIbx6 primary-jT3yIbx6">Send email</span>
+              </label>
+            </div>
+          </div>
+          <div class="description-r1gd9t4j"><p>Provides an email notification to the address specified in your <a href="javascript:void(0)">account settings</a>.</p></div>
+
+          <div class="spacer-n6vUJlGl"></div>
+
+          <!-- Webhook URL -->
+          <div class="container-r1gd9t4j">
+            <div>
+              <label class="checkbox-r1gd9t4j checkbox-jT3yIbx6" data-qa-id="webhook">
+                <span class="wrapper-C5jbOtb_">
+                  <span class="view-C5jbOtb_">
+                    <div class="box-NqYuLwbg unchecked-NqYuLwbg"></div>
+                  </span>
+                  <input class="input-C5jbOtb_" type="checkbox" disabled>
+                </span>
+                <span class="label-jT3yIbx6 primary-jT3yIbx6">Webhook URL</span>
+              </label>
+            </div>
+            <a class="hintButton-r1gd9t4j" title="Click here to learn more about webhooks" href="javascript:void(0)">
+              <span role="img" aria-hidden="true" class="icon-A5Aio7eI">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg>
+              </span>
+            </a>
+          </div>
+          <div class="description-r1gd9t4j">Sends a POST request to your specified URL when your alert triggers.</div>
+          <div class="expander-DE3XEJA6">
+            <span class="inputWrap-wkaWHl9F" style="display:flex;">
+              <input class="input-wkaWHl9F" placeholder="https://example.com/alert-hook" disabled style="width:100%;">
+            </span>
+          </div>
+
+          <div class="spacer-n6vUJlGl"></div>
+
+          <!-- Play sound -->
+          <div class="container-r1gd9t4j">
+            <div>
+              <label class="checkbox-r1gd9t4j checkbox-jT3yIbx6" data-qa-id="play-sound">
+                <span class="wrapper-C5jbOtb_">
+                  <span class="view-C5jbOtb_">
+                    <div class="box-NqYuLwbg unchecked-NqYuLwbg"></div>
+                  </span>
+                  <input class="input-C5jbOtb_" type="checkbox" disabled>
+                </span>
+                <span class="label-jT3yIbx6 primary-jT3yIbx6">Play sound</span>
+              </label>
+            </div>
+          </div>
+          <div class="description-r1gd9t4j">Plays an audio cue when your alert triggers.</div>
+          <div class="expander-DE3XEJA6">
+            <div class="selectGroup-nyxe3wzq" style="opacity:0.4;">
+              <button type="button" class="button-a8bbdOgw select-fnEF3F6k disabled-a8bbdOgw" disabled data-qa-id="sound-title-select">
+                <div class="content-a8bbdOgw"><div class="middleSlot-a8bbdOgw">Thin</div>
+                  <span class="caret-a8bbdOgw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg></span>
+                </div>
+              </button>
+              <button type="button" class="button-a8bbdOgw disabled-a8bbdOgw" disabled data-qa-id="sound-duration-select">
+                <div class="content-a8bbdOgw"><div class="middleSlot-a8bbdOgw">Once</div>
+                  <span class="caret-a8bbdOgw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg></span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="spacer-n6vUJlGl"></div>
+
+          <!-- Send plain text -->
+          <div class="container-r1gd9t4j">
+            <div>
+              <label class="checkbox-r1gd9t4j checkbox-jT3yIbx6" data-qa-id="send-email-to-sms">
+                <span class="wrapper-C5jbOtb_">
+                  <span class="view-C5jbOtb_">
+                    <div class="box-NqYuLwbg unchecked-NqYuLwbg"></div>
+                  </span>
+                  <input class="input-C5jbOtb_" type="checkbox" disabled>
+                </span>
+                <span class="label-jT3yIbx6 primary-jT3yIbx6">Send plain text</span>
+              </label>
+            </div>
+            <a class="hintButton-r1gd9t4j" title="Click here to learn more about alternative email notifications" href="javascript:void(0)">
+              <span role="img" aria-hidden="true" class="icon-A5Aio7eI">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg>
+              </span>
+            </a>
+          </div>
+          <div class="description-r1gd9t4j">Sends plain text to an alternative email.</div>
+
+          <div class="spacer-n6vUJlGl separator-n6vUJlGl"></div>
+
+          <!-- Notification schedule -->
+          <div class="container-f82XTZjR">
+            <div class="label-f82XTZjR">
+              Notification schedule
+              <span class="hint-f82XTZjR">&nbsp;<a href="javascript:void(0)" title="Click here to learn more">
+                <span role="img" aria-hidden="true" class="icon-A5Aio7eI">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" fill-rule="evenodd" d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16Zm-1-4a1 1 0 1 0 2 0 1 1 0 0 0-2 0Zm2.83-3.52c-.49.43-.97.85-1.06 1.52H8.26c.08-1.18.74-1.69 1.32-2.13.49-.38.92-.71.92-1.37C10.5 6.67 9.82 6 9 6s-1.5.67-1.5 1.5V8H6v-.5a3 3 0 1 1 6 0c0 .96-.6 1.48-1.17 1.98Z"></path></svg>
+                </span>
+              </a></span>
+            </div>
+            <div class="dropdown-f82XTZjR">
+              <button type="button" class="button-a8bbdOgw dropdownButton-ZhEj1oR_" data-qa-id="notification-schedule">
+                <div class="content-a8bbdOgw"><div class="middleSlot-a8bbdOgw">24/7</div>
+                  <span class="caret-a8bbdOgw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width="18" height="18"><path fill="currentColor" d="M3.92 7.83 9 12.29l5.08-4.46-1-1.13L9 10.29l-4.09-3.6-.99 1.14Z"></path></svg></span>
+                </div>
+              </button>
+            </div>
+          </div>
+          <div class="description-f82XTZjR">Notifications are muted outside this schedule.</div>
+
+        </div>
+      </div>
+
+      <div class="footerWrapper-Rytf0znw">
+        <div class="buttons-m9pp3wEB">
+          <div style="display:flex;gap:8px;">
+            <button type="button" data-qa-id="cancel" class="button-KoxY3d86 small-KoxY3d86 gray-KoxY3d86 secondary-KoxY3d86">
+              <span class="content-KoxY3d86">Cancel</span>
+            </button>
+            <button type="submit" data-qa-id="submit" class="button-KoxY3d86 small-KoxY3d86 black-KoxY3d86 primary-KoxY3d86">
+              <span class="content-KoxY3d86">Apply</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>
