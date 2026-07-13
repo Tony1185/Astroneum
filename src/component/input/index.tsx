@@ -13,12 +13,19 @@ export interface InputProps {
   placeholder?: string
   value: string | number
   disabled?: boolean
-  onChange?: (value: string | number) => void 
+  onChange?: (value: string | number) => void
+  id?: string
+  name?: string
+  role?: string
+  ariaLabel?: string
+  autoFocus?: boolean
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  inputRef?: (el: HTMLInputElement | null) => void
 }
 
 const Input: Component<InputProps> = p => {
   const props = { min: Number.MIN_SAFE_INTEGER, max: Number.MAX_SAFE_INTEGER, ...p }
-  let input: HTMLInputElement
+  let input: HTMLInputElement | null = null
 
   const [status, setStatus] = useState('normal')
 
@@ -29,10 +36,17 @@ const Input: Component<InputProps> = p => {
       data-status={status}
       onClick={() => { input?.focus() }}>
       <input
-        ref={(el) => { input = el }}
+        ref={(el) => { input = el; props.inputRef?.(el) }}
         className="input is-small"
         placeholder={props.placeholder ?? ''}
         value={props.value}
+        id={props.id}
+        name={props.name}
+        role={props.role}
+        aria-label={props.ariaLabel}
+        autoFocus={props.autoFocus}
+        disabled={props.disabled}
+        onKeyDown={props.onKeyDown}
         onFocus={() => { setStatus('focus') }}
         onBlur={() => { setStatus('normal') }}
         onChange={(changeEvent) => {

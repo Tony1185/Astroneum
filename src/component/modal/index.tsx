@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { type ParentComponent, type ParentProps, type JSX } from '@/react-shared'
 
@@ -9,40 +9,52 @@ export interface ModalProps extends ParentProps {
   title?: JSX.Element
   buttons?: ButtonProps[]
   onClose?: () => void
+  className?: string
+  /** 'body' focuses the first focusable element inside modal-card-body (e.g. a search input) instead of the header close button. Defaults to 'first'. */
+  initialFocus?: 'first' | 'body'
 }
+
+const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 let _modalIdCounter = 0
 
 const Modal: ParentComponent<ModalProps> = (props) => {
   const titleId = `astroneum-modal-title-${++_modalIdCounter}`
-  let cardRef: HTMLDivElement | undefined
-
-  const onKeyDown = (keyboardEvent: KeyboardEvent): void => {
-    if (keyboardEvent.key === 'Escape') {
-      props.onClose?.()
-      return
-    }
-    if (keyboardEvent.key === 'Tab' && cardRef) {
-      const focusable = cardRef.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      if (keyboardEvent.shiftKey) {
-        if (document.activeElement === first) { keyboardEvent.preventDefault(); last?.focus() }
-      } else {
-        if (document.activeElement === last) { keyboardEvent.preventDefault(); first?.focus() }
-      }
-    }
-  }
+  const cardRef = useRef<HTMLDivElement | null>(null)
+  const bodyRef = useRef<HTMLElement | null>(null)
+  const triggerRef = useRef<Element | null>(null)
 
   useEffect(() => {
-    document.addEventListener('keydown', onKeyDown)
-    // Move focus into modal
-    const btn = cardRef?.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-    btn?.focus()
+    triggerRef.current = document.activeElement
 
-    return () => { document.removeEventListener('keydown', onKeyDown) }
+    const onKeyDown = (keyboardEvent: KeyboardEvent): void => {
+      if (keyboardEvent.key === 'Escape') {
+        props.onClose?.()
+        return
+      }
+      if (keyboardEvent.key === 'Tab' && cardRef.current) {
+        const focusable = cardRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (keyboardEvent.shiftKey) {
+          if (document.activeElement === first) { keyboardEvent.preventDefault(); last?.focus() }
+        } else {
+          if (document.activeElement === last) { keyboardEvent.preventDefault(); first?.focus() }
+        }
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+
+    const focusRoot = props.initialFocus === 'body' ? bodyRef.current : cardRef.current
+    const target = focusRoot?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR)
+    target?.focus()
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      const trigger = triggerRef.current
+      if (trigger instanceof HTMLElement) trigger.focus()
+    }
   }, [])
 
   return (
@@ -55,9 +67,9 @@ const Modal: ParentComponent<ModalProps> = (props) => {
         className="modal-background"
         onClick={props.onClose}/>
       <div
-        ref={el => { cardRef = el }}
-        style={{ width: `${props.width ?? 400}px` }}
-        className="modal-card">
+        ref={el => { cardRef.current = el }}
+        style={{ width: `${props.width ?? 400}px`, maxWidth: 'calc(100vw - 32px)' }}
+        className={`modal-card ${props.className ?? ''}`}>
         <header
           className="modal-card-head">
           <p id={titleId} className="modal-card-title">{props.title}</p>
@@ -67,6 +79,7 @@ const Modal: ParentComponent<ModalProps> = (props) => {
             onClick={props.onClose}/>
         </header>
         <section
+          ref={el => { bodyRef.current = el }}
           className="modal-card-body">
           {props.children}
         </section>

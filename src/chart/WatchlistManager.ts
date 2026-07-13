@@ -3,22 +3,44 @@
  * Persists to localStorage under key 'astroneum-watchlists'.
  */
 
-import type { Price } from '@/types'
+import type { Price, QuoteSnapshot, SymbolInfo, Volume } from '@/types'
 
 const STORAGE_KEY = 'astroneum-watchlists'
 
 export interface WatchSymbol {
   ticker: string
   name?: string
+  shortName?: string
+  exchange?: string
+  pricePrecision?: number
+  volumePrecision?: number
+  logo?: string
+  group?: string
   /** Injected externally — not stored. Branded Price ensures callers use asPrice() at ingress. */
   lastPrice?: Price
+  change?: number
   changePercent?: number
+  volume?: Volume
+  open?: Price
+  high?: Price
+  low?: Price
+}
+
+export type WatchlistColumn = 'name' | 'last' | 'change' | 'changePercent' | 'volume' | 'open'
+export type WatchlistSortDirection = 'asc' | 'desc'
+
+export interface WatchlistSort {
+  column: WatchlistColumn
+  direction: WatchlistSortDirection
 }
 
 export interface Watchlist {
   id: string
   name: string
   symbols: WatchSymbol[]
+  color?: string
+  columns?: WatchlistColumn[]
+  sort?: WatchlistSort
 }
 
 export type WatchlistsChangedCallback = (lists: Watchlist[]) => void
@@ -70,7 +92,7 @@ export class WatchlistManager {
   }
 
   reorderLists (from: number, to: number): void {
-    if (from === to) return
+    if (from === to || from < 0 || to < 0 || from >= this._lists.length || to >= this._lists.length) return
     const [item] = this._lists.splice(from, 1)
     this._lists.splice(to, 0, item)
     this._persist()
@@ -84,8 +106,21 @@ export class WatchlistManager {
     const list = this._find(listId)
     if (!list) return
     if (list.symbols.some(s => s.ticker === symbol.ticker)) return
-    list.symbols.push({ ticker: symbol.ticker, name: symbol.name })
+    list.symbols.push(this._storedSymbol(symbol))
     this._persist()
+  }
+
+  addSymbolFromInfo (listId: string, symbol: SymbolInfo): void {
+    this.addSymbol(listId, {
+      ticker: symbol.ticker,
+      name: symbol.name,
+      shortName: symbol.shortName,
+      exchange: symbol.exchange,
+      pricePrecision: symbol.pricePrecision,
+      volumePrecision: symbol.volumePrecision,
+      logo: symbol.logo,
+      group: typeof symbol.group === 'string' ? symbol.group : undefined,
+    })
   }
 
   removeSymbol (listId: string, ticker: string): void {
@@ -97,21 +132,95 @@ export class WatchlistManager {
 
   reorderSymbols (listId: string, from: number, to: number): void {
     const list = this._find(listId)
-    if (!list || from === to) return
+    if (!list || from === to || from < 0 || to < 0 || from >= list.symbols.length || to >= list.symbols.length) return
     const [item] = list.symbols.splice(from, 1)
     list.symbols.splice(to, 0, item)
     this._persist()
+  }
+
+  moveSymbol (fromListId: string, toListId: string, ticker: string, toIndex?: number): void {
+    const from = this._find(fromListId)
+    const to = this._find(toListId)
+    const index = from?.symbols.findIndex(symbol => symbol.ticker === ticker) ?? -1
+    if (!from || !to || index < 0 || to.symbols.some(symbol => symbol.ticker === ticker)) return
+    const [symbol] = from.symbols.splice(index, 1)
+    const target = Math.max(0, Math.min(toIndex ?? to.symbols.length, to.symbols.length))
+    to.symbols.splice(target, 0, symbol)
+    this._persist()
+  }
+
+  setSort (listId: string, column: WatchlistColumn, direction?: WatchlistSortDirection): void {
+    const list = this._find(listId)
+    if (!list) return
+    list.sort = direction ? { column, direction } : undefined
+    this._persist()
+  }
+
+  setColumns (listId: string, columns: WatchlistColumn[]): void {
+    const list = this._find(listId)
+    if (!list) return
+    list.columns = [...new Set(columns)]
+    this._persist()
+  }
+
+  setColor (listId: string, color: string): void {
+    const list = this._find(listId)
+    if (!list) return
+    list.color = color
+    this._persist()
+  }
+
+  updateQuotes (snapshots: QuoteSnapshot[]): void {
+    if (snapshots.length === 0) return
+    const quotes = new Map(snapshots.map(snapshot => [snapshot.ticker, snapshot]))
+    let changed = false
+    for (const list of this._lists) {
+      for (const symbol of list.symbols) {
+        const quote = quotes.get(symbol.ticker)
+        if (!quote) continue
+        symbol.lastPrice = quote.last
+        symbol.change = quote.change
+        symbol.changePercent = quote.changePercent
+        symbol.volume = quote.volume
+        symbol.open = quote.open
+        symbol.high = quote.high
+        symbol.low = quote.low
+        changed = true
+      }
+    }
+    if (changed) this._emit()
   }
 
   // ─── Internals ────────────────────────────────────────────────────────────
 
   private _find (id: string): Watchlist | undefined { return this._lists.find(l => l.id === id) }
 
+  private _storedSymbol (symbol: WatchSymbol): WatchSymbol {
+    return {
+      ticker: symbol.ticker,
+      name: symbol.name,
+      shortName: symbol.shortName,
+      exchange: symbol.exchange,
+      pricePrecision: symbol.pricePrecision,
+      volumePrecision: symbol.volumePrecision,
+      logo: symbol.logo,
+      group: symbol.group,
+    }
+  }
+
+  private _emit (): void {
+    this._listeners.forEach(cb => { cb(this._lists.map(list => ({ ...list, symbols: list.symbols.map(symbol => ({ ...symbol })) }))) })
+  }
+
   private _persist (): void {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this._lists))
+      const stored = this._lists.map(list => ({
+        ...list,
+        symbols: list.symbols.map(symbol => this._storedSymbol(symbol)),
+      }))
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored))
     } catch { /* quota exceeded — ignore */ }
-    this._listeners.forEach(cb => { cb([...this._lists]) })
+    this._emit()
   }
 
   private _load (): void {
@@ -119,7 +228,12 @@ export class WatchlistManager {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
         const parsed: Watchlist[] = JSON.parse(raw)
-        if (Array.isArray(parsed)) this._lists = parsed
+        if (Array.isArray(parsed)) {
+          this._lists = parsed.filter(list => list && typeof list.id === 'string' && typeof list.name === 'string').map(list => ({
+            ...list,
+            symbols: Array.isArray(list.symbols) ? list.symbols.filter(symbol => symbol && typeof symbol.ticker === 'string').map(symbol => this._storedSymbol(symbol)) : [],
+          }))
+        }
       }
     } catch { /* corrupt data — start fresh */ }
 

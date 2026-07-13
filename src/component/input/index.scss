@@ -2,9 +2,9 @@
 
 .#{$prefix-cls}-input {
   cursor: pointer;
-  // Focus glow using astroneum primary (Bulma handles border-color change)
+  // Focus glow uses the active astroneum primary token, not a hardcoded brand color
   &[data-status="focus"] .input {
     border-color: var(--astroneum-primary-color);
-    box-shadow: 0 0 0 2px rgba(#2962ff, 0.2);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--astroneum-primary-color) 20%, transparent);
   }
 }
