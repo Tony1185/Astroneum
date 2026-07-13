@@ -10,6 +10,7 @@ Implementation-focused documentation for the current TradingView chart workspace
 - [Structure](structure.md) — regions, overlays, responsive architecture, and nested surfaces.
 - [Essential controls](tradingview-buttons.md) — normalized semantic IDs and stable selector guidance.
 - [Interactions](interactions.md) — events, states, focus, dismissal, gestures, and edge cases.
+- [Watchlist panel](watchlist.md) — right-panel anatomy, control inventory, interaction model, and gaps.
 - [Audit results](audit-results.md) — confirmed inconsistencies, missing behavior, and prioritized recommendations.
 
 ## Scope
@@ -20,7 +21,7 @@ The Markdown focuses on necessary controls for:
 - adding indicators and alerts;
 - drawing and navigating;
 - saving/managing layouts;
-- using watchlist and analysis panels;
+- using watchlist and analysis panels (Watchlist deep-dive in [watchlist.md](watchlist.md));
 - opening product curtains and moving them to split view;
 - handling replay, settings, snapshot, date, and timezone flows.
 
@@ -53,8 +54,11 @@ Confidence markers used throughout:
 | `ref-icons.html` | Derived icon gallery | Does not define interaction behavior; Icons flyout scan is empty |
 | `cdp-expand-scan.js` | Drawing flyout scanner | Uses port 9223 and hashed classes; update before reuse |
 | `cdp-live-capture.js` | HTML/screenshot capture | Replaces canvas with an image in exported HTML |
+| `cdp-screenshot.js` | PNG + HTML wrapper capture | Simpler alternative to `cdp-live-capture.js` |
+| `chart-screenshot.png` | Chart screenshot | Output of `cdp-screenshot.js` |
+| `watchlist-screenshot.png` | Watchlist panel screenshot (2026-07-13, CDP clip capture) | Manual clip capture, not from a checked-in script |
 
-The former `chart-screenshot.png` reference was stale because that file is not present in this directory.
+`cdp-symbol-search.js`, `cdp-watchlist.js`, `ref-symbol-search.html`, and `ref-watchlist.html` referenced in `docs/MIRROR-PLAN-SYMBOL-SEARCH-WATCHLIST.md` were **not built**. The Symbol Search and Watchlist geometry used for the 2026-07-13 implementation pass came from ad hoc CDP `Runtime.evaluate` calls (computed styles + DOM structure), recorded inline in `structure.md` §4.1 and `watchlist.md` §2.4/§3/§8 rather than as standalone reusable scripts or checked-in HTML/PNG artifacts. This is a known evidence-reproducibility gap: the exact values are documented, but the capture is not re-runnable from a script in this directory.
 
 ## Refresh policy
 
