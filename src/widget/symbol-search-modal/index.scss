@@ -1,42 +1,171 @@
 @use '../../styles/base' as *;
 
+.#{$prefix-cls}-symbol-search-modal {
+  width: 100%;
+  font-size: 14px;
+  color: var(--astroneum-text-color);
+  display: flex;
+  flex-direction: column;
+}
+
 .#{$prefix-cls}-symbol-search-modal-input {
-  margin: 0 0 10px;
-  height: 36px;
+  margin: 0 0 12px;
+  height: 40px;
   svg {
     width: 16px;
     height: 16px;
     fill: var(--astroneum-text-second-color);
   }
   .value {
-    font-size: 13px;
+    font-size: 16px;
   }
 }
 
-.#{$prefix-cls}-symbol-search-modal-list {
-  height: 360px;
-  margin-left: -16px;
-  margin-right: -16px;
-  li {
-    height: 34px;
-    justify-content: space-between;
-    font-size: 13px;
-    div {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      img {
-        width: 14px;
-        height: 14px;
-        margin-right: 6px;
-        border-radius: 50%;
-      }
-      span {
-        width: 280px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
+.#{$prefix-cls}-symbol-search-modal-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: all;
+  svg {
+    width: 12px;
+    height: 12px;
+    fill: var(--astroneum-text-second-color);
+  }
+  &:hover svg {
+    fill: var(--astroneum-text-color);
+  }
+}
+
+.#{$prefix-cls}-symbol-search-modal-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 0 0 12px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  &::-webkit-scrollbar { height: 0; }
+}
+
+.#{$prefix-cls}-symbol-search-modal-tab {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: var(--astroneum-hover-background-color);
+  color: var(--astroneum-text-second-color);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  &:hover {
+    color: var(--astroneum-text-color);
+  }
+  &.is-active {
+    background: var(--astroneum-primary-color);
+    color: #fff;
+    font-weight: 500;
+  }
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    &:hover {
+      color: var(--astroneum-text-second-color);
     }
   }
+}
+
+.#{$prefix-cls}-symbol-search-modal-results {
+  flex: 1;
+  min-height: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  margin: 0 -20px;
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb { background: var(--astroneum-border-color); border-radius: 3px; }
+}
+
+.#{$prefix-cls}-symbol-search-modal-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 180px 40px;
+  align-items: center;
+  height: 40px;
+  padding: 0 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--astroneum-border-color);
+  &:hover {
+    background: var(--astroneum-hover-background-color);
+  }
+  &.is-active {
+    background: var(--astroneum-selected-color);
+    box-shadow: inset 2px 0 0 var(--astroneum-primary-color);
+  }
+}
+
+.#{$prefix-cls}-symbol-search-modal-cell-ticker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 24px;
+  img {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+.#{$prefix-cls}-symbol-search-modal-ticker {
+  font-weight: 500;
+  color: var(--astroneum-text-color);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.#{$prefix-cls}-symbol-search-modal-cell-desc {
+  color: var(--astroneum-text-second-color);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 8px;
+  font-size: 13px;
+}
+
+.#{$prefix-cls}-symbol-search-modal-cell-exchange {
+  color: var(--astroneum-text-second-color);
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 20px;
+}
+
+.#{$prefix-cls}-symbol-search-modal-cell-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.#{$prefix-cls}-symbol-search-modal-empty,
+.#{$prefix-cls}-symbol-search-modal-message {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--astroneum-text-second-color);
+  font-size: 14px;
+}
+
+.#{$prefix-cls}-symbol-search-modal-footer {
+  padding: 9px 20px;
+  text-align: center;
+  color: var(--astroneum-text-second-color);
+  font-size: 12px;
+  background: var(--astroneum-hover-background-color);
+  margin: 0 -20px -16px;
+  flex-shrink: 0;
 }

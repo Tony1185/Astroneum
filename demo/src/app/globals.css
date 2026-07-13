@@ -50,12 +50,12 @@ body {
   --term-backdrop: rgba(0, 0, 0, 0.5);
 
   /* geometry — per TV terminal spec */
-  --term-toolbar-h: 48px;
-  --term-rail-w: 60px;
-  --term-sidebar-w: 300px;
-  --term-sidebar-min: 240px;
+   --term-toolbar-h: 44px;
+   --term-left-rail-w: 52px;
+   --term-sidebar-w: 320px;
+  --term-sidebar-min: 280px;
   --term-sidebar-max: 540px;
-  --term-dock-h: 300px;
+   --term-dock-h: 220px;
   --term-dock-min: 120px;
   --term-dock-max: 480px;
   --term-dock-collapsed-h: 36px;
@@ -71,6 +71,8 @@ body {
   --term-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --term-dur-fast: 100ms;
   --term-dur: 200ms;
+  --term-dur-surface: 160ms;
+  --term-dur-panel: 240ms;
 }
 
 /* Tabular figures everywhere numeric by default; opt out per-element. */

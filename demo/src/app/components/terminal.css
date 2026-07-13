@@ -1,6 +1,6 @@
 /* Astroneum Terminal — shell grid.
-   TV terminal layout: topbar (48px) / rail (60px) / chart (flex) /
-   sidebar (300px) / dock (300px) / footer (22px).
+   TV terminal layout: topbar (48px) / chart (flex) /
+   sidebar (260px) / dock (220px) / footer (28px).
    All colors reference --term-* tokens (which alias --astroneum-*). */
 
 .term-shell {
@@ -13,28 +13,53 @@
   font-family: 'Trebuchet MS', -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif;
   font-size: 13px;
   grid-template-areas:
-    "topbar  topbar  topbar"
-    "rail    chart   sidebar"
-    "dock    dock    dock"
-    "footer  footer  footer";
-  grid-template-columns: var(--term-rail-w) 1fr var(--term-sidebar-w);
+    "topbar    topbar"
+    "workspace sidebar"
+    "footer    footer";
+  grid-template-columns: 1fr var(--term-sidebar-w);
   grid-template-rows:
     var(--term-toolbar-h)
     1fr
-    var(--term-dock-h)
     var(--term-footer-h);
-  transition: grid-template-columns var(--term-dur) var(--term-ease),
-              grid-template-rows var(--term-dur) var(--term-ease);
+  transition: grid-template-columns var(--term-dur) var(--term-ease);
 }
 
-/* Collapsed sidebar — width 0, content hidden */
+/* Collapsed sidebar retains the tab strip so it can be reopened in place. */
 .term-shell[data-sidebar="closed"] {
-  --term-sidebar-w: 0px;
+  --term-sidebar-w: 52px;
+}
+.term-shell[data-sidebar="closed"] .term-sidebar {
+  opacity: 1;
+  pointer-events: auto;
+}
+.term-shell[data-sidebar="closed"] .term-sidebar-body {
+  flex: 0 0 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-/* Collapsed dock — just the tab strip height */
+/* Collapsed dock — just the tab strip height. Dock height lives on
+   .term-workspace-main's grid-template-rows (not a flex-basis percentage,
+   which proved unreliable against a nested flex container's indefinite
+   height), so it can never visually collide with the chart above it. */
 .term-shell[data-dock="closed"] {
   --term-dock-h: var(--term-dock-collapsed-h);
+}
+/* Maximize floats the dock as a fixed overlay instead of resizing the
+   layout. Because the chart/dock split is a CSS Grid (grid-template-rows),
+   not flexbox, the dock's row keeps reserving its own space in the grid's
+   track structure even while the dock itself is taken out of flow via
+   position:fixed — so the chart (and the library's own left drawing rail
+   embedded inside it) never resizes or shifts position. */
+.term-shell[data-dock-maximized="true"] .term-dock {
+  position: fixed;
+  top: var(--term-toolbar-h);
+  left: 0;
+  right: 0;
+  bottom: var(--term-footer-h);
+  z-index: 50;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Topbar ── */
@@ -51,83 +76,70 @@
   overflow: hidden;
 }
 
-/* ── Left rail ── */
-.term-rail {
-  grid-area: rail;
+/* ── Workspace: chart + dock stacked in a single column. The chart's own
+   left drawing rail (library-owned) is rendered inside .term-chart; the
+   dock sits directly below it, inset by the same rail width (see .term-dock
+   below) so it never renders underneath the rail. */
+.term-workspace {
+  grid-area: workspace;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--term-sm, 8px) 0;
-  gap: var(--term-xs, 4px);
-  background: var(--term-app-bg);
-  border-right: 1px solid var(--term-divider);
-  z-index: 20;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.term-rail-group {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--term-xs, 4px);
-}
-
-.term-rail-divider {
-  width: 32px;
-  height: 1px;
-  background: var(--term-divider);
-  margin: 6px 0;
-  flex-shrink: 0;
-}
-
-.term-rail-spacer { flex: 1; }
-
-/* Rail item — 44px hit area, icon 24px */
-.term-rail-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--term-icon-hit);
-  height: var(--term-icon-hit);
-  background: transparent;
-  color: var(--term-text-2);
-  border: none;
-  border-radius: var(--term-r-md);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background-color var(--term-dur-fast) var(--term-ease),
-              color var(--term-dur-fast) var(--term-ease);
-}
-.term-rail-item:hover {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--term-text);
-}
-.term-rail-item.is-active {
-  background: var(--term-accent-tint);
-  color: var(--term-accent);
-}
-.term-rail-item.is-active::before {
-  content: '';
-  position: absolute;
-  left: -8px;
-  top: 10px;
-  bottom: 10px;
-  width: 3px;
-  border-radius: 2px;
-  background: var(--term-accent);
-}
-
-/* ── Chart cell ── */
-.term-chart {
-  grid-area: chart;
-  display: flex;
-  flex-direction: column;
-  background: var(--term-app-bg);
-  overflow: hidden;
+  flex-direction: row;
   min-width: 0;
   min-height: 0;
+  overflow: hidden;
+}
+.term-workspace-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) var(--term-dock-h);
+  overflow: visible;
+  transition: grid-template-rows var(--term-dur) var(--term-ease);
+}
+
+/* ── Chart cell ──
+   A grid row (minmax(0,1fr)), not a flex-basis percentage. Grid tracks are
+   defined structurally by .term-workspace-main's grid-template-rows and do
+   not depend on the dock being a live flex participant — taking the dock
+   out of flow for maximize (position:fixed, below) cannot cause this row to
+   grow or shrink, so the chart (and the library's left drawing rail
+   embedded inside it) is guaranteed pixel-identical whether or not the dock
+   is currently in the document flow. */
+.term-chart {
+  display: flex;
+  flex-direction: column;
+  background: var(--term-app-bg);
+  overflow: visible;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The library's own left drawing rail (`.astroneum-drawing-bar`) has no
+   overflow guard of its own — on short viewports its ~14 stacked tool icons
+   can need more vertical space than the chart row has available. `.term-chart`
+   clips the excess (so it never visually paints over the dock below), but
+   without a scroll affordance the clipped icons become silently unreachable.
+   Make the rail scroll instead so every tool stays reachable. App-level
+   override via the library's public class name — no library fork needed. */
+.astroneum-drawing-bar {
+  height: calc(100% + var(--term-dock-h));
+  position: relative;
+  z-index: 40;
+}
+@media (max-height: 620px) {
+  .astroneum-drawing-bar {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+  }
+  .astroneum-drawing-bar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .astroneum-drawing-bar::-webkit-scrollbar-thumb {
+    background: var(--term-border);
+    border-radius: 2px;
+  }
 }
 
 /* Chart strip — temporary container for indicator picker (Phase 2 removes) */
@@ -154,10 +166,27 @@
   grid-area: sidebar;
   display: flex;
   flex-direction: row;
+  position: relative;
   background: var(--term-panel-bg);
   border-left: 1px solid var(--term-border);
   z-index: 20;
   overflow: hidden;
+ transition: opacity var(--term-dur) var(--term-ease);
+}
+
+.term-sidebar-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  z-index: 21;
+  cursor: col-resize;
+  touch-action: none;
+}
+.term-sidebar-resize-handle:hover,
+.term-sidebar-resize-handle:active {
+  background: var(--term-accent);
 }
 
 .term-sidebar-strip {
@@ -168,7 +197,7 @@
   padding: 8px 0;
   gap: 4px;
   background: var(--term-panel-bg);
-  border-right: 1px solid var(--term-divider);
+  border-left: 1px solid var(--term-divider);
   flex-shrink: 0;
 }
 
@@ -247,15 +276,40 @@
   overflow-x: hidden;
 }
 
-/* ── Bottom dock ── */
+/* ── Bottom dock ──
+   A grid row of .term-workspace-main (see grid-template-rows above), not a
+   flex-basis, stacked directly under the chart. Its left edge is inset by
+   the library's own drawing rail width so it never renders underneath that
+   rail — driven purely by the library's existing `data-drawing-bar-visible`
+   attribute on `.astroneum-widget`, no extra spacer element required. */
 .term-dock {
-  grid-area: dock;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin-left: var(--term-left-rail-w);
   display: flex;
   flex-direction: column;
   background: var(--term-panel-bg);
   border-top: 1px solid var(--term-border);
   z-index: 30;
   overflow: hidden;
+  transition: margin-left var(--term-dur-fast) var(--term-ease);
+}
+.term-shell:has(.astroneum-widget[data-drawing-bar-visible="false"]) .term-dock {
+  margin-left: 0;
+}
+.term-dock-resize {
+  position: absolute;
+  inset: -3px 0 auto;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 2;
+}
+.term-dock-resize:focus-visible { outline: 2px solid var(--term-accent); }
+/* Height dragging is meaningless once the dock is a fixed full-height
+   overlay (see the maximize rule above). */
+.term-shell[data-dock-maximized="true"] .term-dock-resize {
+  display: none;
 }
 
 .term-dock-tabs {
@@ -281,6 +335,43 @@
   cursor: pointer;
   transition: color var(--term-dur-fast) var(--term-ease);
 }
+.term-dock-tab-wrap { position: relative; display: flex; align-items: stretch; }
+.term-dock-tab-menu {
+  width: 22px;
+  border: 0;
+  background: transparent;
+  color: var(--term-text-2);
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+.term-dock-tab-wrap:hover .term-dock-tab-menu,
+.term-dock-tab-menu:focus-visible { color: var(--term-text); }
+.term-dock-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  z-index: 80;
+  min-width: 130px;
+  padding: 4px;
+  background: var(--term-elevated-bg);
+  border: 1px solid var(--term-border);
+  border-radius: var(--term-r-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+.term-dock-menu button {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--term-text);
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.term-dock-menu button:hover, .term-dock-menu button:focus-visible { background: var(--term-accent-tint); }
+.term-dock-more { right: 44px; }
 .term-dock-tab:hover {
   color: var(--term-text);
 }
@@ -290,6 +381,7 @@
 }
 
 .term-dock-controls {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -302,6 +394,7 @@
   overflow: auto;
   min-height: 0;
 }
+.term-dock-body > [role="tabpanel"] { height: 100%; }
 
 .term-dock-placeholder {
   display: flex;
@@ -705,7 +798,9 @@
   cursor: pointer;
   user-select: none;
   flex-shrink: 0;
-  transition: all var(--term-dur-fast) var(--term-ease);
+  transition: border-color var(--term-dur-fast) var(--term-ease),
+              background-color var(--term-dur-fast) var(--term-ease),
+              color var(--term-dur-fast) var(--term-ease);
 }
 .term-chip:hover {
   color: var(--term-text);
@@ -747,9 +842,91 @@
   text-align: center;
 }
 
-/* Responsive — below 1100px, collapse sidebar by default */
+/* Product curtains and split views share one explicit surface layer. */
+.term-curtain-backdrop {
+ position: fixed;
+ inset: 0;
+ z-index: 100;
+ display: flex;
+ align-items: stretch;
+ justify-content: flex-end;
+ background: rgba(0, 0, 0, 0.42);
+ animation: term-backdrop-in var(--term-dur-surface) var(--term-ease) both;
+}
+.term-curtain {
+ width: min(920px, 88vw);
+ height: 100%;
+ display: flex;
+  flex-direction: column;
+ background: var(--term-panel-bg);
+ border-left: 1px solid var(--term-border);
+ box-shadow: -16px 0 40px rgba(0, 0, 0, 0.35);
+ animation: term-curtain-in var(--term-dur-panel) var(--term-ease) both;
+}
+.term-split-view {
+ position: absolute;
+ z-index: 40;
+ top: var(--term-toolbar-h);
+ right: 0;
+ bottom: calc(var(--term-dock-h) + var(--term-footer-h));
+ width: min(42vw, 580px);
+ min-width: 320px;
+ display: flex;
+ flex-direction: column;
+ background: var(--term-panel-bg);
+ border-left: 1px solid var(--term-border);
+ box-shadow: -8px 0 24px rgba(0, 0, 0, 0.22);
+ animation: term-split-in var(--term-dur-surface) var(--term-ease) both;
+}
+.term-surface-header {
+ display: flex;
+ align-items: center;
+ min-height: 44px;
+ padding: 0 12px;
+ border-bottom: 1px solid var(--term-border);
+ color: var(--term-text);
+}
+.term-surface-actions {
+ display: flex;
+ align-items: center;
+ gap: 4px;
+ margin-left: auto;
+}
+.term-surface-header > .term-icon-btn { margin-left: auto; }
+.term-surface-empty {
+ display: grid;
+ place-items: center;
+ flex: 1;
+ padding: 24px;
+ color: var(--term-text-2);
+ text-align: center;
+}
+
+@keyframes term-backdrop-in {
+ from { opacity: 0; }
+ to { opacity: 1; }
+}
+@keyframes term-curtain-in {
+ from { opacity: 0; transform: translateX(24px); }
+ to { opacity: 1; transform: translateX(0); }
+}
+@keyframes term-split-in {
+ from { opacity: 0; transform: translateX(12px); }
+ to { opacity: 1; transform: translateX(0); }
+}
+
+/* Responsive below 1100px: collapse sidebar by default */
 @media (max-width: 1100px) {
   .term-shell:not([data-sidebar="open"]) {
     --term-sidebar-w: 0px;
   }
+}
+
+@media (max-width: 1024px) {
+  .term-dock { margin-left: 0; }
+}
+
+@media (max-width: 720px) {
+ .term-curtain { width: 100vw; }
+ .term-split-view { width: 100%; min-width: 0; }
 }
