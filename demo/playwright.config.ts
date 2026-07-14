@@ -8,7 +8,6 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:3003/astroneum/',
     colorScheme: 'dark',
     deviceScaleFactor: 1,
-    reducedMotion: 'reduce',
   },
   webServer: {
     command: 'pnpm exec next start -p 3003',
