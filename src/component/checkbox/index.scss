@@ -4,22 +4,61 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   font-size: 14px;
   color: var(--astroneum-text-color);
-  fill: var(--astroneum-text-color);
   cursor: pointer;
-  .icon {
-    width: 20px;
-    height: 20px;
+  user-select: none;
+
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    margin: 0;
+  }
+
+  .checkbox-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border: 1px solid #363a45;
+    border-radius: 4px;
+    background: transparent;
+    transition: border-color 0.15s, background-color 0.15s;
+
+    svg {
+      width: 12px;
+      height: 10px;
+      color: #fff;
+    }
+  }
+
+  &:hover .checkbox-visual {
+    border-color: var(--astroneum-text-second-color);
+  }
+
+  &.checked .checkbox-visual {
+    background: var(--astroneum-primary-color);
+    border-color: var(--astroneum-primary-color);
+  }
+
+  input:focus-visible + .checkbox-visual {
+    outline: 2px solid var(--astroneum-primary-color);
+    outline-offset: 1px;
   }
 
   .label {
     display: inline-block;
-    margin-left: 6px;
+    font-size: 14px;
   }
-  &.checked {
-    color: var(--astroneum-primary-color);
-    fill: var(--astroneum-primary-color);
+
+  &.is-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }

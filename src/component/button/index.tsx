@@ -6,6 +6,7 @@ export interface ButtonProps extends ParentProps {
   className?: string
   style?: JSX.CSSProperties | string
   type?: ButtonType
+  disabled?: boolean
   onClick?: () => void
 }
 
@@ -14,6 +15,7 @@ const Button: ParentComponent<ButtonProps> = props => {
     <button
       style={props.style}
       className={`astroneum-button button is-small ${props.type === 'confirm' ? 'is-primary' : ''} ${props.className ?? ''}`}
+      disabled={props.disabled}
       onClick={props.onClick}>
       {props.children}
     </button>

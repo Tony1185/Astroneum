@@ -1,9 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { AlertManager } from '@tony01/astroneum'
-import AlertDialog from '../_components/alerts/AlertDialog'
-import '../_components/alerts/alert-dialog.css'
+import { AlertManager, AlertModal } from '@tony01/astroneum'
 
 interface AlertItem {
   id: string
@@ -189,12 +187,10 @@ export default function AlertsPage() {
       </div>
 
       {showDialog && (
-        <AlertDialog
+        <AlertModal
+          locale="en-US"
           symbol="BTCUSDT"
-          symbolLogo="https://s3-symbol-logo.tradingview.com/crypto/XTVCBTC.svg"
-          currentPrice={undefined}
           onClose={() => setShowDialog(false)}
-          onCreated={() => refresh()}
         />
       )}
     </div>
