@@ -164,3 +164,22 @@
 .astroneum-workspace-watchlist-table .is-down { color: #ef5350; }
 .astroneum-workspace-watchlist-empty { display: grid; place-items: center; gap: 8px; min-height: 160px; color: var(--astroneum-text-second-color); }
 .astroneum-workspace-watchlist-empty button { padding: 6px 10px; border-radius: 3px; background: var(--astroneum-primary-color); color: white; }
+
+.astroneum-workspace-alerts { display: flex; flex-direction: column; width: 100%; min-height: 0; color: var(--astroneum-text-color); background: var(--astroneum-popover-background-color); font-size: 12px; }
+.astroneum-workspace-alerts-header { display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 4px 8px; border-bottom: 1px solid var(--astroneum-border-color); }
+.astroneum-workspace-alerts-header span { color: var(--astroneum-text-second-color); }
+.astroneum-workspace-alerts-header button { border: 0; border-radius: 3px; background: transparent; color: var(--astroneum-text-second-color); font: inherit; cursor: pointer; }
+.astroneum-workspace-alerts-header button:last-child { margin-left: auto; padding: 6px 10px; background: var(--astroneum-primary-color); color: white; }
+.astroneum-workspace-alerts-list { min-height: 0; overflow: auto; }
+.astroneum-workspace-alert-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; min-height: 54px; padding: 8px 10px; border-bottom: 1px solid var(--astroneum-border-color); cursor: pointer; }
+.astroneum-workspace-alert-row:hover { background: var(--astroneum-hover-background-color); }
+.astroneum-workspace-alert-row > div:nth-child(2) { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.astroneum-workspace-alert-row > div:nth-child(2) span { color: var(--astroneum-text-second-color); }
+.astroneum-workspace-alert-state { text-transform: capitalize; color: var(--astroneum-text-second-color); }
+.astroneum-workspace-alert-state.is-active { color: #26a69a; }
+.astroneum-workspace-alert-state.is-paused { color: #f7931a; }
+.astroneum-workspace-alert-actions { display: flex; gap: 4px; }
+.astroneum-workspace-alert-actions button, .astroneum-workspace-alerts-empty button { border: 0; background: transparent; color: var(--astroneum-text-second-color); font: inherit; cursor: pointer; }
+.astroneum-workspace-alert-actions button:hover { color: var(--astroneum-text-color); }
+.astroneum-workspace-alerts-empty { display: grid; place-items: center; gap: 8px; min-height: 150px; color: var(--astroneum-text-second-color); }
+.astroneum-workspace-alerts-empty button { padding: 6px 10px; border-radius: 3px; background: var(--astroneum-primary-color); color: white; }

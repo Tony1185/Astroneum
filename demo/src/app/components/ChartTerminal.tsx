@@ -27,8 +27,7 @@ import {
 import { AlertManager } from '@tony01/astroneum'
 import type { BacktestResult } from '@tony01/astroneum'
 import type { CompiledStrategy } from '@tony01/astroneum/script'
-import { LayerProvider, WorkspaceShell, WorkspaceToolbar, WorkspaceWatchlist, useWorkspaceShell } from '@tony01/astroneum/workspace'
-import { AlertsPanel } from './panels/WatchlistPanel'
+import { LayerProvider, WorkspaceAlerts, WorkspaceShell, WorkspaceToolbar, WorkspaceWatchlist, useWorkspaceShell } from '@tony01/astroneum/workspace'
 import PineEditorPanel, { StrategyTesterPanel, TradingPanel, StubPanel } from './panels/PineEditorPanel'
 import DateRangeNavigator from './DateRangeNavigator'
 import CommandPalette from './CommandPalette'
@@ -219,7 +218,7 @@ function SidebarContent({ onSymbolSelect, selectedTicker, symbol, datafeed, getC
         </div>
         <div className="term-sidebar-content">
           <div hidden={active !== 'watchlist'} style={{ height: '100%' }}><WorkspaceWatchlist onSymbolSelect={onSymbolSelect} selectedTicker={selectedTicker} datafeed={datafeed} open={sidebarOpen} /></div>
-          <div hidden={active !== 'alerts'} style={{ height: '100%' }}><AlertsPanel symbol={symbol?.ticker} getCurrentPrice={getCurrentPrice} indicatorSources={getIndicatorSources?.()} onSymbolChange={onSymbolSelect} /></div>
+          <div hidden={active !== 'alerts'} style={{ height: '100%' }}><WorkspaceAlerts symbol={symbol?.ticker ?? 'BTCUSDT'} currentPrice={getCurrentPrice?.()} indicatorSources={getIndicatorSources?.()} onSymbolChange={onSymbolSelect} /></div>
           <div hidden={active !== 'calendar'} style={{ height: '100%' }}><StubPanel title="Calendar" icon="ðŸ“…" hint="Economic calendar events â€” wired when an economic data feed is connected" /></div>
           <div hidden={active !== 'ideas'} style={{ height: '100%' }}><StubPanel title="Ideas" icon="ðŸ’¡" hint="Published community ideas â€” wired when an ideas API is connected" /></div>
           <div hidden={active !== 'trading'} style={{ height: '100%' }}><StubPanel title="Trading" icon="ðŸ’¼" hint="Connect a broker to place orders and track positions" /></div>

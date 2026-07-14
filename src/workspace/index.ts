@@ -3,3 +3,5 @@ export type { WorkspaceShellContextValue, WorkspaceShellProps, WorkspaceToolbarP
 export { LayerProvider, useLayer, useLayerProvider } from './LayerProvider'
 export { default as WorkspaceWatchlist } from './WatchlistPanel'
 export type { WorkspaceWatchlistProps } from './WatchlistPanel'
+export { default as WorkspaceAlerts } from './AlertsPanel'
+export type { WorkspaceAlertsProps } from './AlertsPanel'
