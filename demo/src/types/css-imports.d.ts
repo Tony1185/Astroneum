@@ -1,3 +1,3 @@
 declare module '*.css'
 
-declare module 'astroneum/style.css'
+declare module '@tony01/astroneum/style.css'

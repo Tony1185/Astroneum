@@ -5,6 +5,7 @@ import { type Component, type JSX } from '@/react-shared'
 export interface SelectDataSourceItem {
   key: string
   text: JSX.Element
+  isHeader?: boolean
 }
 
 export interface SelectProps {

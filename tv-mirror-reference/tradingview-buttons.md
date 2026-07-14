@@ -122,7 +122,7 @@ Replay controls are absent before replay starts. Stopping replay returns the cha
 
 | semantic_id | Control | Selector | Presentation | Necessary nested controls |
 |---|---|---|---|---|
-| `sidebar.watchlist` | Watchlist/details/news | `[data-name="base"]` | docked panel | Add symbol, advanced view, settings, sorting |
+| `sidebar.watchlist` | Watchlist/details/news | `[data-name="base"]` | docked panel | List selector, Add symbol, Advanced view, Settings, sortable columns, Details sub-view — full inventory in [watchlist.md](watchlist.md) |
 | `sidebar.alerts` | Alerts | `[data-name="alerts"]` | docked panel | Alerts/Log tabs, Create alert |
 | `sidebar.object_tree` | Object tree/data window | `[data-name="object_tree"]` | docked panel | tabs, group, clone/copy, move, manage drawings |
 | `sidebar.chats` | Chats | `[data-name="union_chats"]` | docked panel | empty and message-list states |
@@ -144,6 +144,8 @@ Replay controls are absent before replay starts. Stopping replay returns the cha
 | `panel.hide` | Panel hider | widgetbar-scoped hider control | collapses right panel; exact selector `not captured` |
 
 TradingView's observed "pop-out" is an in-app split view, not a new operating-system window.
+
+The Watchlist panel (`sidebar.watchlist`) has a full control inventory, sortable-column contract, and interaction/state model in [watchlist.md](watchlist.md).
 
 ## 7. Essential dialog controls
 

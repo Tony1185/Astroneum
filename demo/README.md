@@ -15,7 +15,7 @@ cd demo
 pnpm install
 
 # 3. Start the dev server
-pnpm dev        # http://localhost:5556
+pnpm dev        # Next.js prints the active local URL
 ```
 
 ## Data Source
@@ -25,15 +25,17 @@ The demo uses astroneum's built-in standard crypto datafeed (`createStandardCryp
 - Binance USD-M futures
 - Bitget USDT futures
 - OKX USDT swap
+- Batched 24-hour quote snapshots for the visible watchlist
 
 ## Features
 
-- Data source badge: live exchange route per symbol
-- Symbol selector (multi-exchange crypto)
-- Period buttons: 1m / 5m / 15m / 1H / 4H / D / W
-- Sub-indicator toggles: VOL, MACD, RSI, KDJ, BOLL
-- Dark / Light theme toggle
-- Strict live-only behavior with explicit feed errors
+- Trading terminal shell with chart, drawing rail, bottom dock, and persistent outer-right sidebar strip
+- Watchlist/Details/News panel with horizontal lists, validated symbol search, live sortable columns, view presets, list colors, context actions, and cross-list symbol drag
+- Binance, Bitget, and OKX symbols with history, live candles, and 2-second visible-watchlist quote polling
+- Alerts panel and unified alert creation
+- Pine editor and strategy reports in a resizable/maximizable bottom dock
+- Multi-chart layouts, replay controls, indicators, drawing tools, date-range navigation, and command palette
+- Dark/light/high-contrast terminal tokens with keyboard focus and reduced-motion behavior
 
 ## Next.js notes
 

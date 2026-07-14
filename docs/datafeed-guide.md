@@ -1,6 +1,6 @@
 # Building a Datafeed
 
-A **Datafeed** is a simple interface that lets Astroneum fetch historical data and subscribe to real-time ticks from any source. This guide shows 3 patterns: minimal mock, REST API, and real-time stream.
+A **Datafeed** lets Astroneum search symbols, fetch historical bars, subscribe to real-time ticks, and optionally fetch batched quote snapshots for watchlists. This guide shows 3 patterns: minimal mock, REST API, and real-time stream.
 
 ---
 
@@ -21,6 +21,7 @@ interface Datafeed {
     callback: DatafeedSubscribeCallback
   ): void
   unsubscribe(symbol: SymbolInfo, period: Period): void
+  getQuotes?(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]>
 }
 ```
 
@@ -29,6 +30,23 @@ interface Datafeed {
 - `getHistoryData(symbol, period, from, to)` â€” Fetch bars between timestamps (Unix ms).
 - `subscribe(symbol, period, callback)` â€” Stream real-time ticks; call `callback(tick)` on each update.
 - `unsubscribe(symbol, period)` â€” Stop streaming for this symbol/period pair.
+- `getQuotes(symbols)` — Optional batched snapshot method used by watchlists for last, change, volume, and OHLC values.
+
+```ts
+interface QuoteSnapshot {
+  ticker: string
+  last: Price
+  change?: number
+  changePercent?: number
+  volume?: Volume
+  open?: Price
+  high?: Price
+  low?: Price
+  timestamp?: Timestamp
+}
+```
+
+`StandardCryptoDatafeed` implements this method with Binance, Bitget, and OKX 24-hour ticker endpoints. Snapshot values are not a replacement for candle subscriptions: use `subscribe` for the active chart and `getQuotes` for compact multi-symbol panels.
 
 ---
 

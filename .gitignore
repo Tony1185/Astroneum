@@ -31,9 +31,12 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Nested clones / reference material (not part of the library)
+# Nested clones (not part of the library)
 Astroneum/
-tv-mirror-reference/
+
+# TradingView evidence is intentionally versioned under tv-mirror-reference/.
+# It is documentation only: do not import it into source, package it, or treat
+# captured HTML/assets as implementation material. See docs/WORKSTREAMS.md.
 
 # Editor / IDE
 .vscode/*

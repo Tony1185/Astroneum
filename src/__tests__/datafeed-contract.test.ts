@@ -6,6 +6,7 @@ import {
   DATAFEED_ERROR_EVENT,
   createStandardCryptoDatafeed,
 } from '../datafeed/StandardCryptoDatafeed'
+import { asPrice } from '../utils'
 import type { Datafeed, SymbolInfo, Period, CandleData } from '../types'
 
 /**
@@ -36,6 +37,29 @@ test('createStandardCryptoDatafeed returns the documented Datafeed shape', () =>
   assert.equal(typeof df.getHistoryData, 'function')
   assert.equal(typeof df.subscribe, 'function')
   assert.equal(typeof df.unsubscribe, 'function')
+  assert.equal(typeof df.getQuotes, 'function')
+})
+
+test('StandardCryptoDatafeed batches quote requests by exchange adapter', async () => {
+  const symbol: SymbolInfo = { ticker: 'TEST:BTCUSD', exchange: 'TEST' }
+  let received: SymbolInfo[] = []
+  const df = createStandardCryptoDatafeed({
+    symbols: [symbol],
+    adapters: [{
+      id: 'TEST',
+      async getHistoryBars () { return [] },
+      async getQuotes (symbols) {
+        received = symbols
+        return [{ ticker: symbols[0].ticker, last: asPrice(100) }]
+      },
+      getWebSocketUrl () { return 'wss://example.test' },
+      parseMessage () { return null },
+    }],
+  })
+
+  const quotes = await df.getQuotes([symbol])
+  assert.deepEqual(received, [symbol])
+  assert.deepEqual(quotes, [{ ticker: symbol.ticker, last: 100 }])
 })
 
 test('a minimal custom Datafeed satisfies the type contract', async () => {

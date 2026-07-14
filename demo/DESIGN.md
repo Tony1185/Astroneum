@@ -113,10 +113,6 @@ components:
 
 # Design System: Astroneum Terminal
 
-> **Role:** Demo app (`astroneum-demo-next`) design system — palette, typography, elevation, components.
-> **NOT:** Library UX spec → see `docs/design-astroneum.md`.
-> **Palette note:** Cosmic-indigo-on-terminal-black (`#6366f1` accent) is the demo's brand choice, distinct from the library's TV-dark reference palette (`#2962FF`). Intentional per `demo/PRODUCT.md` "Anti-references: never the exact brand blue."
-
 ## 1. Overview
 
 **Creative North Star: "The Instrument"**
@@ -128,13 +124,15 @@ aesthetic of a well-made tool — flat, dense, calm, with a single note of
 cosmic indigo for the things that matter most.
 
 The system deliberately mirrors the interaction grammar of the category's
-reference tool (TradingView): a 48px top toolbar, a 60px left drawing rail, a
-flex chart, a 300px right watchlist sidebar, a 300px bottom dock for the script
+reference tool (TradingView): a 44px top toolbar, a 52px left drawing rail that remains pinned through the dock, a
+flex chart, a 260px right sidebar whose 52px toggle strip stays on the viewport's outer edge, and a 220px resizable bottom dock for persistent analysis panels
 editor and strategy tester. Familiarity is the feature; strangeness is the
 failure. It rejects AI slop (purple gradients, gradient text, glassmorphism,
 side-stripe borders, eyebrow kickers, identical card grids) and SaaS marketing
 dressing ("supercharge your trading", fake metrics, celebratory motion). Motion
-conveys state only, 100–200ms, ease-out, no bounce.
+conveys state only, 100-240ms, ease-out, no bounce. Menus, dialogs, and
+contextual terminal surfaces use a short transform and opacity settle; live chart
+data remains immediate.
 
 The chrome is a thin layer over the Astroneum charting library. Every color,
 font, and radius token references the library's own `--astroneum-*` CSS
@@ -265,42 +263,11 @@ from the library base styles).
 - **Rail:** 60px fixed, icon 24px in a 44px hit area, 4px gap, 1px
   `rgba(255,255,255,0.06)` group divider. Hover → 4% white bg. Active →
   indigo 15% tint + 3px left indigo bar.
-- **Sidebar strip:** 52px, icon + rotated 11px label. Same active treatment.
-
-### Footer (date-range navigator)
-- **Bar:** 28px height, full width, App Slate bg, 1px top divider. Left =
-  7 preset buttons (1D/1W/1M/3M/1Y/5Y/ALL, 20px tall, 10px label). Right =
-  live visible-range readout (`MMM D, YYYY → MMM D, YYYY`, tabular-nums) +
-  `SYMBOL · TZ` meta, divider-prefixed.
-- **Action:** preset click → `scrollToRealTime()` then
-  `zoomAtDataIndex(currentBars/targetBars, lastIdx, 220)`. `ALL` targets
-  the full bar count. Range readout subscribes to engine
-  `onVisibleRangeChange` + `onZoom` actions; updates live as the user
-  scrolls/zooms.
-- **Engine bridge:** the navigator needs the full `Chart` engine
-  (`scrollToRealTime`/`zoomAtDataIndex`/`getVisibleRange`), which
-  `AstroneumHandle` doesn't expose. A `ChartPlugin` captures it in
-  `onInit` and hands it to React state — the library-blessed extension
-  path, no forking.
+- **Sidebar strip:** 52px on the viewport's outer-right edge, icon + compact label. The panel body opens to its left and may collapse independently. Same active treatment.
 
 ### Panels
 - **Shape:** 0–2px radius (nearly square). Panel Slate bg, 1px Elevated Slate
   border. Header 36px. Body padding 8–16px per density. No shadow.
-
-### Command palette (Ctrl+K)
-- **Trigger:** `Ctrl+K` / `Cmd+K` (demo-level listener in `ChartTerminal`),
-  plus a search-icon button in the topbar (first right-side button after the
-  spacer).
-- **Shape:** 480px max-width overlay, Elevated Slate bg, 8px radius,
-  `0 12px 48px` shadow, 50% black backdrop. Top: 44px input row with
-  search icon + `Esc` kbd. Middle: scrollable result list. Bottom: 32px
-  footer with `↑↓` / `↵` / `Esc` hints.
-- **Results:** symbols (filtered from `STANDARD_CRYPTO_SYMBOLS` by ticker +
-  name, max 12) + actions (timeframe switch, toggle theme/replay/VP/DOM/
-  patterns). `current` badge on the active symbol/period. Default (empty
-  query): 8 symbols + all actions.
-- **Keyboard:** `↑`/`↓` navigate, `↵` select, `Esc` close. Input auto-focuses
-  on open.
 
 ### Signature: Chart Legend
 Top-left DOM overlay on the chart. `SYMBOL · TF` then `O H L C` color-coded
@@ -328,8 +295,9 @@ crosshair leave.
   (`border-left` > 1px as color), or eyebrow kickers above sections.
 - **Don't** use shadows on panels, cards, buttons, or rows — flat by default.
 - **Don't** use display fonts in labels, buttons, or data.
-- **Don't** animate layout properties or add decorative motion — state only,
-  100–200ms, ease-out.
+- **Don't** animate layout properties beyond the shell's sidebar/dock resize or
+  add decorative motion. State motion stays within 100-240ms, uses ease-out,
+  and never delays chart data or page readiness.
 - **Don't** color a surface with up-green or down-red — they carry direction,
   not decoration.
 - **Don't** invent custom scrollbars, form controls, or modal patterns —

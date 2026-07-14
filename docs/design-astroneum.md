@@ -10,9 +10,9 @@ colors:
   ink: "#D1D4DC"
   ink-muted: "#787B86"
   ink-subtle: "#5D606B"
-  accent: "#2962FF"
-  accent-soft: "#1E53E5"
-  accent-deep: "#0D2B8C"
+  accent: "#6366F1"
+  accent-soft: "#4F46E5"
+  accent-deep: "rgba(99, 102, 241, 0.15)"
   profit: "#26A69A"
   loss: "#EF5350"
   warning: "#F89D3E"
@@ -36,7 +36,7 @@ typography:
     lineHeight: "1.125rem"
     letterSpacing: "normal"
   body:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Trebuchet MS', -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif"
     fontSize: "0.8125rem"
     fontWeight: 400
     lineHeight: "1.25rem"
@@ -48,12 +48,12 @@ typography:
     lineHeight: "0.9375rem"
     letterSpacing: "0.02em"
   numeric:
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "'Trebuchet MS', -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif"
     fontSize: "0.8125rem"
     fontWeight: 500
     lineHeight: "1.25rem"
     letterSpacing: "normal"
-    fontFeature: "'tnum' 1, 'cv11' 1"
+    fontFeature: "tabular-nums"
 rounded:
   sm: "3px"
   md: "4px"
@@ -92,8 +92,8 @@ components:
   watchlist-row-hover:
     backgroundColor: "{colors.surface-elevated}"
   watchlist-row-selected:
-    borderLeft: "2px solid {colors.accent}"
-    backgroundColor: "{colors.surface}"
+    boxShadow: "inset 1px 0 0 {colors.accent}"
+    backgroundColor: "{colors.accent-deep}"
   panel-tab:
     backgroundColor: "transparent"
     textColor: "{colors.ink-muted}"
@@ -124,7 +124,7 @@ components:
 
 # Design System: Astroneum
 
-> **Last verified against:** `astroneum` pre-v1.0 (pre-integration in `/opt/astroneum`; reference: `Desktop\Astroneum\docs\api.md`) Â· TV Super Chart Jul 2026 Â· `/opt/astroneum` @ HEAD.
+> **Last verified against:** `/opt/astroneum` @ HEAD, 2026-07-13. TradingView reference behavior is documented separately under `tv-mirror-reference/`.
 
 ## 1. Overview
 
@@ -137,21 +137,21 @@ The aesthetic is **dense, precise, instrument-grade**. The operator is a chartis
 **Mount model.** The chart pane is `<AstroneumChart>` from the `astroneum` npm package â€” a MIT-licensed, TV-class React charting library (Canvas2D / WebGL2, Web Workers, OPFS cache, `EventBus`, plugin system, subpath modules for replay/multichart/watchlist/portfolio/alerts/script/crypto datafeeds). Astroneum does NOT embed a TradingView widget; the `astroneum` library IS the chart engine. Everything around it (top bar, left toolbar, right rail, bottom panel, context menu, OHLC legend) is native Next.js chrome, styled to match the library's dark palette so the seam between `<AstroneumChart>` and chrome is invisible. The library is the chart; Astroneum chrome wraps it.
 
 **Key Characteristics:**
-- Single accent (`#2962FF`, Astroneum Blue) used on â‰¤8% of any screen.
+- Single accent (`#6366F1`, Cosmic Indigo) used on no more than 10% of any screen.
 - Three neutral tones stack for depth: BG â†’ Surface â†’ Surface-Elevated. Matched to the `astroneum` library's default dark theme.
-- Two UI type families: Trebuchet MS for labels and headings, Inter with tabular-nums for all data.
+- One UI family, Trebuchet MS with system fallbacks; numeric data uses tabular figures.
 - Profit/Loss carried by teal and coral, paired always with the numeric sign or an explicit side label.
-- Motion conveys state only: crosshair tracking, tooltip follow, panel collapse. No entrance animations. No card hover lifts.
+- Motion conveys state only: crosshair tracking, tooltip follow, panel collapse, and short contextual-surface entry. No page-load choreography or card hover lifts.
 - Chart-occupies-most-of-screen: the chart pane is never smaller than 60% of non-chrome viewport area at any breakpoint â‰¥ lg.
 
-## 2. Colors: The TV Dark Palette
+## 2. Colors: Cosmic Indigo on Terminal Black
 
-The palette is TradingView's dark theme, transcribed exactly. Astroneum inherits it so `<AstroneumChart>` and the native chrome read as one surface. Anything outside this list is wrong.
+The neutral ramp stays compatible with the chart library while Cosmic Indigo gives Astroneum its own identity. The reference product's interaction grammar is mirrored without copying its exact brand blue.
 
 ### Primary
-- **Astroneum Blue** (`#2962FF`, `oklch(0.55 0.22 264)`): The single accent. Reserved for the active panel tab underline, selected watchlist row left-edge, focused input ring, primary action button, current timeframe button, and the active drawing-tool indicator. Never used for decoration, never on inactive states, never paired with another saturated color on the same screen.
-- **Astroneum Blue Soft** (`#1E53E5`, `oklch(0.50 0.22 264)`): Hover state of `Astroneum Blue` only. Not a standalone color.
-- **Astroneum Blue Deep** (`#0D2B8C`, `oklch(0.27 0.16 264)`): Used as a 12% background tint behind the selected watchlist row and the active toolbar button, and as the deep ring on focused inputs. Not used for text.
+- **Cosmic Indigo** (`#6366F1`): The single accent. Reserved for active tabs, selected states, focus rings, primary actions, the current timeframe, and active drawing tools. Never used as decoration.
+- **Cosmic Indigo Hover** (`#4F46E5`): Hover state of primary indigo controls only.
+- **Cosmic Indigo Tint** (`rgba(99, 102, 241, 0.15)`): Selected-row and active-control background tint.
 
 ### Tertiary (Data Semantics)
 - **Profit Teal** (`#26A69A`, `oklch(0.65 0.10 175)`): Positive P&L, BUY/LONG side pill, "Connected" status dot, "Live" mode chip. Always paired with the numeric sign (`+`) so the meaning survives color blindness.
@@ -170,7 +170,7 @@ The palette is TradingView's dark theme, transcribed exactly. Astroneum inherits
 
 ### Named Rules
 
-**The One Voice Rule.** Astroneum Blue is used on â‰¤8% of pixels on any screen.
+**The One Voice Rule.** Cosmic Indigo is used on no more than 10% of pixels on any screen.
 **The Sign + Color Rule.** P&L and side semantics always carry the numeric sign or an explicit label.
 **The Two-Layer Rule.** Neutral surfaces stack at most three tones deep: BG â†’ Surface â†’ Surface-Elevated.
 **The Match-The-Library Rule.** Native chrome colors match the `astroneum` library's dark theme exactly. Do not tune `#131722` toward a brand tint; if chrome drifts, the seam shows.
@@ -178,10 +178,10 @@ The palette is TradingView's dark theme, transcribed exactly. Astroneum inherits
 ## 3. Typography
 
 **UI Font:** Trebuchet MS (with `-apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif` fallback)
-**Data Font:** Inter (with `ui-sans-serif, system-ui, sans-serif` fallback)
-**Numeric Font:** Inter with `font-feature-settings: 'tnum' 1, 'cv11' 1` for tabular numerals
+**Data Font:** Trebuchet MS with the same system fallback and tabular numerals
+**Numeric Font:** Trebuchet MS with `font-variant-numeric: tabular-nums`
 
-**Character:** Two families, deliberately split. Trebuchet MS carries UI chrome (panel titles, toolbar labels, symbol search, watchlist symbols, tab labels). Inter carries data (prices, P&L, quantities, percentages, timestamps). The Inter numeric variant locks digits to a fixed advance so columns of numbers align.
+**Character:** One family carries chrome and data. Numeric values enable tabular figures so quote, OHLC, P&L, quantity, and timestamp columns align.
 
 ### Hierarchy
 
@@ -190,7 +190,7 @@ The palette is TradingView's dark theme, transcribed exactly. Astroneum inherits
 - **Title** (Trebuchet MS, 700, 0.8125rem / 1.125rem): Section titles inside a panel, modal titles, popover headers.
 - **Body** (Inter, 400, 0.8125rem / 1.25rem): Default text.
 - **Label** (Trebuchet MS, 700, 0.6875rem / 0.9375rem, 0.02em): Toolbar button tooltips, table column headers, form field labels. Sentence case, never tracked-uppercase.
-- **Numeric** (Inter with tabular-nums, 500, 0.8125rem / 1.25rem): All numbers.
+- **Numeric** (Trebuchet MS with tabular-nums, 500, 0.8125rem / 1.25rem): All numbers.
 
 ### Named Rules
 
@@ -208,18 +208,18 @@ Astroneum v1 ships one layout: the Super Chart terminal. It is a 5-region grid t
 | Region | Size | Position | Contents |
 |---|---|---|---|
 | Top bar | 44px height, full width | top | symbol-search pill (left), timeframe selector, chart-type button, indicators button, alerts button, settings, fullscreen toggle (right) |
-| Left toolbar | 48px width, full chart height | left of chart | drawing tools: cursor, trend line, fib retracement, rectangle, text, measure, magnet snap |
+| Left toolbar | 52px width, full workspace height | left of chart + dock | library-owned drawing tools: cursor, trend line, fib retracement, rectangle, text, measure, magnet snap, forecasting group (long/short position, VWAP, volume profile, price/date range) |
 | Chart pane | flex-1 (â‰¥60% of non-chrome viewport) | center | `<AstroneumChart>` mounted here; owns all chart rendering |
-| Right rail | 260px width, collapsible to 0 | right of chart | watchlist (top), quote summary + P&L (bottom) |
-| Bottom panel | 220px height, collapsible to 0, tabs | below chart | tabs: Trading Panel (default), Strategy Tester, Script Editor |
+| Right rail | 260px width, collapsible to a 52px icon strip | outer-right edge; panel body opens to its left | 52px vertical tab strip (5 tabs: Watchlist, Alerts, Calendar, Ideas, Trading). Watchlist panel contains 3 sub-tabs: Watchlist / Details / News |
+| Bottom panel | 220px height, collapsible to 36px tab strip | below chart | tabs: Pine Editor, Strategy Tester, Trading Panel |
 
 ### Behavior
 
-- **Top bar** is fixed-height. Symbol-search pill opens a command-palette-style overlay (see Â§5). Timeframe buttons are mutually exclusive; active gets the Astroneum Blue underline + tint.
-- **Left toolbar** is icon-only, vertical. Active tool gets Astroneum Blue icon + 12% tint background. Hover reveals a settings popover for the active drawing (stroke width, color, magnet). Controls `astroneum`'s `drawingBarVisible` + drawing overlays via the library's drawing API.
+- **Top bar** is fixed-height. Symbol-search pill opens a command-palette-style overlay (see Â§5). Timeframe buttons are mutually exclusive; active gets the Cosmic Indigo underline + tint.
+- **Left toolbar** is the library-owned `DrawingBar`, icon-only and vertical. It remains pinned through the dock's full height; the dock is inset by the same 52px rail width rather than moving or covering the rail. On short viewports the rail scrolls internally so its final tools remain reachable. Active tool gets a Cosmic Indigo icon + tint background. Controls `astroneum`'s `drawingBarVisible` + drawing overlays via the library's drawing API.
 - **Chart pane** is `<AstroneumChart>`. The library owns all rendering inside this pane â€” candles, indicators, drawing overlays, crosshair, axis. Astroneum adds two read-only overlays on top: the OHLC legend (Â§11, via `EventBus` `crosshair-move`) and the context menu (Â§11, via DOM `contextmenu` on the container). No other chrome inside the pane.
-- **Right rail** collapses with a 240ms slide. Collapsed state stores per-user via `serializeState()`. Watchlist row selection drives `chartRef.current.setSymbol()`.
-- **Bottom panel** tabs are underline-on-active. Trading Panel tab is always present; Strategy Tester and Script Editor tabs surface the `astroneum/script` `ScriptEngine` and backtest capabilities. Panel collapses to 0 with the same 240ms slide.
+- **Right rail** keeps its 52px strip pinned to the viewport's outer-right edge and opens the panel body immediately to its left. It collapses with a 240ms slide by hiding only the body; the strip stays interactive and hidden body controls become inert. Repeating the active tab or using the header close button collapses it; any strip icon reopens it. Collapsed state stores per-user in `localStorage` key `astroneum:shell`, separate from chart `serializeState()`. The watchlist panel is a 3-sub-tab container (Watchlist / Details / News); Details+News are sub-tabs inside the panel, not separate rail tabs. Watchlist row selection updates the active symbol and drives `chartRef.current.setSymbol()`; the Details sub-tab reads the latest OHLC candle and symbol metadata. Calendar, Ideas, and Trading remain in-rail empty states until their data feeds exist.
+- **Bottom panel** keeps Pine Editor and Trading Panel as permanent tabs; compiled strategy runs open persistent report tabs. Tabs are underline-on-active, retain state while inactive, provide Rename/Duplicate/Close for reports, and expose a More menu. The dock resizes between 120px and 480px, begins to the right of the pinned 52px drawing rail, maximizes as a fixed overlay without changing chart/rail geometry, and collapses to a 36px tab strip with the same 240ms slide. Pine runs bounded `strategySignals()` scripts against chart history; Trading remains an honest broker-empty state.
 
 ### Responsive
 
@@ -232,22 +232,34 @@ Each component ships `default`, `hover`, `focus-visible`, `active`, `disabled`, 
 
 ### Toolbar Button (top bar + left toolbar)
 - 3px corner radius. 32px square (top bar) or 36px square (left toolbar).
-- Default: transparent, `Ink Muted` icon. Hover: `Surface-Elevated`, `Ink`. Active: `Surface-Elevated`, `Astroneum Blue` icon, 12% `Astroneum Blue Deep` tint. Focus: 2px `Astroneum Blue` ring. Disabled: 40% opacity.
+- Default: transparent, `Ink Muted` icon. Hover: `Surface-Elevated`, `Ink`. Active: Cosmic Indigo icon + tint. Focus: 2px Cosmic Indigo ring. Disabled: 40% opacity.
 
 ### Symbol Search Pill (top bar)
 - 4px radius, 6px / 10px padding, 1px `Hairline Border`. `Surface` background, `Ink` text, search icon left.
-- Click opens command-palette overlay (640px max, `Surface-Elevated`, `shadow-floating`). Search input 40px tall. Result rows 36px: symbol + name + muted exchange. Selected: 8% `Astroneum Blue` tint.
-- Keyboard: `/` focuses. `Enter` calls `chartRef.current.setSymbol()`.
+- Click opens Symbol Search dialog (840px, `Surface-Elevated`, `shadow-floating`). Search input 40px tall, `role="searchbox"`, placeholder "Symbol, ISIN, or CUSIP". Result rows 36px: 4-cell grid (ticker bold / description muted / exchange smaller muted / actions). Active row: Cosmic Indigo tint.
+- Asset-class tabs (`role="tablist"`): All / Stocks / Funds / Futures / Forex / Crypto / Indices / Bonds / Economy / Options / More. Each `role="tab"` with `aria-selected`. Tabs filter results by `SymbolInfo.type`.
+- Footer: "Search using ISIN and CUSIP codes".
+- Keyboard: `/` focuses. Arrow up/down navigates results. `Enter` calls `chartRef.current.setSymbol()`.
+- 200ms debounce on input — prevents API hammering on network-backed feeds.
 
-### Watchlist Row (right rail)
-- Transparent, `Ink` symbol + `Ink Muted` last + Sign+Color change%. Hover: `Surface-Elevated`. Selected: 2px `Astroneum Blue` left edge, `Surface` bg.
-- 1px `Hairline Border` top divider. 32px row. Tabular-nums on price + change.
+### Watchlist Panel (right rail)
+- 3 sub-tabs at panel top: Watchlist / Details / News. Sub-tabs are underline-on-active (same style as bottom panel tabs), 28px, local state (not persisted).
+- **Watchlist sub-tab:** horizontal list tabs at top (one active list visible; overflow → dropdown on ≥6 lists). Header toolbar: tabs + add-list (+) + column settings (gear) + sort indicator + More menu (⋯). Per-list color dot (6-color palette) before list name.
+- **Watchlist Row:** Transparent, `Ink` symbol + `Ink Muted` name + `Ink` last (tabular-nums) + Sign+Color change%. Hover: `Surface-Elevated`. Selected: indigo tint + 1px inset signal. 1px `Hairline Border` divider. 36px minimum row. Tabular-nums on all numeric columns.
+- **Section group headers:** Non-interactive plain-text divider rows between symbol groups (e.g. "US STOCK"). Uppercase, `Label` weight, `Ink Muted`, sticky top within scroll. Driven by `WatchSymbol.group?` field on `WatchlistManager`.
+- **Column header:** sticky, clickable labels (Symbol / Last / Chg% / Vol). Click toggles asc/desc sort, persisted per list. Columns configurable via gear popover (Last / Chg / Chg% / Vol / Open + Name toggle). Simple/Advanced toggle presets column set.
+- **Row context menu:** Copy ticker / Add alert / Move to list / Remove. Pointer and ContextMenu/Shift+F10 invocation ship; Escape/outside-click dismiss. Hide/Lock remain pending because the reference semantics are inferred.
+- **Cross-list drag:** drag symbol row to another list's tab; 4px drop-indicator on tab hover.
+- **Empty state:** muted "No symbols yet" + primary `+ Add symbol` button (Cosmic Indigo) opens `SymbolSearchModal`.
+- **Live quotes:** `Datafeed.getQuotes?(symbols: SymbolInfo[])` polled at 2s for the visible list only; paused when the sidebar or Watchlist sub-tab is hidden. Falls back to `—` when feed absent. Error state: muted "Quotes unavailable" banner with Retry.
+- **Details sub-tab:** `DetailsPanel` — OHLC snapshot + symbol metadata. Fundamentals/P&L deferred (🟦 v1.1).
+- **News sub-tab:** `StubPanel` empty state until news feed connected.
 
 ### Panel Tab (bottom panel)
-- Transparent, `Ink Muted`, 8px / 12px padding. Active: `Ink` text, 2px `Astroneum Blue` bottom border. Hover (inactive): `Ink` text. Underline-on-active, never pill.
+- Transparent, `Ink Muted`, 8px / 12px padding. Active: `Ink` text, 2px Cosmic Indigo bottom border. Hover (inactive): `Ink` text. Underline-on-active, never pill.
 
 ### Order / Position Table (Trading Panel tab)
-- Header: `Label`, `Ink Muted`, sentence case, 1px bottom `Hairline Border`. Data rows: `Body`/`Numeric`, 1px top `Hairline Border`, 36px dense. Row hover: `Surface-Elevated`. Row selection: 2px `Astroneum Blue` left edge + 8% tint.
+- Header: `Label`, `Ink Muted`, sentence case, 1px bottom `Hairline Border`. Data rows: `Body`/`Numeric`, 1px top `Hairline Border`, 36px dense. Row hover: `Surface-Elevated`. Row selection: Cosmic Indigo tint + 1px inset signal.
 - Side pill: transparent, `Profit Teal`/`Loss Coral` text, 1px colored border at 40% alpha. Always paired with `LONG`/`SHORT`.
 - Empty state: one `Ink Muted` sentence + a `Secondary` button. No illustration.
 
@@ -261,7 +273,7 @@ The chart pane is `<AstroneumChart>` from the `astroneum` npm package. Configura
 **Mount props** (from `astroneum` API):
 - `symbol: SymbolInfo` â€” ticker + precision + description
 - `period: Period` â€” `{ multiplier, timespan, text }` e.g. `{ multiplier: 1, timespan: 'hour', text: '1H' }`
-- `datafeed: Datafeed` â€” implements `searchSymbols` / `getHistoryData` / `subscribe` / `unsubscribe` (see Â§6)
+- `datafeed: Datafeed` â€” implements `searchSymbols` / `getHistoryData` / `subscribe` / `unsubscribe` (see §6). Optional `getQuotes?(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]>` supplies watchlist snapshots.
 - `theme: 'dark'` â€” locked to dark in v1
 - `locale`, `timezone` â€” UI locale + IANA timezone for X-axis
 - `watermark` â€” Astroneum logo SVG (or omit)
@@ -323,7 +335,7 @@ const datafeed = createStandardCryptoDatafeed({ exchange: 'binance' })
 ### Lifecycle
 - **Symbol / interval change:** call `chartRef.current.setSymbol(next)` or `chartRef.current.setPeriod(next)`. **Do not reboot the component.** The library reloads data via the datafeed and re-renders in place. (This is the key difference from a TV widget embed, which required destroy + re-init.)
 - **Unmount cleanup:** dispose the `EventBus` subscribers and any `ChartPlugin` disposers returned from `onInit`. The library handles its own canvas/WebGL teardown.
-- **State persistence:** `serializeState()` â†’ `localStorage`; `loadState()` on mount. Covers theme, locale, timezone, symbol, period, styles, indicators, drawing overlays.
+- **State persistence:** `serializeState()` -> `localStorage`; `loadState()` on mount for chart state. Covers theme, locale, timezone, symbol, period, styles, indicators, drawing overlays. Shell chrome state (right rail + bottom panel collapse) is separate and stored under `astroneum:shell`.
 
 ### Bridge to app state
 Subscribe to `EventBus` events so Astroneum chrome stays in sync with the chart. The demo app manages its own state (it does NOT share Trading-Bot-V2's `useTradingStore` â€” the projects are separate):
@@ -337,7 +349,7 @@ Subscribe to `EventBus` events so Astroneum chrome stays in sync with the chart.
 - Watchlist row click â†’ `chartRef.current.setSymbol({ ticker })`.
 - Timeframe button click â†’ `chartRef.current.setPeriod(period)`.
 - Indicators button â†’ mutate `mainIndicators` / `subIndicators` state â†’ re-render `<AstroneumChart>`.
-- Layout save/load â†’ `serializeState()` / `loadState()`.
+- Layout save/load -> `SaveLoadMenu` backed by `ChartTemplateManager`, using `serializeState()` / `loadState()` for named chart-state templates.
 
 ### Datafeed
 Use `astroneum/datafeeds/crypto` (`createStandardCryptoDatafeed` with `BinanceAdapter` / `BitgetAdapter` / `OkxAdapter`) for 100+ crypto symbols with real-time WebSocket. This is the default. The Astroneum demo app does NOT proxy through Trading-Bot-V2's `/api/binance` â€” the two projects are separate. For exchange keys / account-specific data, implement a custom `Datafeed` (`searchSymbols` / `getHistoryData` / `subscribe` / `unsubscribe`) inside `/opt/astroneum/demo/src/app/api/`.
@@ -353,10 +365,11 @@ For v1, the Trading Panel tab in the bottom panel is charting-only (no order pla
 
 ## 7. Motion & State
 
-The terminal is sparse on motion. Motion conveys state, never entry.
+The terminal is sparse on motion. Motion conveys state; contextual surfaces may
+enter briefly so their origin and state change remain legible.
 
-- **Permitted:** crosshair tracking (library-native via `crosshair-move`), tooltip follow, OHLC legend value updates on crosshair move, panel collapse/expand slide (240ms, the only layout-motion permitted), focus ring appearance, hover background fades (120ms, color-only).
-- **Prohibited:** page-entrance fades, card hover lifts (`-translate-y`), card-gradient surfaces, decorative iconography in empty states, animated sparkle, count-up animations on numeric values.
+- **Permitted:** crosshair tracking (library-native via `crosshair-move`), tooltip follow, OHLC legend value updates on crosshair move, panel collapse/expand slide (240ms, the only layout-motion permitted), focus ring appearance, hover background fades (120ms, color-only), 100ms press feedback, and 160-240ms opacity/transform entry for menus, dialogs, curtains, and split views.
+- **Prohibited:** page-entrance fades, card hover lifts (`-translate-y`), card-gradient surfaces, decorative iconography in empty states, animated sparkle, count-up animations on numeric values, and animation of live price/chart values.
 - **Loading:** the chart pane shows nothing until `<AstroneumChart>` mounts; the library renders its own loading state. Surrounding chrome shows skeleton bars (`Surface-Elevated` blocks pulsing at 1.2s) until data resolves.
 - **Error:** the affected chrome region shows a single `Ink Muted` sentence with the specific problem and the retry action.
 
@@ -371,15 +384,15 @@ The keyboard is a first-class input. The terminal is operable without a mouse.
 - Arrow keys â€” navigate menus, watchlist rows, context menu items.
 - `Enter` â€” confirms selection.
 - `<AstroneumChart accessible>` â€” opts the canvas into screen-reader + keyboard-focus support: container gets `tabindex=0`, `role="img"`, `aria-label`; a visually-hidden `aria-live="polite"` region announces OHLCV on crosshair changes (throttled ~10/s).
-- Focus ring: 2px `Astroneum Blue` offset by 2px `Terminal BG`, via `box-shadow`.
+- Focus ring: 2px Cosmic Indigo offset by 2px `Terminal BG`, via `box-shadow`.
 - Color is never the only state channel â€” always paired with sign, label, or icon.
 
 ## 9. Do's and Don'ts
 
 ### Do:
 - **Do** match the `astroneum` library's dark theme exactly. The seam between `<AstroneumChart>` and chrome must be invisible.
-- **Do** use Trebuchet MS for UI chrome and Inter with tabular-nums for data.
-- **Do** give Astroneum Blue the rarest seat in the house. â‰¤8% of any screen.
+- **Do** use Trebuchet MS for UI chrome and enable tabular figures for data.
+- **Do** give Cosmic Indigo the rarest seat in the house: no more than 10% of any screen.
 - **Do** pair P&L and side semantics with the numeric sign or explicit label.
 - **Do** call `chartRef.current.setSymbol()` / `setPeriod()` on change. Do not reboot `<AstroneumChart>`.
 - **Do** clean up `EventBus` subscribers and `ChartPlugin` disposers on unmount.
@@ -453,7 +466,7 @@ Top-left overlay inside the chart pane showing live values as the crosshair move
 - **Line 1:** symbol + interval (Trebuchet MS, `Ink`).
 - **Line 2:** O H L C values (Inter, tabular-nums) with Sign+Color applied to change (profit teal `#26A69A` / loss coral `#EF5350`).
 - **Line 3:** Volume + active `mainIndicators`/`subIndicators` with their current values (via the library's indicator output API).
-- No entrance animation (per Â§7).
+- No independent entrance animation; the legend updates immediately with crosshair state.
 - **Data plumbing reuse:** the `accessible` prop's `aria-live` OHLCV announcement already does this data extraction for screen readers. The visual OhlcLegend renders the same data in a positioned overlay. No duplication of the data path.
 - This is a read-only overlay â€” it does NOT add interactive chrome inside the chart pane beyond the legend (see Â§9 Don'ts).
 
@@ -477,3 +490,129 @@ The following surfaces are explicitly **not** part of Astroneum v1. Some are sup
 | Logo / brand mark lockup | n/a | separate design pass | Needs dedicated brand work. |
 
 **Moved OUT of deferred (now native via `astroneum` package):** multi-chart, compare/overlay, alerts, script editor (`astroneum/script` `ScriptEngine`), layouts (`serializeState`/`loadState` + `DrawingTemplates`), DOM â€” all library-supported. They remain v1-deferred at the APP surface level (v1.1 follow-up), not blocked on the library.
+
+## 13. Reference Workspace Contract
+
+This section translates the `tv-mirror-reference` evidence into Astroneum
+requirements. It is a behavior reference, not a visual or verbal clone. The
+library's dark defaults remain a compatibility baseline; the demo's
+Cosmic Indigo override is the product expression defined in `demo/DESIGN.md`.
+Astroneum does not use TradingView marks, exact brand blue, product names, or
+marketing copy.
+
+### Logical regions
+
+1. **Top toolbar:** chart context first, then workspace actions. At reduced
+   width, labels collapse before essential controls move into overflow.
+2. **Drawing toolbar:** direct tool and disclosure are separate targets.
+   Flyouts are scrollable, anchored, and retain the selected tool.
+3. **Chart workspace:** canvas, legends, scales, ranges, drawing handles, and
+   context-sensitive overlays remain the primary surface.
+4. **Widget rail:** docked panels switch without blocking the chart. Repeating
+   the active rail target collapses only the panel body.
+5. **Dock and split view:** long-running analysis and product work reduce chart
+   space instead of opening a browser window. Every pane has a visible close or
+   collapse path; resizable panes expose a resize affordance when applicable.
+
+One logical control has one semantic ID, accessible name, and keyboard path,
+even if it has wide, medium, and compact renderings. Responsive duplicates are
+not focusable, clickable, or exposed to assistive technology.
+
+### Surface rules
+
+| Surface | Placement | Required dismissal | Focus behavior |
+|---|---|---|---|
+| Tooltip | anchored | pointer leave or blur | no transfer |
+| Flyout/menu | anchored, viewport constrained | selection, outside click, Escape | menu navigation |
+| Dialog | centered over scrim | Close, Cancel, Escape | trap; initial field focus |
+| Docked panel | right rail | rail hider or active rail target | normal workspace order |
+| Product curtain | workspace overlay | Close or Escape | trapped while modal |
+| Split view | chart-adjacent | close/collapse | normal pane order |
+| Context menu | pointer anchored | selection, outside click, Escape | menu navigation |
+| Toast | foreground notification layer | timeout or close | polite announcement |
+
+Only one transient menu or flyout may be open per layer. Opening a dialog
+closes peer transient surfaces. A product curtain can coexist with docked chrome
+but is visually dominant. Popups escape clipping containers and flip or clamp
+at viewport edges.
+
+### Responsive and density contract
+
+Use available-width decisions, not inferred pixel breakpoints. Preserve Symbol,
+Interval, Chart Type, Indicators, Alert, Replay, and workspace access before
+secondary controls. Range shortcuts move to a Range menu before clipping.
+Dialogs remain usable at 200% zoom through viewport clamping, internal scroll,
+and fixed Close/primary actions. Dense desktop hit areas are at least 38x38px;
+touch targets increase to 44x44px without reducing essential information.
+
+## 14. Interaction, State, and Accessibility Contract
+
+### Shared behavior
+
+Every action defines default, hover, focus-visible, pressed, selected/checked,
+expanded, disabled, loading, success, and error states when applicable. Use
+native disabled controls where possible. Loading preserves dimensions and blocks
+duplicate submission; announce a busy state after 300ms. Success and recoverable
+error messages are short, specific, and actionable.
+
+`Escape` closes the frontmost eligible layer. For drawings it first cancels the
+in-progress point or segment, then closes a flyout, then returns to Cursor.
+Closing a transient surface restores focus to its trigger unless selection
+navigated or intentionally changed workspace mode. No required action is
+hover-only.
+
+### Essential workflow requirements
+
+- **Symbol and compare:** search gains focus on open; asset filters do not clear
+  the query; empty, entitlement, delayed-data, and network states retain the
+  query and give recovery. Re-selecting the same market symbol preserves the
+  viewport where possible.
+- **Interval and chart type:** anchored single-select menus support arrows,
+  Enter, and Escape. Preserve the visible time anchor where possible. Gated
+  options stay visible with an explanation.
+- **Indicators:** search and category/type navigation update the result region.
+  Applying a study creates a legend row with Hide, Settings, Remove, and More.
+  Support no-result, limit, permission, compile/runtime, and network failures.
+- **Alerts:** validate beside the field; model editing, invalid, submitting,
+  success, quota/permission failure, and retry. Create remains disabled while
+  submitting and is never optimistically reported as complete.
+- **Save and snapshots:** expose saved, dirty, saving, and failed-with-retry.
+  Keep local chart/script work after failure. Clipboard and download failures
+  offer retry or a viable alternative without blocking the workspace.
+- **Drawing:** selection changes the cursor; Keep Drawing retains the tool after
+  completion; lock affects editing only; hide affects visibility only; bulk
+  remove uses explicit destructive language and preserves locked objects unless
+  the user explicitly chooses otherwise.
+- **Range, Go to, timezone:** preserve symbol and drawings. Go to validates
+  unavailable/future dates and only enables intraday time precision when the
+  interval supports it. Timezone changes labels and live clock, never source
+  timestamps.
+- **Replay:** model inactive, date selection, paused, playing, endpoint, and
+  stopped/realtime. Stopping returns to real-time data and explains any
+  discarded simulated work.
+- **Context menu:** use the click context, including price when available.
+  Reset, Go to, zoom, and object management all have keyboard alternatives.
+
+### Accessibility floor
+
+- WCAG 2.2 AA is the implementation floor, including 4.5:1 normal text and
+  3:1 non-text controls.
+- Icon-only controls have context-specific accessible names. Expose
+  `aria-pressed`, `aria-selected`, `aria-checked`, `aria-expanded`, invalid,
+  busy, and disabled state consistently.
+- Dialogs trap focus and restore it. Menus use roving selection; docked and
+  split panes remain in logical keyboard order.
+- Direction, alert severity, and selection pair color with sign, label, icon,
+  or structural treatment.
+- Announce save, alert, clipboard, replay, loading, and error outcomes without
+  stealing focus. Respect reduced motion and retain a chart summary/data-table
+  alternative where practical.
+
+### Evidence boundary
+
+Use `tv-mirror-reference/structure.md`, `interactions.md`,
+`tradingview-buttons.md`, and `watchlist.md` (Watchlist right-panel deep-dive)
+as the reference evidence. `observed` behavior is the
+fidelity baseline; unverified or account-dependent behavior is marked as such
+rather than inferred. Astroneum may improve accessibility and recovery behavior
+without copying the reference product's identity.

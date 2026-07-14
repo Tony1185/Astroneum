@@ -4,9 +4,9 @@
  * Alerts are persisted to localStorage and evaluated on every new bar
  * or price tick via `AlertManager.check()`.
  *
- * Extended fields: expiration, messageTemplate, emailEnabled,
- * plainTextEnabled, plainTextEmail, toastEnabled, notificationSchedule,
- * soundTitle, soundDuration.
+ * Supports multi-condition alerts (AND), price-source and indicator-source
+ * conditions, paused status, and a change-event subscription so UI panels
+ * can update live without manual refresh.
  *
  * Delivery: sound (variable titles), browser notification, toast popup,
  * webhook (via server-side relay /astroneum/api/alerts/webhook), email
@@ -19,12 +19,26 @@
 // Types
 // ---------------------------------------------------------------------------
 
-export type AlertCondition = 'above' | 'below' | 'crosses_above' | 'crosses_below' | 'crossing'
-export type AlertStatus = 'active' | 'triggered' | 'expired' | 'dismissed'
+export type AlertOperator = 'above' | 'below' | 'crosses_above' | 'crosses_below' | 'crosses' | 'is_between'
+export type AlertCondition = AlertOperator
+
+export type AlertStatus = 'active' | 'paused' | 'triggered' | 'expired' | 'dismissed'
 export type AlertFrequency = 'once' | 'every_bar' | 'bar_close'
 export type SoundTitle = 'Thin' | 'Classic' | 'Alert' | 'Bell' | 'Chime'
 export type SoundDuration = 'once' | 'repeating'
 export type WebhookStatus = 'pending' | 'delivered' | 'failed'
+
+export type AlertSource =
+  | { type: 'price' }
+  | { type: 'indicator'; paneId: string; name: string; plot: string; shortName?: string }
+
+export interface AlertConditionDef {
+  id: string
+  source: AlertSource
+  operator: AlertOperator
+  value: number
+  secondValue?: number
+}
 
 export interface NotificationSchedule {
   preset: '24/7' | 'weekdays' | 'working_hours' | 'custom'
@@ -36,8 +50,9 @@ export interface NotificationSchedule {
 export interface Alert {
   id: string
   symbol: string
-  condition: AlertCondition
+  conditions: AlertConditionDef[]
   price: number
+  condition: string
   note?: string
   timeframe?: string
   frequency: AlertFrequency
@@ -61,16 +76,18 @@ export interface Alert {
   soundDuration?: SoundDuration
 }
 
-export type AlertCreate = Omit<Alert, 'id' | 'status' | 'createdAt' | 'triggeredAt'> &
-  Partial<Pick<Alert, 'frequency' | 'soundEnabled' | 'notificationEnabled'>>
+export type AlertCreate = Omit<Alert, 'id' | 'status' | 'createdAt' | 'triggeredAt' | 'conditions'> &
+  Partial<Pick<Alert, 'conditions' | 'frequency' | 'soundEnabled' | 'notificationEnabled'>>
 
 export interface AlertCheckInput {
   symbol: string
   price: number
   timestamp: number
+  indicatorResolver?: (source: AlertSource) => number | undefined
 }
 
 export type AlertTriggeredCallback = (alert: Alert, price: number) => void
+export type AlertChangeCallback = (alerts: Alert[]) => void
 
 function isValidWebhookUrl(raw: string): boolean {
   try {
@@ -92,6 +109,21 @@ function isValidWebhookUrl(raw: string): boolean {
 
 const STORAGE_KEY = 'astroneum-alerts'
 
+function migrateLegacyAlert(raw: Record<string, unknown>): Record<string, unknown> {
+  if (Array.isArray(raw.conditions)) return raw
+  const condition = raw.condition as string | undefined
+  const price = raw.price as number | undefined
+  if (condition && typeof price === 'number') {
+    raw.conditions = [{
+      id: `cond_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      source: { type: 'price' },
+      operator: condition,
+      value: price,
+    }]
+  }
+  return raw
+}
+
 function loadFromStorage(): Alert[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
@@ -101,12 +133,14 @@ function loadFromStorage(): Alert[] {
     return parsed.filter((a: unknown) => {
       if (a === null || typeof a !== 'object') return false
       const obj = a as Record<string, unknown>
+      const hasConditions = Array.isArray(obj.conditions) && obj.conditions.length > 0
+      const hasLegacy = typeof obj.condition === 'string' && typeof obj.price === 'number'
       return typeof obj.id === 'string' &&
         typeof obj.symbol === 'string' &&
-        typeof obj.price === 'number' &&
         typeof obj.status === 'string' &&
-        typeof obj.createdAt === 'string'
-    }) as Alert[]
+        typeof obj.createdAt === 'string' &&
+        (hasConditions || hasLegacy)
+    }).map((a: unknown) => migrateLegacyAlert(a as Record<string, unknown>) as unknown as Alert)
   } catch {
     return []
   }
@@ -282,14 +316,55 @@ async function sendAlertWebhook(
 }
 
 // ---------------------------------------------------------------------------
+// Condition evaluation
+// ---------------------------------------------------------------------------
+
+function resolveSourceValue(
+  source: AlertSource,
+  price: number,
+  resolver?: (source: AlertSource) => number | undefined,
+): number | undefined {
+  if (source.type === 'price') return price
+  if (resolver) return resolver(source)
+  return undefined
+}
+
+function evaluateCondition(
+  cond: AlertConditionDef,
+  current: number,
+  previous: number | undefined,
+): boolean {
+  switch (cond.operator) {
+    case 'above': return current >= cond.value
+    case 'below': return current <= cond.value
+    case 'crosses_above':
+      return previous !== undefined && previous < cond.value && current >= cond.value
+    case 'crosses_below':
+      return previous !== undefined && previous > cond.value && current <= cond.value
+    case 'crosses':
+      return previous !== undefined && (
+        (previous < cond.value && current >= cond.value) ||
+        (previous > cond.value && current <= cond.value)
+      )
+    case 'is_between':
+      if (cond.secondValue === undefined) return false
+      const lo = Math.min(cond.value, cond.secondValue)
+      const hi = Math.max(cond.value, cond.secondValue)
+      return current >= lo && current <= hi
+    default: return false
+  }
+}
+
+// ---------------------------------------------------------------------------
 // AlertManager singleton
 // ---------------------------------------------------------------------------
 
 export class AlertManager {
   private static _instance: AlertManager | null = null
   private _alerts: Alert[]
-  private _lastPrice: Map<string, number> = new Map()
+  private _lastValues: Map<string, number> = new Map()
   private _listeners: AlertTriggeredCallback[] = []
+  private _changeListeners: AlertChangeCallback[] = []
   private _savePending = false
 
   private constructor() {
@@ -303,9 +378,21 @@ export class AlertManager {
     return AlertManager._instance
   }
 
+  private _notifyChange(): void {
+    for (const cb of this._changeListeners) {
+      try { cb([...this._alerts]) } catch {}
+    }
+  }
+
   add(create: AlertCreate): string {
     const alert: Alert = {
       ...create,
+      conditions: create.conditions ?? [{
+        id: `cond_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        source: { type: 'price' },
+        operator: create.condition as AlertOperator,
+        value: create.price,
+      }],
       id: `alert_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       status: 'active',
       createdAt: new Date().toISOString(),
@@ -315,6 +402,7 @@ export class AlertManager {
     }
     this._alerts.push(alert)
     saveToStorage(this._alerts)
+    this._notifyChange()
     return alert.id
   }
 
@@ -323,21 +411,30 @@ export class AlertManager {
     if (idx === -1) return false
     this._alerts[idx] = { ...this._alerts[idx], ...patch }
     saveToStorage(this._alerts)
+    this._notifyChange()
     return true
   }
 
   delete(id: string): boolean {
     const prev = this._alerts.length
     this._alerts = this._alerts.filter(a => a.id !== id)
-    if (this._alerts.length !== prev) { saveToStorage(this._alerts); return true }
+    if (this._alerts.length !== prev) { saveToStorage(this._alerts); this._notifyChange(); return true }
     return false
   }
 
   dismiss(id: string): boolean { return this.update(id, { status: 'dismissed' }) }
   reactivate(id: string): boolean { return this.update(id, { status: 'active', triggeredAt: undefined }) }
+
+  togglePause(id: string): boolean {
+    const a = this._alerts.find(a => a.id === id)
+    if (!a) return false
+    return this.update(id, { status: a.status === 'paused' ? 'active' : 'paused' })
+  }
+
   clear(symbol?: string): void {
     this._alerts = symbol ? this._alerts.filter(a => a.symbol !== symbol) : []
     saveToStorage(this._alerts)
+    this._notifyChange()
   }
 
   getAll(): readonly Alert[] { return this._alerts }
@@ -346,42 +443,38 @@ export class AlertManager {
   getActiveForSymbol(symbol: string): Alert[] {
     return this._alerts.filter(a => a.symbol === symbol && a.status === 'active')
   }
-  getHistory(): Alert[] { return this._alerts.filter(a => a.status !== 'active') }
+  getHistory(): Alert[] { return this._alerts.filter(a => a.status !== 'active' && a.status !== 'paused') }
+  getById(id: string): Alert | undefined { return this._alerts.find(a => a.id === id) }
 
   /**
    * Call on every price tick or bar close.
-   * Checks expiration, evaluates conditions, fires delivery.
+   * Checks expiration, evaluates conditions (AND), fires delivery.
+   * indicatorResolver maps indicator sources to their current plot values.
    */
   check(input: AlertCheckInput): void {
-    const { symbol, price, timestamp } = input
-    const last = this._lastPrice.get(symbol)
-    this._lastPrice.set(symbol, price)
+    const { symbol, price, timestamp, indicatorResolver } = input
 
     for (const alert of this._alerts) {
       if (alert.symbol !== symbol || alert.status !== 'active') continue
 
-      // Expiration check
       if (alert.expiration && new Date(alert.expiration).getTime() < timestamp) {
         alert.status = 'expired'
         continue
       }
 
-      let triggered = false
-      switch (alert.condition) {
-        case 'above': triggered = price >= alert.price; break
-        case 'below': triggered = price <= alert.price; break
-        case 'crosses_above':
-          triggered = last !== undefined && last < alert.price && price >= alert.price; break
-        case 'crosses_below':
-          triggered = last !== undefined && last > alert.price && price <= alert.price; break
-        case 'crossing':
-          triggered = last !== undefined && (
-            (last < alert.price && price >= alert.price) ||
-            (last > alert.price && price <= alert.price)
-          ); break
+      let allTriggered = true
+      for (const cond of alert.conditions) {
+        const sourceKey = cond.source.type === 'price'
+          ? `${symbol}:price`
+          : `${symbol}:ind:${cond.source.name}:${cond.source.plot}`
+        const last = this._lastValues.get(sourceKey)
+        const current = resolveSourceValue(cond.source, price, indicatorResolver)
+        if (current === undefined) { allTriggered = false; break }
+        this._lastValues.set(sourceKey, current)
+        if (!evaluateCondition(cond, current, last)) { allTriggered = false; break }
       }
 
-      if (!triggered) continue
+      if (!allTriggered) continue
 
       const triggeredAt = new Date(timestamp).toISOString()
       alert.triggeredAt = triggeredAt
@@ -391,6 +484,7 @@ export class AlertManager {
     }
 
     this._schedulePersist()
+    this._notifyChange()
   }
 
   private _schedulePersist(): void {
@@ -401,15 +495,13 @@ export class AlertManager {
 
   private _fire(alert: Alert, price: number): void {
     const inSchedule = isWithinSchedule(alert.notificationSchedule)
-    const label = alert.messageTemplate ?? alert.note ?? `${alert.symbol} ${alert.condition} ${alert.price}`
-    const body = `${alert.symbol} ${alert.condition} ${alert.price} — current: ${price}`
+    const label = alert.messageTemplate ?? alert.note ?? `${alert.symbol} ${alert.conditions.map(c => `${c.operator} ${c.value}`).join(' AND ')}`
+    const body = `${alert.symbol} alert triggered — current: ${price}`
 
-    // Sound
     if (alert.soundEnabled && inSchedule) {
       playBeep(alert.soundTitle ?? 'Thin', alert.soundDuration ?? 'once')
     }
 
-    // Browser notification
     if (alert.notificationEnabled && inSchedule && 'Notification' in window) {
       if (Notification.permission === 'granted') {
         new Notification(`Alert: ${label}`, { body: `Current price: ${price}`, icon: '/favicon.ico' })
@@ -422,16 +514,15 @@ export class AlertManager {
       }
     }
 
-    // Toast
     if (alert.toastEnabled && inSchedule) {
       showToast(`Alert: ${label}`, body)
     }
 
-    // Webhook — relay through server-side route (bypasses CORS, mirrors TV)
     if (alert.webhookUrl && isValidWebhookUrl(alert.webhookUrl) && inSchedule) {
       const messageBody = alert.messageTemplate ?? body
       const payload = {
-        id: alert.id, symbol: alert.symbol, condition: alert.condition,
+        id: alert.id, symbol: alert.symbol,
+        conditions: alert.conditions,
         price: alert.price, triggeredPrice: price, triggeredAt: alert.triggeredAt,
         note: alert.note, message: messageBody,
       }
@@ -440,17 +531,14 @@ export class AlertManager {
       })
     }
 
-    // Email
     if (alert.emailEnabled && inSchedule) {
       void sendAlertEmail('', `Alert: ${label}`, body, false)
     }
 
-    // Plain text email
     if (alert.plainTextEnabled && alert.plainTextEmail && inSchedule) {
       void sendAlertEmail(alert.plainTextEmail, `Alert: ${label}`, body, true)
     }
 
-    // Registered callbacks
     for (const cb of this._listeners) {
       try { cb(alert, price) } catch {}
     }
@@ -459,6 +547,12 @@ export class AlertManager {
   onTriggered(cb: AlertTriggeredCallback): () => void {
     this._listeners.push(cb)
     return () => { this._listeners = this._listeners.filter(l => l !== cb) }
+  }
+
+  onChange(cb: AlertChangeCallback): () => void {
+    this._changeListeners.push(cb)
+    cb([...this._alerts])
+    return () => { this._changeListeners = this._changeListeners.filter(l => l !== cb) }
   }
 
   async requestNotificationPermission(): Promise<NotificationPermission> {

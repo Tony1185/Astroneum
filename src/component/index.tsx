@@ -6,9 +6,10 @@ import Select, { type SelectDataSourceItem } from './select'
 import Input from './input'
 import Loading from './loading'
 import Switch from './switch'
+import Dropdown, { type DropdownOption } from './dropdown'
 
 export {
-  Button, Checkbox, List, Modal, Select, Input, Loading, Switch
+  Button, Checkbox, List, Modal, Select, Input, Loading, Switch, Dropdown
 }
 
-export type { SelectDataSourceItem }
+export type { SelectDataSourceItem, DropdownOption }

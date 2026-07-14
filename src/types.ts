@@ -73,11 +73,24 @@ export interface Period {
 
 export type DatafeedSubscribeCallback = (data: CandleData) => void
 
+export interface QuoteSnapshot {
+  ticker: string
+  last: Price
+  change?: number
+  changePercent?: number
+  volume?: Volume
+  open?: Price
+  high?: Price
+  low?: Price
+  timestamp?: Timestamp
+}
+
 export interface Datafeed {
   searchSymbols(search?: string): Promise<SymbolInfo[]>
   getHistoryData(symbol: SymbolInfo, period: Period, from: number, to: number): Promise<CandleData[]>
   subscribe(symbol: SymbolInfo, period: Period, callback: DatafeedSubscribeCallback): void
   unsubscribe(symbol: SymbolInfo, period: Period): void
+  getQuotes?(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]>
 }
 
 export interface AstroneumOptions {
@@ -196,6 +209,7 @@ export interface AstroneumHandle {
   lockAllDrawings(locked: boolean): void
   createIndicator(value: string | IndicatorCreate, isStack?: boolean, paneOptions?: PaneOptions): Nullable<string>
   removeIndicator(filter?: IndicatorFilter): boolean
+  getIndicators(filter?: IndicatorFilter): Indicator[]
   createOverlay(value: string | OverlayCreate | Array<string | OverlayCreate>): Nullable<string> | Array<Nullable<string>>
   removeOverlay(filter?: OverlayFilter): boolean
   getDataList(): CandleData[]

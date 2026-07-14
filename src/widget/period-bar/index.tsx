@@ -160,7 +160,7 @@ const PeriodBar: Component<PeriodBarProps> = props => {
           className='item tools'
           role="button"
           tabIndex={0}
-          aria-label={i18n('alerts', props.locale)}
+          aria-label={i18n('alert_create_alert', props.locale)}
           onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); props.onAlertClick?.() } }}
           onClick={props.onAlertClick}>
           <svg viewBox="0 0 20 20">

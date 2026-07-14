@@ -13,7 +13,12 @@ import {
   weakMagnet, strongMagnet, noMagnet, snapLevels,
   visible, invisible,
   lock, unlock,
-  remove
+  remove,
+  crossCursor, dotCursor, arrowCursor, eraserCursor,
+  measure, zoomIn, keepDrawing,
+  longPosition, shortPosition, positionForecast, barsPattern, ghostFeed, sector,
+  anchoredVwap, fixedRangeVolumeProfile, anchoredVolumeProfile,
+  priceRange, dateRange, dateAndPriceRange, forecasting
 } from './icons'
 
 import type { SelectDataSourceItem } from '@/component'
@@ -61,7 +66,27 @@ export const mapping = {
   unlock,
   visible,
   invisible,
-  remove
+  remove,
+  crossCursor,
+  dotCursor,
+  arrowCursor,
+  eraserCursor,
+  measure,
+  zoomIn,
+  keepDrawing,
+  longPosition,
+  shortPosition,
+  positionForecast,
+  barsPattern,
+  ghostFeed,
+  sector,
+  anchoredVwap,
+  fixedRangeVolumeProfile,
+  anchoredVolumeProfile,
+  priceRange,
+  dateRange,
+  dateAndPriceRange,
+  forecasting
 }
 
 export function createSingleLineOptions (locale: string): SelectDataSourceItem[] {
@@ -129,6 +154,15 @@ export function createMagnetOptions (locale: string): SelectDataSourceItem[] {
   ]
 }
 
+export function createCursorOptions (locale: string): SelectDataSourceItem[] {
+  return [
+    { key: 'crossCursor', text: i18n('cross_cursor', locale) },
+    { key: 'dotCursor', text: i18n('dot_cursor', locale) },
+    { key: 'arrowCursor', text: i18n('arrow_cursor', locale) },
+    { key: 'eraserCursor', text: i18n('eraser_cursor', locale) }
+  ]
+}
+
 interface IconProps {
   class?: string
   name: string
@@ -136,3 +170,24 @@ interface IconProps {
 
 // @ts-expect-error mapping is dynamically keyed; props.name accesses it safely
 export const Icon: Component<IconProps> = props => mapping[props.name](props.class)
+
+
+export function createForecastingOptions (locale: string): SelectDataSourceItem[] {
+  return [
+    { key: '__header_forecasting', text: i18n('forecasting', locale), isHeader: true },
+    { key: 'longPosition', text: i18n('long_position', locale) },
+    { key: 'shortPosition', text: i18n('short_position', locale) },
+    { key: 'positionForecast', text: i18n('position_forecast', locale) },
+    { key: 'barsPattern', text: i18n('bars_pattern', locale) },
+    { key: 'ghostFeed', text: i18n('ghost_feed', locale) },
+    { key: 'sector', text: i18n('sector', locale) },
+    { key: '__header_volume_based', text: i18n('volume_based', locale), isHeader: true },
+    { key: 'anchoredVwap', text: i18n('anchored_vwap', locale) },
+    { key: 'fixedRangeVolumeProfile', text: i18n('fixed_range_volume_profile', locale) },
+    { key: 'anchoredVolumeProfile', text: i18n('anchored_volume_profile', locale) },
+    { key: '__header_measurers', text: i18n('measurers', locale), isHeader: true },
+    { key: 'priceRange', text: i18n('price_range', locale) },
+    { key: 'dateRange', text: i18n('date_range', locale) },
+    { key: 'dateAndPriceRange', text: i18n('date_and_price_range', locale) }
+  ]
+}

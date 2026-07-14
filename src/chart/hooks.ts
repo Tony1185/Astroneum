@@ -47,11 +47,12 @@ const WHEEL_ZOOM_STEP = 0.15 // zoom factor per wheel tick
  * | Shortcut            | Action                                 |
  * |---------------------|----------------------------------------|
  * | Delete / Backspace  | Remove selected overlay                |
- * | Escape              | Cancel drawing tool                     |
+ * | Escape              | Cancel in-progress drawing only          |
  * | Arrow Left / Right  | Pan chart by one step                   |
  * | Page Up / Down      | Scroll by one screen width               |
  * | Home / End          | Jump to start / end of data              |
- * | Ctrl+Z              | Undo (placeholder — UndoManager pending) |
+ * | Ctrl+C / Ctrl+V     | Copy / paste drawing overlays            |
+ * | Ctrl+Alt+H          | Toggle visibility of all drawings        |
  * | Mouse wheel         | Zoom centered on cursor                  |
  *
  * Returns a stable cleanup function.
@@ -66,14 +67,32 @@ export function useKeyboardShortcuts(widgetRef: React.RefObject<Nullable<Chart>>
       const widget = widgetRef.current
       if (!widget) return
 
+      // Ctrl+Alt+H → toggle visibility of all drawings
+      if (keyboardEvent.ctrlKey && keyboardEvent.altKey && (keyboardEvent.key === 'h' || keyboardEvent.key === 'H')) {
+        keyboardEvent.preventDefault()
+        const overlays = widget.getOverlays({ groupId: DRAWING_GROUP_ID })
+        if (overlays.length > 0) {
+          const anyVisible = overlays.some(o => o.visible)
+          widget.overrideOverlay({ groupId: DRAWING_GROUP_ID, visible: !anyVisible })
+        }
+        return
+      }
+
       switch (keyboardEvent.key) {
         case 'Delete':
         case 'Backspace':
           widget.removeOverlay()
           break
-        case 'Escape':
-          widget.removeOverlay({ groupId: DRAWING_GROUP_ID })
+        case 'Escape': {
+          // Cancel only the in-progress drawing — currentStep > 0 means
+          // the overlay is being drawn (not yet finished, which is -1).
+          const overlays = widget.getOverlays({ groupId: DRAWING_GROUP_ID })
+          const inProgress = overlays.find(o => o.currentStep > 0)
+          if (inProgress) {
+            widget.removeOverlay({ id: inProgress.id })
+          }
           break
+        }
         case 'ArrowLeft':
           keyboardEvent.preventDefault()
           widget.scrollByDistance(SCROLL_DISTANCE)

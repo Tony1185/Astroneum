@@ -16,3 +16,5 @@ export {
   IndicatorSettingModal, SymbolSearchModal,
   AlertModal, ScriptEditorModal, WatchlistWidget
 }
+
+export type { IndicatorSourceOption } from './alert-modal'

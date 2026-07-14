@@ -1,0 +1,115 @@
+/* Astroneum Terminal — design system root.
+   Aligns chrome with the library's --astroneum-* tokens (src/styles/index.scss)
+   and overrides the primary accent to Astroneum's Cosmic Indigo. */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--astroneum-background-color, #131722);
+  color: var(--astroneum-text-color, #d1d4dc);
+  font-family: 'Trebuchet MS', -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Astroneum brand accent — overrides the library's default TradingView blue.
+   Applied at the demo root so the chart's selection/focus/drawing handles
+   re-skin with the chrome. The library reads this var on .astroneum. */
+:root {
+  --astroneum-primary-color: #6366f1;
+  --astroneum-selected-color: rgba(99, 102, 241, 0.15);
+}
+
+/* Terminal shell tokens (reference library vars; keep shell + chart in sync). */
+:root {
+  /* neutrals — alias the library */
+  --term-app-bg: var(--astroneum-background-color, #131722);
+  --term-panel-bg: var(--astroneum-popover-background-color, #1e222d);
+  --term-elevated-bg: var(--astroneum-hover-background-color, #2a2e39);
+  --term-border: var(--astroneum-border-color, #2a2e39);
+  --term-text: var(--astroneum-text-color, #d1d4dc);
+  --term-text-2: var(--astroneum-text-second-color, #787b86);
+  --term-text-muted: #5d606b;
+  --term-accent: var(--astroneum-primary-color, #6366f1);
+  --term-accent-tint: var(--astroneum-selected-color, rgba(99, 102, 241, 0.15));
+  --term-up: #26a69a;
+  --term-down: #ef5350;
+  --term-warning: #f7931a;
+  --term-divider: rgba(255, 255, 255, 0.06);
+  --term-backdrop: rgba(0, 0, 0, 0.5);
+
+  /* geometry — per TV terminal spec */
+   --term-toolbar-h: 44px;
+   --term-left-rail-w: 52px;
+   --term-sidebar-w: 260px;
+  --term-sidebar-min: 240px;
+  --term-sidebar-max: 540px;
+   --term-dock-h: 220px;
+  --term-dock-min: 120px;
+  --term-dock-max: 480px;
+  --term-dock-collapsed-h: 36px;
+  --term-footer-h: 28px;
+  --term-icon-hit: 44px;
+
+  /* radii */
+  --term-r-sm: 3px;
+  --term-r-md: 4px;
+  --term-r-lg: 8px;
+
+  /* motion */
+  --term-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --term-dur-fast: 100ms;
+  --term-dur: 200ms;
+}
+
+/* Tabular figures everywhere numeric by default; opt out per-element. */
+[data-numeric],
+.tabnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* High-contrast theme — let the library's .astroneum[data-theme="high-contrast"]
+   own the chart; mirror its tokens for the chrome. */
+:root[data-theme="high-contrast"] {
+  --term-accent: #ffff00;
+  --term-accent-tint: rgba(255, 255, 0, 0.25);
+  --term-app-bg: #000000;
+  --term-panel-bg: #000000;
+  --term-elevated-bg: #1a1a00;
+  --term-text: #ffffff;
+  --term-text-2: #ffff00;
+  --term-text-muted: #cccc00;
+  --term-border: #ffffff;
+}
+
+/* Focus ring — inherited from the library base; reinforced for chrome. */
+*:focus-visible {
+  outline: 2px solid var(--term-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Reduced motion — every transition gets an instant fallback. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* Scrollbar — thin, neutral, standard (no custom affordance). */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { border-radius: 3px; background: var(--term-border); }
+::-webkit-scrollbar-track { background: transparent; }

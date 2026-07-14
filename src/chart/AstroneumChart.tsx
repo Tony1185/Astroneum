@@ -16,7 +16,7 @@ import { type SelectDataSourceItem, Loading } from '@/component'
 import {
   PeriodBar, DrawingBar, IndicatorModal, TimezoneModal, SettingModal,
   ScreenshotModal, IndicatorSettingModal, SymbolSearchModal,
-  AlertModal, ScriptEditorModal
+  AlertModal, ScriptEditorModal, type IndicatorSourceOption
 } from '@/widget'
 
 import DrawingSnapper from './DrawingSnapper'
@@ -26,7 +26,7 @@ import { mountChartPlugins } from '@/plugin'
 
 import { translateTimezone } from '@/widget/timezone-modal/data'
 
-import { type Period, type AstroneumOptions, type AstroneumHandle, type SerializedChartState, type IndicatorCreate, type IndicatorFilter, type OverlayCreate, type OverlayFilter } from '@/types'
+import { type Period, type AstroneumOptions, type AstroneumHandle, type SerializedChartState, type OverlayCreate } from '@/types'
 
 import { useChartStore } from '@/store/chartStore'
 import { useIndicatorStore } from '@/store/indicatorStore'
@@ -236,33 +236,6 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
   const clockTime = useClockTick()
   useKeyboardShortcuts(widgetRef)
 
-  // Modal hotkeys — wire PeriodBar toggle actions to keyboard shortcuts.
-  // `/` → indicators dialog, `Alt+A` → alert dialog, `Shift+F` → fullscreen.
-  useEffect(() => {
-    const handleModalHotkey = (e: KeyboardEvent): void => {
-      const tag = (document.activeElement as HTMLElement)?.tagName?.toLowerCase()
-      if (tag === 'input' || tag === 'textarea') return
-
-      if (e.key === '/') {
-        e.preventDefault()
-        ui.setIndicatorModalVisible(v => !v)
-      } else if (e.altKey && (e.key === 'a' || e.key === 'A')) {
-        e.preventDefault()
-        setAlertModalVisible(v => !v)
-      } else if (e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && (e.key === 'f' || e.key === 'F')) {
-        e.preventDefault()
-        if (document.fullscreenElement) {
-          void document.exitFullscreen?.call(document)
-        } else {
-          const container = widgetContainerRef.current?.closest('.astroneum') as HTMLElement | null
-          void container?.requestFullscreen?.call(container)
-        }
-      }
-    }
-    document.addEventListener('keydown', handleModalHotkey)
-    return () => document.removeEventListener('keydown', handleModalHotkey)
-  }, [])
-
   // chart.* getters are stable useCallback refs — stable identity, empty deps is intentional
   useImperativeHandle(ref, () => ({
     setTheme: chart.setTheme,
@@ -349,14 +322,50 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
         widget.overrideOverlay({ id: o.id, lock: locked })
       }
     },
-    createIndicator: (value: string | IndicatorCreate, isStack?: boolean, paneOptions?: PaneOptions) => widgetRef.current?.createIndicator(value, isStack, paneOptions) ?? null,
-    removeIndicator: (filter?: IndicatorFilter) => widgetRef.current?.removeIndicator(filter) ?? false,
-    createOverlay: (value: string | OverlayCreate | Array<string | OverlayCreate>) => (widgetRef.current?.createOverlay(value) ?? null),
-    removeOverlay: (filter?: OverlayFilter) => widgetRef.current?.removeOverlay(filter) ?? false,
+    createIndicator: (value: { name: string; calcParams?: number[] }, isStack?: boolean, paneOptions?: { id?: string }): string | null => {
+      const widget = widgetRef.current
+      if (!widget) return null
+      return widget.createIndicator(value, isStack, paneOptions) ?? null
+    },
+    removeIndicator: (filter: { paneId?: string; name?: string }): boolean => {
+      const widget = widgetRef.current
+      if (!widget) return false
+      return widget.removeIndicator(filter)
+    },
+    getIndicators: (filter?: { paneId?: string; name?: string }) => {
+      const widget = widgetRef.current
+      if (!widget) return []
+      return widget.getIndicators(filter) ?? []
+    },
+    createOverlay: (value: string | OverlayCreate | Array<string | OverlayCreate>) => {
+      const widget = widgetRef.current
+      if (!widget) return null
+      return widget.createOverlay(value)
+    },
+    removeOverlay: (filter?: { groupId?: string; name?: string }): boolean => {
+      const widget = widgetRef.current
+      if (!widget) return false
+      return widget.removeOverlay(filter)
+    },
     getDataList: () => widgetRef.current?.getDataList() ?? [],
     resetData: () => { widgetRef.current?.resetData() },
     resize: () => { widgetRef.current?.resize() },
   }), [])
+
+  const buildIndicatorSources = (): IndicatorSourceOption[] => {
+    const widget = widgetRef.current
+    if (!widget) return []
+    const indicators = widget.getIndicators()
+    return indicators.flatMap(ind => {
+      const figures = (ind as unknown as { figures?: Array<{ key: string }> }).figures ?? []
+      return figures.map(f => ({
+        paneId: ind.paneId ?? "",
+        name: ind.name,
+        plot: f.key,
+        shortName: ind.shortName ?? ind.name,
+      }))
+    })
+  }
 
   const resizeFrameRef = useRef<number | null>(null)
   const documentResize = (): void => {
@@ -453,7 +462,21 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
         ui.setLoadingVisible(true)
         try {
           if (type === 'init') {
-            const [from, to] = adjustFromTo(per, Date.now(), 500)
+            let from: number
+            let to: number
+            const initialHistory = props.initialHistory
+            if (initialHistory === 'all') {
+              // Full-history mode: hand the datafeed an unbounded range
+              // (from=0, to=now-aligned) and let it paginate + cap
+              // internally. The datafeed decides how many bars to return.
+              const [, alignedTo] = adjustFromTo(per, Date.now(), 1)
+              from = 0
+              to = alignedTo
+            } else if (typeof initialHistory === 'number' && initialHistory > 0) {
+              ;[from, to] = adjustFromTo(per, Date.now(), initialHistory)
+            } else {
+              ;[from, to] = adjustFromTo(per, Date.now(), 500)
+            }
             let dataList = await props.datafeed.getHistoryData(sym, per, from, to)
             if (props.barStyle === 'heikin_ashi') dataList = heikinAshi(dataList)
             if (props.priceScale && props.priceScale !== 'linear') dataList = transformCandles(dataList, props.priceScale)
@@ -721,6 +744,9 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
       )}
       {alertModalVisible && (
         <AlertModal
+          currentPrice={widgetRef.current?.getDataList()?.slice(-1)[0]?.close}
+          timeframe={chart.period().text}
+          indicatorSources={buildIndicatorSources()}
           locale={locale}
           symbol={chart.symbol().ticker}
           onClose={() => { setAlertModalVisible(false) }} />

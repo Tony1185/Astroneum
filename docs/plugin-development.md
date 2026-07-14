@@ -2,6 +2,10 @@
 
 This guide shows how to extend Astroneum with custom indicators, WebGL renderers, chart plugins, and script-based indicators.
 
+Strategy scripts are separate from indicator plugins. Use the bounded
+`ScriptEngine.compileStrategy()` signal contract in [`api.md`](api.md) for
+deterministic local backtesting; plugins must not execute orders or broker calls.
+
 ---
 
 ## Table of Contents

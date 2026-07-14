@@ -22,7 +22,7 @@ TradingView-class features, zero licensing fees, and MIT license.
 - **Multi-chart grid** (2/4/8/16 panes) and **multi-period stacked layout** (e.g. 4H + 1H + 15m)
 
 ### Indicators & Analysis
-- **28 built-in indicators** â€” SMA, EMA, MACD, RSI, KDJ, Bollinger Bands, TRIX, SAR, and more
+- **50 built-in indicators** â€” SMA, EMA, MACD, RSI, KDJ, Bollinger Bands, TRIX, SAR, and more
 - **Volume Profile** â€” horizontal histogram with POC, Value Area, and price-level bucketing
 - **ZigZag + auto pattern detection** â€” swing highs/lows, support/resistance clustering
 - **Depth of Market** â€” bid/ask volume ladder visualization
@@ -30,9 +30,10 @@ TradingView-class features, zero licensing fees, and MIT license.
 - **Multi-timeframe indicators** â€” resample any TF, forward-fill to lower TF bars
 - **Custom indicator plugins** via `registerIndicatorPlugin()` with Canvas2D or WebGL2 render path
 - **Script editor** â€” sandboxed Pine-Scriptâ€“inspired JS environment for custom indicators
+- **Deterministic strategy backtesting** â€” bounded script signal contract, trade/equity/drawdown result types, and a demo report surface; not broker execution
 
 ### Drawing Tools
-- **18 drawing tools** â€” trend lines, Fibonacci (circle, spiral, extension, segment, fan), Gann boxes, pitchforks, Elliott waves, harmonic patterns (ABCD, XABCD), and **measure/ruler tool**
+- **20 drawing tools** ? trend lines, Fibonacci (circle, spiral, extension, segment, fan), Gann boxes, pitchforks, Elliott waves, harmonic patterns (ABCD, XABCD), cursor modes, zoom, and **measure/ruler tool**
 - **Magnet/Snap** â€” snap to bar OHLC within 8px, angle snap to 0Â°/30Â°/45Â°/60Â°/90Â°
 - **Drawing style presets** (7 built-in + custom) with live preview and per-drawing color
 - **Undo/Redo** â€” `UndoManager` with 50-entry depth via Ctrl+Z / Ctrl+Y
@@ -65,7 +66,7 @@ TradingView-class features, zero licensing fees, and MIT license.
 ### Developer Experience
 - **Fully typed TypeScript** â€” branded financial types (`Price`, `Volume`, `Timestamp`)
 - **8 tree-shakeable subpath exports** â€” import only what you need
-- **19 locales** â€” lazy-loaded on demand, dark/light/high-contrast themes
+- **18 locale JSON files** ? lazy-loaded on demand, dark/light/high-contrast themes
 - **SSR-safe** â€” `'use client'` on every entry, Next.js App Router compatible
 - **MIT license** â€” no usage limits, no watermark, no "Powered by" branding
 
@@ -119,7 +120,7 @@ export default function App() {
 |------|------|-------------|
 | `symbol` | `SymbolInfo` | Symbol to display |
 | `period` | `Period` | Timeframe (1m, 5m, 1H, 4H, D, etc.) |
-| `datafeed` | `Datafeed` | Data source (crypto, Polygon, or custom) |
+| `datafeed` | `Datafeed` | Data source (crypto, Polygon, or custom); may implement optional batched `getQuotes` for watchlists |
 | `theme` | `string` | `'dark'`, `'light'`, or `'high-contrast'` |
 | `barStyle` | `'candle' \| 'heikin_ashi'` | Candle rendering style |
 | `priceScale` | `'linear' \| 'log' \| 'percent' \| 'indexed'` | Price axis scale |
@@ -141,7 +142,7 @@ import { AstroneumChart, DefaultDatafeed } from '@tony01/astroneum'
 import { BarReplay }            from '@tony01/astroneum/replay'
 import { MultiChartLayout }     from '@tony01/astroneum/multichart'
 import { MultiPeriodLayout }    from '@tony01/astroneum'              // same symbol, stacked periods
-import { WatchlistManager }     from '@tony01/astroneum/watchlist'
+import { WatchlistManager }     from '@tony01/astroneum/watchlist' // persisted lists, sort, columns, colors, live snapshots
 import { PortfolioTracker }     from '@tony01/astroneum/portfolio'
 import { AlertManager }         from '@tony01/astroneum/alerts'
 import { ScriptEngine }         from '@tony01/astroneum/script'
@@ -167,6 +168,8 @@ import { volumeProfilePlugin, domPlugin, zigzagPlugin,
          pointAndFigurePlugin }           from '@tony01/astroneum'  // registerIndicatorPlugin(...)
 import { createCompareIndicator }         from '@tony01/astroneum'  // compare symbols overlay
 ```
+
+`createStandardCryptoDatafeed()` implements batched watchlist snapshots for Binance, Bitget, and OKX. Custom datafeeds can opt in with `getQuotes(symbols)`; consumers without it continue to work and display unavailable quote values.
 
 ## Browser Support
 

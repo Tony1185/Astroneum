@@ -20,6 +20,7 @@ import ScriptEngine from './scripting/ScriptEngine'
 import WatchlistManager from './chart/WatchlistManager'
 import PortfolioTracker from './chart/PortfolioTracker'
 import PerformanceMode from './chart/PerformanceMode'
+import { AlertModal, SymbolSearchModal } from './widget'
 
 import { load, loadLocale, BUILTIN_LOCALES } from './i18n'
 import {
@@ -54,6 +55,7 @@ import {
   type SymbolInfo,
   type Period,
   type DatafeedSubscribeCallback,
+  type QuoteSnapshot,
   type AstroneumOptions,
   type AstroneumHandle,
   type SerializedChartState,
@@ -76,6 +78,8 @@ export {
   WatchlistManager,
   PortfolioTracker,
   PerformanceMode,
+  AlertModal,
+  SymbolSearchModal,
   load as loadLocales,
   loadLocale,
   BUILTIN_LOCALES,
@@ -112,7 +116,7 @@ export { TickAnimator } from './engine/common/TickAnimator'
 export { RingBuffer } from './engine/common/RingBuffer'
 
 export type {
-  Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, AstroneumOptions, AstroneumHandle, CandleData,
+  Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, QuoteSnapshot, AstroneumOptions, AstroneumHandle, CandleData,
   ChartPlugin, ChartPluginContext, SerializedChartState
 }
 export type { Viewport, IndicatorPlugin, ChartEventMap, Price, Volume, Timestamp } from './types'
@@ -132,13 +136,25 @@ export type {
 export type { MultiChartCount, MultiChartSlot, MultiChartLayoutOptions } from './chart/MultiChartLayout'
 export type { BarReplayOptions, BarReplayState } from './chart/BarReplay'
 export type { OverlayStylePreset, DrawingStyleTemplate } from './chart/DrawingTemplates'
-export type { Alert, AlertCondition, AlertStatus, AlertFrequency, AlertCreate, AlertCheckInput, AlertTriggeredCallback, SoundTitle, SoundDuration, NotificationSchedule } from './chart/AlertManager'
+export type { Alert, AlertCondition, AlertOperator, AlertConditionDef, AlertSource, AlertStatus, AlertFrequency, AlertCreate, AlertCheckInput, AlertTriggeredCallback, AlertChangeCallback, SoundTitle, SoundDuration, NotificationSchedule, WebhookStatus } from './chart/AlertManager'
 export type { FormatPriceOptions, DateFormatStyle, TimeFormatStyle } from './i18n/format'
-export type { CompiledIndicator, StudyOptions, PlotOptions, InputOptions } from './scripting/ScriptEngine'
-export type { Watchlist, WatchSymbol } from './chart/WatchlistManager'
+export type { CompiledIndicator, CompiledStrategy, StudyOptions, PlotOptions, InputOptions } from './scripting/ScriptEngine'
+export type { Watchlist, WatchSymbol, WatchlistColumn, WatchlistSort, WatchlistSortDirection } from './chart/WatchlistManager'
+export type { IndicatorSourceOption } from './widget'
+export type { SymbolSearchModalProps } from './widget/symbol-search-modal'
 export type { Position, PositionSide, PnLResult } from './chart/PortfolioTracker'
 export type { Bar as PerformanceBar } from './chart/PerformanceMode'
+export type {
+  BacktestConfig,
+  BacktestMetrics,
+  BacktestResult,
+  BacktestTrade,
+  EquityPoint,
+  StrategySide,
+} from './strategy'
 export { heikinAshi } from './chart/PerformanceMode'
+export { runBacktest } from './strategy'
+export type { StrategySignal } from './strategy'
 export { UndoManager } from './chart/UndoManager'
 export { SessionVisualizer } from './chart/SessionVisualizer'
 export type { SessionConfig } from './chart/SessionVisualizer'
