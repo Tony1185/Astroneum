@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { STANDARD_CRYPTO_SYMBOLS, type SymbolInfo, type Period } from '@tony01/astroneum'
+import { useLayer } from '@tony01/astroneum/workspace'
 
 interface CommandAction {
   id: string
@@ -43,6 +44,7 @@ export default function CommandPalette({
   const [query, setQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+  useLayer('command-palette', open, onClose)
 
   const actions = useMemo<CommandAction[]>(() => {
     const list: CommandAction[] = [
@@ -121,7 +123,7 @@ export default function CommandPalette({
 
   return (
     <div className="term-cmdk-overlay" onClick={onClose}>
-      <div className="term-cmdk" onClick={e => e.stopPropagation()}>
+      <div className="term-cmdk" role="dialog" aria-modal="true" aria-label="Command palette" onClick={e => e.stopPropagation()}>
         <div className="term-cmdk-input-wrap">
           <svg className="term-cmdk-search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
             <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/>

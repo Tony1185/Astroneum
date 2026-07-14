@@ -3,6 +3,7 @@
 import './enhancements.css'
 import { useState, useRef, useEffect } from 'react'
 import { PATTERN_CATALOGUE, type PatternDef } from '@tony01/astroneum'
+import { useLayer } from '@tony01/astroneum/workspace'
 
 interface PatternDialogProps {
   enabledMask: number[]
@@ -25,6 +26,7 @@ const TYPE_COLORS: Record<string, string> = {
 export default function PatternDialog({ enabledMask, onToggle, onClose }: PatternDialogProps) {
   const [search, setSearch] = useState('')
   const ref = useRef<HTMLDivElement>(null)
+  useLayer('pattern-dialog', true, onClose)
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -42,7 +44,7 @@ export default function PatternDialog({ enabledMask, onToggle, onClose }: Patter
   const enabledCount = enabledMask.filter(v => v === 1).length
 
   return (
-    <div className="term-pattern-dialog" ref={ref}>
+    <div className="term-pattern-dialog" ref={ref} role="dialog" aria-modal="true" aria-label="Candlestick patterns">
       <div className="term-pattern-header">
         <span className="term-pattern-title">Candlestick Patterns</span>
         <span style={{ fontSize: 11, color: 'var(--term-text-2)', marginRight: 8 }}>

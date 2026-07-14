@@ -1,5 +1,5 @@
 export { default as WorkspaceShell, WorkspaceToolbar, useWorkspaceShell } from './WorkspaceShell'
 export type { WorkspaceShellContextValue, WorkspaceShellProps, WorkspaceToolbarProps } from './WorkspaceShell'
-export { LayerProvider, useLayerProvider } from './LayerProvider'
+export { LayerProvider, useLayer, useLayerProvider } from './LayerProvider'
 export { default as WorkspaceWatchlist } from './WatchlistPanel'
 export type { WorkspaceWatchlistProps } from './WatchlistPanel'

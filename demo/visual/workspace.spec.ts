@@ -17,3 +17,14 @@ for (const viewport of viewports) {
     })
   })
 }
+
+test('Escape closes only the top workspace layer', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('', { waitUntil: 'networkidle' })
+  const trigger = page.getByRole('button', { name: 'Quick Search' })
+  await trigger.click()
+  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden()
+  await expect(trigger).toBeFocused()
+})

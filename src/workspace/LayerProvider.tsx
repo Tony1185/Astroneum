@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
 interface LayerRecord {
   id: string
@@ -37,6 +37,16 @@ export function LayerProvider ({ children }: { children: ReactNode }) {
     for (const layer of [...layers.current].reverse()) layer.close()
   }, [])
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape' || !closeTop()) return
+      event.preventDefault()
+      event.stopPropagation()
+    }
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => document.removeEventListener('keydown', onKeyDown, true)
+  }, [closeTop])
+
   return <LayerContext.Provider value={{ register, closeTop, closeAll }}>{children}</LayerContext.Provider>
 }
 
@@ -44,4 +54,20 @@ export function useLayerProvider (): LayerContextValue {
   const context = useContext(LayerContext)
   if (!context) throw new Error('useLayerProvider must be used inside LayerProvider')
   return context
+}
+
+export function useLayer (id: string, open: boolean, onClose: () => void): void {
+  const { register } = useLayerProvider()
+  const trigger = useRef<Element | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    trigger.current = document.activeElement
+    return register({ id, close: onClose })
+  }, [id, onClose, open, register])
+
+  useEffect(() => {
+    if (open || !(trigger.current instanceof HTMLElement)) return
+    trigger.current.focus()
+  }, [open])
 }
