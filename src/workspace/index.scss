@@ -142,3 +142,25 @@
 .astroneum-workspace-resize:hover {
   background: var(--astroneum-primary-color);
 }
+
+.astroneum-workspace-watchlist { display: flex; flex-direction: column; width: 100%; min-height: 0; color: var(--astroneum-text-color); background: var(--astroneum-popover-background-color); font-size: 12px; }
+.astroneum-workspace-watchlist-header { display: flex; gap: 4px; min-height: 38px; padding: 4px 8px; border-bottom: 1px solid var(--astroneum-border-color); }
+.astroneum-workspace-watchlist-header select { flex: 1; min-width: 0; border: 0; background: transparent; color: inherit; font: inherit; }
+.astroneum-workspace-watchlist button { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.astroneum-workspace-watchlist-header button { padding: 0 7px; border-radius: 3px; color: var(--astroneum-text-second-color); }
+.astroneum-workspace-watchlist-header button:hover { background: var(--astroneum-hover-background-color); color: var(--astroneum-text-color); }
+.astroneum-workspace-watchlist-error { padding: 6px 10px; color: #ef5350; border-bottom: 1px solid var(--astroneum-border-color); }
+.astroneum-workspace-watchlist-table { min-height: 0; overflow: auto; }
+.astroneum-workspace-watchlist-columns, .astroneum-workspace-watchlist-table [role='row'] { display: grid; align-items: center; gap: 8px; padding: 0 10px; }
+.astroneum-workspace-watchlist-columns { min-height: 28px; border-bottom: 1px solid var(--astroneum-border-color); color: var(--astroneum-text-second-color); }
+.astroneum-workspace-watchlist-columns button { text-align: right; color: inherit; }
+.astroneum-workspace-watchlist-columns button:first-child { text-align: left; }
+.astroneum-workspace-watchlist-table [role='row'] { width: 100%; min-height: 34px; border-bottom: 1px solid var(--astroneum-border-color); text-align: right; }
+.astroneum-workspace-watchlist-table [role='row']:hover, .astroneum-workspace-watchlist-table [role='row'].is-selected { background: var(--astroneum-hover-background-color); }
+.astroneum-workspace-watchlist-table [role='row'].is-selected { box-shadow: inset 2px 0 var(--astroneum-primary-color); }
+.astroneum-workspace-watchlist-table span:first-child { display: flex; flex-direction: column; min-width: 0; text-align: left; }
+.astroneum-workspace-watchlist-table small { overflow: hidden; color: var(--astroneum-text-second-color); text-overflow: ellipsis; white-space: nowrap; }
+.astroneum-workspace-watchlist-table .is-up { color: #26a69a; }
+.astroneum-workspace-watchlist-table .is-down { color: #ef5350; }
+.astroneum-workspace-watchlist-empty { display: grid; place-items: center; gap: 8px; min-height: 160px; color: var(--astroneum-text-second-color); }
+.astroneum-workspace-watchlist-empty button { padding: 6px 10px; border-radius: 3px; background: var(--astroneum-primary-color); color: white; }

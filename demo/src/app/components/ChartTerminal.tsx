@@ -27,8 +27,8 @@ import {
 import { AlertManager } from '@tony01/astroneum'
 import type { BacktestResult } from '@tony01/astroneum'
 import type { CompiledStrategy } from '@tony01/astroneum/script'
-import { LayerProvider, WorkspaceShell, WorkspaceToolbar, useWorkspaceShell } from '@tony01/astroneum/workspace'
-import WatchlistPanel, { AlertsPanel } from './panels/WatchlistPanel'
+import { LayerProvider, WorkspaceShell, WorkspaceToolbar, WorkspaceWatchlist, useWorkspaceShell } from '@tony01/astroneum/workspace'
+import { AlertsPanel } from './panels/WatchlistPanel'
 import PineEditorPanel, { StrategyTesterPanel, TradingPanel, StubPanel } from './panels/PineEditorPanel'
 import DateRangeNavigator from './DateRangeNavigator'
 import CommandPalette from './CommandPalette'
@@ -196,7 +196,7 @@ const SIDEBAR_TABS = [
   { id: 'ideas', label: 'Ideas', icon: Icon.Ideas },
   { id: 'trading', label: 'Trading', icon: Icon.Trading },
 ] as const
-function SidebarContent({ onSymbolSelect, selectedTicker, symbol, candle, datafeed, getCurrentPrice, getIndicatorSources }: { onSymbolSelect?: (t: string) => void; selectedTicker?: string; symbol?: SymbolInfo; candle?: CandleData | null; datafeed: Datafeed; getCurrentPrice?: () => number | undefined; getIndicatorSources?: () => IndicatorSourceOption[] }) {
+function SidebarContent({ onSymbolSelect, selectedTicker, symbol, datafeed, getCurrentPrice, getIndicatorSources }: { onSymbolSelect?: (t: string) => void; selectedTicker?: string; symbol?: SymbolInfo; datafeed: Datafeed; getCurrentPrice?: () => number | undefined; getIndicatorSources?: () => IndicatorSourceOption[] }) {
   const [active, setActive] = useState('watchlist')
   const { sidebarOpen, toggleSidebar } = useWorkspaceShell()
   const activeTab = SIDEBAR_TABS.find(t => t.id === active)
@@ -218,7 +218,7 @@ function SidebarContent({ onSymbolSelect, selectedTicker, symbol, candle, datafe
           <button className="term-icon-btn" onClick={toggleSidebar} title="Hide panel" aria-label="Hide panel">×</button>
         </div>
         <div className="term-sidebar-content">
-          <div hidden={active !== 'watchlist'} style={{ height: '100%' }}><WatchlistPanel onSymbolSelect={onSymbolSelect} selectedTicker={selectedTicker} selectedSymbol={symbol} candle={candle} datafeed={datafeed} sidebarOpen={sidebarOpen} /></div>
+          <div hidden={active !== 'watchlist'} style={{ height: '100%' }}><WorkspaceWatchlist onSymbolSelect={onSymbolSelect} selectedTicker={selectedTicker} datafeed={datafeed} open={sidebarOpen} /></div>
           <div hidden={active !== 'alerts'} style={{ height: '100%' }}><AlertsPanel symbol={symbol?.ticker} getCurrentPrice={getCurrentPrice} indicatorSources={getIndicatorSources?.()} onSymbolChange={onSymbolSelect} /></div>
           <div hidden={active !== 'calendar'} style={{ height: '100%' }}><StubPanel title="Calendar" icon="ðŸ“…" hint="Economic calendar events â€” wired when an economic data feed is connected" /></div>
           <div hidden={active !== 'ideas'} style={{ height: '100%' }}><StubPanel title="Ideas" icon="ðŸ’¡" hint="Published community ideas â€” wired when an ideas API is connected" /></div>
@@ -361,7 +361,6 @@ export default function ChartTerminal() {
   const [syncCrosshair, setSyncCrosshair] = useState(true)
   const [syncSymbolPeriod, setSyncSymbolPeriod] = useState(false)
   const lastPriceRef = useRef<number>(0)
-  const [latestCandle, setLatestCandle] = useState<CandleData | null>(null)
   const [strategyResult, setStrategyResult] = useState<BacktestResult | null>(null)
   const [strategyError, setStrategyError] = useState<string | null>(null)
 
@@ -448,7 +447,6 @@ export default function ChartTerminal() {
     base.subscribe = (sym, per, callback) => {
       const wrapped = (data: CandleData) => {
         lastPriceRef.current = data.close
-        setLatestCandle(data)
         AlertManager.getInstance().check({
           indicatorResolver: source => {
             if (source.type !== 'indicator') return undefined
@@ -673,14 +671,12 @@ export default function ChartTerminal() {
     const sym = STANDARD_CRYPTO_SYMBOLS.find(s => s.ticker === ticker)
     if (sym) {
       setSymbol(sym)
-      setLatestCandle(null)
       chartRef.current?.setSymbol(sym)
     }
   }, [])
 
   const handleSymbolSelect = useCallback((sym: SymbolInfo) => {
     setSymbol(sym)
-    setLatestCandle(null)
     chartRef.current?.setSymbol(sym)
   }, [])
 
@@ -738,7 +734,7 @@ export default function ChartTerminal() {
       <WorkspaceShell
         theme={theme}
         toolbar={topbar}
-        sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} candle={latestCandle} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
+        sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
         dock={<DockContent onPineCompiled={handlePineCompiled} onStrategyCompiled={handleStrategyCompiled} result={strategyResult} strategyError={strategyError} />}
         footer={<DateRangeNavigator engine={chartEngine} symbol={symbol.ticker} timezone={timezone} />}
       >
