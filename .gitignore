@@ -48,3 +48,5 @@ Astroneum/
 *.sln
 *.sw?
 tv-mirror-reference/.chrome-cdp/
+demo/test-results/
+demo/playwright-report/

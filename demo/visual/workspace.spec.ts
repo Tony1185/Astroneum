@@ -1,0 +1,19 @@
+import { expect, test } from '@playwright/test'
+
+const viewports = [
+  { name: 'desktop-wide', width: 1920, height: 945 },
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'desktop-floor', width: 1024, height: 768 },
+]
+
+for (const viewport of viewports) {
+  test(`workspace chrome ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport)
+    await page.goto('', { waitUntil: 'networkidle' })
+    await expect(page.locator('.astroneum-workspace')).toBeVisible()
+    await expect(page.locator('.astroneum-workspace-toolbar')).toHaveScreenshot(`${viewport.name}-toolbar.png`)
+    await expect(page.locator('.astroneum-workspace-sidebar')).toHaveScreenshot(`${viewport.name}-sidebar.png`, {
+      mask: [page.locator('.astroneum-widget')],
+    })
+  })
+}

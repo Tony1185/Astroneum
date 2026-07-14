@@ -30,7 +30,7 @@ The demo uses astroneum's built-in standard crypto datafeed (`createStandardCryp
 ## Features
 
 - Trading terminal shell with chart, drawing rail, bottom dock, and persistent outer-right sidebar strip
-- Watchlist/Details/News panel with horizontal lists, validated symbol search, live sortable columns, view presets, list colors, context actions, and cross-list symbol drag
+- Workspace Watchlist with selector, Symbol Search, live sortable columns, keyboard row selection, and 2-second quote polling
 - Binance, Bitget, and OKX symbols with history, live candles, and 2-second visible-watchlist quote polling
 - Alerts panel and unified alert creation
 - Pine editor and strategy reports in a resizable/maximizable bottom dock
@@ -39,6 +39,15 @@ The demo uses astroneum's built-in standard crypto datafeed (`createStandardCryp
 
 ## Next.js notes
 
-- `AstroneumChart` uses canvas + React hooks → rendered inside a `'use client'` component (`ChartDemo.tsx`)
+- `AstroneumChart` uses canvas + React hooks → rendered inside the `'use client'` terminal component
 - `astroneum/style.css` is imported inside the client component
 - `transpilePackages: ['astroneum']` in `next.config.ts` ensures the ESM-only library is bundled correctly by Next.js
+
+## Visual regression
+
+```bash
+pnpm --filter astroneum-demo-next test:visual
+pnpm --filter astroneum-demo-next test:visual:update
+```
+
+The visual gate compares workspace toolbar and sidebar chrome at 1920x945, 1440x900, and 1024x768. Regenerate baselines only after intentionally reviewing a visual change.
