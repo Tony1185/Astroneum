@@ -1,0 +1,118 @@
+.astroneum-workspace {
+  --astroneum-workspace-toolbar-height: 44px;
+  --astroneum-workspace-sidebar-width: 320px;
+  --astroneum-workspace-sidebar-collapsed-width: 52px;
+  --astroneum-workspace-dock-height: 220px;
+  --astroneum-workspace-dock-collapsed-height: 36px;
+  --astroneum-workspace-footer-height: 28px;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--astroneum-text-color);
+  background: var(--astroneum-background-color);
+  font-family: var(--astroneum-font-family);
+  font-size: 13px;
+  grid-template-areas:
+    'toolbar toolbar'
+    'main sidebar'
+    'footer footer';
+  grid-template-columns: minmax(0, 1fr) var(--astroneum-workspace-sidebar-width);
+  grid-template-rows: var(--astroneum-workspace-toolbar-height) minmax(0, 1fr) var(--astroneum-workspace-footer-height);
+}
+
+.astroneum-workspace[data-sidebar='closed'] {
+  grid-template-columns: minmax(0, 1fr) var(--astroneum-workspace-sidebar-collapsed-width);
+}
+
+.astroneum-workspace-toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: visible;
+  border-bottom: 1px solid var(--astroneum-border-color);
+  background: var(--astroneum-popover-background-color);
+}
+
+.astroneum-workspace-main {
+  grid-area: main;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.astroneum-workspace-content {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  grid-template-rows: minmax(0, 1fr) var(--astroneum-workspace-dock-height);
+}
+
+.astroneum-workspace[data-dock='closed'] .astroneum-workspace-main {
+  grid-template-rows: minmax(0, 1fr) var(--astroneum-workspace-dock-collapsed-height);
+}
+
+.astroneum-workspace-chart {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.astroneum-workspace-sidebar {
+  position: relative;
+  display: flex;
+  grid-area: sidebar;
+  min-width: 0;
+  overflow: hidden;
+  border-left: 1px solid var(--astroneum-border-color);
+  background: var(--astroneum-popover-background-color);
+}
+
+.astroneum-workspace-dock {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--astroneum-border-color);
+  background: var(--astroneum-popover-background-color);
+}
+
+.astroneum-workspace-footer {
+  grid-area: footer;
+  min-width: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--astroneum-border-color);
+  background: var(--astroneum-popover-background-color);
+}
+
+.astroneum-workspace-resize {
+  position: absolute;
+  z-index: 2;
+  outline: none;
+}
+
+.astroneum-workspace-resize-vertical {
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  width: 7px;
+  cursor: col-resize;
+}
+
+.astroneum-workspace-resize-horizontal {
+  top: -3px;
+  right: 0;
+  left: 0;
+  height: 7px;
+  cursor: row-resize;
+}
+
+.astroneum-workspace-resize:focus-visible,
+.astroneum-workspace-resize:hover {
+  background: var(--astroneum-primary-color);
+}

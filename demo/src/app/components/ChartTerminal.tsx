@@ -1,7 +1,8 @@
 'use client'
 
 import '@tony01/astroneum/style.css'
-import { type PointerEvent as ReactPointerEvent, useRef, useState, useCallback, useEffect, useMemo } from 'react'
+import './terminal.css'
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import {
   AstroneumChart,
   DATAFEED_ERROR_EVENT,
@@ -25,7 +26,7 @@ import {
 import { AlertManager } from '@tony01/astroneum'
 import type { BacktestResult } from '@tony01/astroneum'
 import type { CompiledStrategy } from '@tony01/astroneum/script'
-import TerminalShell, { useTerminalShell } from './TerminalShell'
+import { LayerProvider, WorkspaceShell, useWorkspaceShell } from '@tony01/astroneum/workspace'
 import WatchlistPanel, { AlertsPanel } from './panels/WatchlistPanel'
 import PineEditorPanel, { StrategyTesterPanel, TradingPanel, StubPanel } from './panels/PineEditorPanel'
 import DateRangeNavigator from './DateRangeNavigator'
@@ -196,7 +197,7 @@ const SIDEBAR_TABS = [
 ] as const
 function SidebarContent({ onSymbolSelect, selectedTicker, symbol, candle, datafeed, getCurrentPrice, getIndicatorSources }: { onSymbolSelect?: (t: string) => void; selectedTicker?: string; symbol?: SymbolInfo; candle?: CandleData | null; datafeed: Datafeed; getCurrentPrice?: () => number | undefined; getIndicatorSources?: () => IndicatorSourceOption[] }) {
   const [active, setActive] = useState('watchlist')
-  const { sidebarOpen, toggleSidebar } = useTerminalShell()
+  const { sidebarOpen, toggleSidebar } = useWorkspaceShell()
   const activeTab = SIDEBAR_TABS.find(t => t.id === active)
 
   const selectTab = (id: typeof active) => {
@@ -250,7 +251,7 @@ function SidebarContent({ onSymbolSelect, selectedTicker, symbol, candle, datafe
 type DockTab = { id: string; label: string; report?: boolean }
 
 function DockContent({ onPineCompiled, onStrategyCompiled, result, strategyError }: { onPineCompiled?: (name: string) => void; onStrategyCompiled?: (strategy: CompiledStrategy) => void; result?: BacktestResult | null; strategyError?: string | null }) {
-  const { dockOpen, dockMaximized, toggleDock, toggleDockMaximized, setDockHeight } = useTerminalShell()
+  const { dockOpen, dockMaximized, toggleDock, toggleDockMaximized } = useWorkspaceShell()
   const [reports, setReports] = useState<DockTab[]>([{ id: 'strategy', label: 'Strategy Tester', report: true }])
   const [active, setActive] = useState('pine')
   const [menuTab, setMenuTab] = useState<string | null>(null)
@@ -282,15 +283,6 @@ function DockContent({ onPineCompiled, onStrategyCompiled, result, strategyError
     if (active === tab.id) setActive('pine')
     setMenuTab(null)
   }
-  const resizeStart = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId)
-    const startY = event.clientY
-    const startHeight = event.currentTarget.parentElement?.getBoundingClientRect().height ?? 220
-    const move = (moveEvent: PointerEvent) => setDockHeight(Math.max(120, Math.min(480, startHeight + startY - moveEvent.clientY)))
-    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', up)
-  }
   const onStrategy = (strategy: CompiledStrategy) => {
     onStrategyCompiled?.(strategy)
     if (reports.length === 0) setReports([{ id: 'strategy', label: 'Strategy Tester', report: true }])
@@ -298,7 +290,6 @@ function DockContent({ onPineCompiled, onStrategyCompiled, result, strategyError
   }
 
   return <>
-    <div className="term-dock-resize" onPointerDown={resizeStart} role="separator" aria-label="Resize bottom panel" aria-orientation="horizontal" />
     <div className="term-dock-tabs" role="tablist" aria-label="Bottom panel">
       {tabs.map((tab, index) => <div className="term-dock-tab-wrap" key={tab.id}>
         <button id={`dock-tab-${tab.id}`} role="tab" aria-selected={active === tab.id} aria-controls={`dock-panel-${tab.id}`} className={`term-dock-tab ${active === tab.id ? 'is-active' : ''}`} onClick={() => selectTab(tab.id)} onKeyDown={event => {
@@ -727,35 +718,37 @@ export default function ChartTerminal() {
   }, [])
 
   return (
-    <TerminalShell
-      theme={theme}
-      topbar={topbar}
-      sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} candle={latestCandle} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
-      dock={<DockContent onPineCompiled={handlePineCompiled} onStrategyCompiled={handleStrategyCompiled} result={strategyResult} strategyError={strategyError} />}
-      footer={<DateRangeNavigator engine={chartEngine} symbol={symbol.ticker} timezone={timezone} />}
-    >
-      {chartCell}
-      {patternDialogOpen && (
-        <PatternDialog
-          enabledMask={patternMask}
-          onToggle={togglePattern}
-          onClose={() => setPatternDialogOpen(false)}
+    <LayerProvider>
+      <WorkspaceShell
+        theme={theme}
+        toolbar={topbar}
+        sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} candle={latestCandle} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
+        dock={<DockContent onPineCompiled={handlePineCompiled} onStrategyCompiled={handleStrategyCompiled} result={strategyResult} strategyError={strategyError} />}
+        footer={<DateRangeNavigator engine={chartEngine} symbol={symbol.ticker} timezone={timezone} />}
+      >
+        {chartCell}
+        {patternDialogOpen && (
+          <PatternDialog
+            enabledMask={patternMask}
+            onToggle={togglePattern}
+            onClose={() => setPatternDialogOpen(false)}
+          />
+        )}
+        <CommandPalette
+          open={cmdkOpen}
+          onClose={() => setCmdkOpen(false)}
+          onSymbolSelect={handleSymbolSelect}
+          onPeriodChange={handlePeriodChange}
+          onToggleTheme={toggleTheme}
+          onToggleReplay={toggleReplay}
+          onToggleVolumeProfile={toggleVolumeProfile}
+          onToggleDOM={toggleDOM}
+          onTogglePatterns={openPatternDialog}
+          periods={PERIODS}
+          currentSymbol={symbol.ticker}
+          currentPeriod={period.text}
         />
-      )}
-      <CommandPalette
-        open={cmdkOpen}
-        onClose={() => setCmdkOpen(false)}
-        onSymbolSelect={handleSymbolSelect}
-        onPeriodChange={handlePeriodChange}
-        onToggleTheme={toggleTheme}
-        onToggleReplay={toggleReplay}
-        onToggleVolumeProfile={toggleVolumeProfile}
-        onToggleDOM={toggleDOM}
-        onTogglePatterns={openPatternDialog}
-        periods={PERIODS}
-        currentSymbol={symbol.ticker}
-        currentPeriod={period.text}
-      />
-    </TerminalShell>
+      </WorkspaceShell>
+    </LayerProvider>
   )
 }

@@ -25,6 +25,7 @@ Read the relevant doc **before building**. These are wired as `@references` in o
 |---|---|---|
 | `@structure` | `docs/STRUCTURE.md` | Where things live — file tree, deploy topology, build flow, refresh workflow |
 | `@gaps` | `docs/TODO.md` | Actionable function-gap backlog — one row per gap with status + next action |
+| `@workstreams` | `docs/WORKSTREAMS.md` | Work ownership, file boundaries, dependencies, acceptance, and handoff |
 | `@design-gaps` | `docs/TODO-DESIGN.md` | Design/layout gap backlog — TV UI surfaces → Astroneum mirror |
 | `@parity` | `docs/tv-functions-skill.md` | TV→Astroneum function catalog + 6-bucket status authority + build/verify workflow |
 | `@design` | `docs/design-astroneum.md` | Library UX spec — colors, typography, layout, motion, a11y, design tokens |
@@ -34,6 +35,7 @@ Read the relevant doc **before building**. These are wired as `@references` in o
 | `@indicator-parity` | `INDICATOR_COMPARISON.md` | 50/50 indicator parity table (Astroneum vs TradingView Pro) |
 | `@demo-design` | `demo/DESIGN.md` | Demo app design system — tokens, component specs, terminal layout |
 | `@demo-product` | `demo/PRODUCT.md` | Product framing — users, brand voice, anti-references ("no AI slop"), design principles |
+| `@tv-reference` | `tv-mirror-reference/README.md` | Read-only behavioral evidence — never implementation source or shipped asset |
 
 ## No TradingView-MCP
 
@@ -44,15 +46,15 @@ Do not call any `tradingview_*` tool.
 ## Build workflow
 
 1. Pick a gap from `@gaps` (TODO.md) or `@design-gaps` (TODO-DESIGN.md).
-2. Read its status in `@parity` (tv-functions-skill.md §3, 6-bucket taxonomy):
+2. Claim the matching work ID in `@workstreams`, including exact files, dependencies, verification, documentation, and risks.
+3. Read its status in `@parity` (tv-functions-skill.md §3, 6-bucket taxonomy):
    - `widget-native` / `api-bridged` → already exists. Do not rebuild.
    - `native-chrome` / `v1-in-scope` → build now per `@design` / `@demo-design`.
    - `v1-deferred` / `v2-future` → do not build. Note only.
-3. Consult `@api` and `@plugin-guide` for implementation patterns.
-4. Implement. Respect conventions (below).
-5. Run `pnpm verify` (lint + typecheck + build + test). Must pass.
-6. Deploy (see deploy skill or `/deploy`).
-7. Update the catalog/TODO rows — docs are part of "done."
+4. Consult `@api` and `@plugin-guide` for implementation patterns.
+5. Implement only within the claimed file scope. Respect conventions (below).
+6. Run `pnpm verify` (lint + typecheck + build + test). Must pass.
+7. Hand off with changed paths, verification, authority-doc updates, and remaining risks; then deploy (see deploy skill or `/deploy`).
 
 ## Verify gate (non-negotiable)
 
@@ -83,7 +85,7 @@ For the full git-sync deploy (pull → build → restart), see the `astroneum-de
 - **No code comments** unless explicitly asked.
 - **Size budgets** — `.size-limit.json` per-entry. Check `pnpm size` after adding exports.
 - **Subpath exports** — every new export needs: `package.json` exports map + `tsup.config.ts` entry + `src/entries/` file.
-- **i18n** — 19 locales in `src/i18n/`. New keys go in `en-US.json` first; other locales fall back.
+- **i18n** - 18 locale JSON files in `src/i18n/`. New keys go in `en-US.json` first; other locales fall back.
 
 ## Doc-sync rule
 

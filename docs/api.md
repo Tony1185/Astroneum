@@ -1,5 +1,17 @@
 # API Reference
 
+## Strategy backtesting
+
+`runBacktest(bars, signals, config)` is a deterministic, bar-close simulation
+API. It returns `BacktestResult`, containing normalized trades, equity and
+drawdown points, and summary metrics. It does not place orders, persist data,
+or connect to brokers.
+
+`ScriptEngine.compileStrategy(source)` is intentionally bounded: scripts define
+`strategySignals({ open, high, low, close, volume, ta })` and return an array
+of `{ index, action: 'enter' | 'exit', side?: 'long' | 'short' }`. Its runner
+uses the same `runBacktest` core. It is not Pine-compatible `strategy.*`.
+
 ## Constructor
 
 ```typescript
@@ -188,7 +200,7 @@ consumer can pull in just what they need.
 | --- | --- |
 | `astroneum/replay` | `BarReplay`, types `BarReplayOptions`, `BarReplayState` |
 | `astroneum/multichart` | `MultiChartLayout`, types `MultiChartCount`, `MultiChartSlot`, `MultiChartLayoutOptions` |
-| `astroneum/watchlist` | `WatchlistManager`, types `Watchlist`, `WatchSymbol` |
+| `astroneum/watchlist` | `WatchlistManager`, types `Watchlist`, `WatchSymbol`, `WatchlistColumn`, `WatchlistSort`, `WatchlistSortDirection` |
 | `astroneum/portfolio` | `PortfolioTracker`, types `Position`, `PositionSide`, `PnLResult` |
 | `astroneum/alerts` | `AlertManager`, full alert type surface |
 | `astroneum/script` | `ScriptEngine`, types `CompiledIndicator`, `StudyOptions`, `PlotOptions`, `InputOptions` |
@@ -313,6 +325,7 @@ import type {
   Period,
   CandleData,
   DatafeedSubscribeCallback,
+  QuoteSnapshot,
 
   // Branded primitives
   Price,
@@ -378,6 +391,9 @@ import type {
   // WatchlistManager
   Watchlist,
   WatchSymbol,
+  WatchlistColumn,
+  WatchlistSort,
+  WatchlistSortDirection,
 
   // PortfolioTracker
   Position,
@@ -387,6 +403,41 @@ import type {
   // PerformanceMode
   PerformanceBar,
 } from '@tony01/astroneum'
+```
+
+### `Datafeed.getQuotes` and `QuoteSnapshot`
+
+`getQuotes` is optional. Watchlist consumers call it with resolved `SymbolInfo` records and keep displaying `—` when a datafeed does not provide snapshots.
+
+```typescript
+interface Datafeed {
+  getQuotes?(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]>
+}
+
+interface QuoteSnapshot {
+  ticker: string
+  last: Price
+  change?: number
+  changePercent?: number
+  volume?: Volume
+  open?: Price
+  high?: Price
+  low?: Price
+  timestamp?: Timestamp
+}
+```
+
+### `WatchlistManager`
+
+List contents and configuration persist to `localStorage`. Quote fields are runtime-only and deliberately excluded from persistence.
+
+```typescript
+manager.addSymbolFromInfo(listId, symbol)
+manager.moveSymbol(fromListId, toListId, ticker, toIndex?)
+manager.setSort(listId, column, direction?)
+manager.setColumns(listId, columns)
+manager.setColor(listId, color)
+manager.updateQuotes(snapshots)
 ```
 
 ### `IndicatorDef`
@@ -525,4 +576,3 @@ Represents the currently visible region of the chart canvas. Used for coordinate
 | `formatDuration` | Format a duration in milliseconds as human-readable text |
 | `formatPeriod` | Format a `Period` as a human-readable string (e.g. `'1H'`) |
 | `detectPricePrecision` | Auto-detect decimal precision from price data |
-

@@ -28,6 +28,11 @@
       "import": "./dist/entries/watchlist.js",
       "default": "./dist/entries/watchlist.js"
     },
+    "./workspace": {
+      "types": "./dist/entries/workspace.d.ts",
+      "import": "./dist/entries/workspace.js",
+      "default": "./dist/entries/workspace.js"
+    },
     "./portfolio": {
       "types": "./dist/entries/portfolio.d.ts",
       "import": "./dist/entries/portfolio.js",

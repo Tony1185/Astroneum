@@ -1,0 +1,262 @@
+# Astroneum — Design TODO: Mirror TradingView Layout
+
+> **Master index** of every TV UI surface → Astroneum design mirror. One row per layout element.
+> **Last updated:** 2026-07-11
+> Pair with: `docs/TODO.md` (function gaps) · `docs/STRUCTURE.md` (where things live) · `docs/tv-functions-skill.md` (function catalog) · `docs/design-astroneum.md` (UX spec) · `INDICATOR_COMPARISON.md` (indicators)
+> **Update on every UI/layout/design change** (see §Maintenance).
+>
+> **Scope:** design/layout only. "Inside function" column is filled when Astroneum has the function wired; left blank when not implemented. Function specs live in `TODO.md`.
+>
+> **Authority:** TV-vs-Astroneum status lives in `docs/tv-functions-skill.md` §3 (6-bucket taxonomy). This file tracks design/layout only. When statuses conflict, tv-functions-skill.md wins.
+
+## How to read
+
+**Design status legend**
+
+| Symbol | Meaning (layout only) |
+|---|---|
+| ✅ | Layout element exists and matches TV |
+| 🔧 | Layout exists but partial (missing sub-elements / wrong placement) |
+| ⏳ | v1-in-scope — layout spec'd to build now |
+| 🟦 | v1.1 — layout deferred |
+| ⟫ | v2-future — layout not in v1 |
+| ❌ | Layout missing |
+| ⚠️ | Layout risk / tech debt |
+
+**TV reference IDs**: `#header-toolbar-*` (top bar), `#drawing-toolbar*` / `linetool-group-*` (left bar), `#right-toolbar` / `data-name` (right rail), `#footer-chart-panel` (bottom dock). Astroneum pointers: `src/widget/`, `src/extension/`, `demo/src/app/components/`.
+
+---
+
+## 0. Shell regions  →  `design-astroneum.md` §4, `STRUCTURE.md` §5
+
+| # | TV region | TV container | Astroneum design | Inside function |
+|---|---|---|---|---|
+| 0.1 | Top toolbar (44px) | `#header-toolbar` | 🔧 `TerminalShell` topbar + `PeriodBar` — covers ~8/23 elements | |
+| 0.2 | Left drawing rail (48px) | `#drawing-toolbar` | ✅ `DrawingBar` is the sole left rail; dead demo `term-rail` placeholder removed from `TerminalShell` | `DrawingBar` |
+| 0.3 | Chart pane (center) | `layout__area--center` | ✅ `TerminalShell` chart slot + `<AstroneumChart>` | Canvas/WebGL render |
+| 0.4 | Right rail toggle bar + panels (260px, 240ms slide, persisted) | `#right-toolbar` | ✅ `TerminalShell` sidebar + `SidebarContent` strip (7 tabs: watchlist/details/alerts/calendar/news/ideas/trading) + unified `AlertModal`; repeated active tab collapses the rail | `WatchlistPanel`, `AlertsPanel`, `TerminalShell` |
+| 0.5 | Bottom dock (tab bar, 220px, 240ms slide, persisted) | `#footer-chart-panel` | ✅ `TerminalShell` dock + `DockContent` tab bar (Pine Editor / Strategy Tester / Trading Panel) + collapse toggle — collapses to 36px tab strip, state persisted | `PineEditorPanel`, `StrategyTesterPanel`, `TradingPanel` |
+| 0.6 | Footer (date range navigator, 28px) | `withdateranges` | ✅ `DateRangeNavigator` — 7 presets (1D/1W/1M/3M/1Y/5Y/ALL) + live visible-range readout via `ChartPlugin` engine bridge | `DateRangeNavigator` |
+
+> **Shell behavior (§4):** Sidebar + dock collapse via `grid-template-columns`/`grid-template-rows` token transitions (240ms, `--term-dur`); collapse state persisted per-user in `localStorage` key `astroneum:shell` (decoupled from chart `serializeState`). Below lg (1024px) the layout is chart-dominant: left rail hidden, sidebar + dock forced collapsed, topbar slimmed to brand + badges (symbol/timeframe live in the chart's `PeriodBar`). FAB overlay for the right rail is 🟦 v1.1.
+
+## 1. Top toolbar — `#header-toolbar`  →  `design-astroneum.md` §5
+
+| # | TV element | TV id / data-name | Astroneum design | Inside function |
+|---|---|---|---|---|
+| 1.1 | Symbol search (value text button) | #header-toolbar-symbol-search | ✅ PeriodBar symbol trigger + SymbolSearchModal - title(symbol_search), data-semantic-id(header.symbol_search), apply-common-tooltip, mobile text-hide @ max-width:600px | PeriodBar + SymbolSearchModal |
+| 1.2 | Switch data type (icon button) | `#header-toolbar-switch-data-type` | ❌ | |
+| 1.3 | Compare symbols button | `#header-toolbar-compare` | 🟦 | |
+| 1.4 | Timeframe radiogroup (1h/4h/D/W) | `#header-toolbar-intervals` | ✅ `PeriodBar` periods | `PeriodBar` |
+| 1.5 | Chart interval dropdown (`,`) | `menuBtn-U9b0TAs4` | 🔧 `PeriodBar` has period buttons, no overflow dropdown — `,` hotkey not wired. Deferred to a library `PeriodBar` pass | |
+| 1.6 | Chart style menu (Candles) | `#header-toolbar-chart-styles` | ✅ `ChartTypeDropdown` | `ChartTypeDropdown` |
+| 1.7 | Indicators dialog button (`/`) | `data-name="open-indicators-dialog"` | ✅ `IndicatorModal` — `/` hotkey wired in `AstroneumChart.tsx` | `IndicatorModal` |
+| 1.8 | Favorite indicators menu | `data-name="show-favorite-indicators"` | 🟦 v1.1 — needs an indicator-favorites model + menu | |
+| 1.9 | Indicator templates menu | `#header-toolbar-study-templates` | ✅ folded into `SaveLoadMenu` — named chart-state presets via `ChartTemplateManager` | `SaveLoadMenu` |
+| 1.10 | Create alert button (Alt+A) | `#header-toolbar-alerts` | ✅ `AlertModal` — Alt+A hotkey wired in `AstroneumChart.tsx` | `AlertModal` |
+| 1.11 | Bar replay button | `#header-toolbar-replay` | ✅ `ReplayToolbar` + `BarReplay` | `BarReplay` |
+| 1.12 | Undo button | `#header-toolbar-undo-redo` | ✅ `UndoManager` + brand-bar button (disabled when empty) + `Ctrl+Z` wired in `ChartTerminal` | `UndoManager` |
+| 1.13 | Redo button | `#header-toolbar-undo-redo` | ✅ `UndoManager` + brand-bar button + `Ctrl+Y` / `Ctrl+Shift+Z` wired in `ChartTerminal` | `UndoManager` |
+| 1.14 | Fill-spacer (push right groups) | `fill-dlFDN0Zd` | ✅ CSS flex auto | |
+| 1.15 | Layout setup (grid picker) | `#header-toolbar-layouts` | ✅ `LayoutPicker` in demo topbar — 1/2/4/8/16 grid | `LayoutPicker` |
+| 1.16 | Save/Load button ("Unnamed" + state) | `#header-toolbar-save-load` | ✅ `SaveLoadMenu` — "Unnamed" label + Save/Load/Clear/Delete dropdown via `ChartTemplateManager` | `SaveLoadMenu` |
+| 1.17 | Manage layouts menu | `data-name="save-load-menu"` | ✅ folded into `SaveLoadMenu` dropdown (save-as / load / delete per layout) | `SaveLoadMenu` |
+| 1.18 | Quick search button (Ctrl+K) | `#header-toolbar-quick-search` | ✅ `CommandPalette` — symbol search + actions, Ctrl+K wired in demo | `CommandPalette` |
+| 1.19 | Settings button | `#header-toolbar-properties` | ✅ `SettingModal` | `SettingModal` |
+| 1.20 | Fullscreen button (Shift+F) | `#header-toolbar-fullscreen` | ✅ `PeriodBar` fullscreen — Shift+F hotkey wired in `AstroneumChart.tsx` | `PeriodBar` fullscreen |
+| 1.21 | Screenshot button (with menu) | `#header-toolbar-screenshot` | ✅ `ScreenshotModal` | `ScreenshotModal` |
+| 1.22 | Mobile trade pill | `#header-toolbar-trade-mobile` | ⟫ mobile (§12) | |
+| 1.23 | Mobile publish button | `#header-toolbar-publish-mobile` | ⟫ | |
+
+## 2. Left drawing toolbar — `#drawing-toolbar`  →  `design-astroneum.md` §5
+
+| # | TV element | TV data-name | Astroneum design | Inside function |
+|---|---|---|---|---|
+| 2.1 | Cursors group (Cross default + submenu) | `linetool-group-cursors` | ✅ `DrawingBar` cursor group — Cross/Dot/Arrow/Eraser submenu + `onCursorChange` sets CSS cursor | `DrawingBar` |
+| 2.2 | Trendline + Trend tools submenu | `linetool-group-trend-line` | 🔧 `singleLine` group | |
+| 2.3 | Fib retracement + Gann/Fib submenu | `linetool-group-gann-and-fibonacci` | 🔧 `fibonacci` group — missing pure Fib Retracement, Channel, Wedge, Time Zones, Arcs, Fan | |
+| 2.4 | XABCD pattern + Patterns submenu | `linetool-group-patterns` | 🔧 `wave` group — missing Cypher, Crab, Bat, Butterfly, Three Drives, Elliott Impulse | |
+| 2.5 | Long position + Forecasting submenu | `linetool-group-prediction-and-measurement` | ❌ `measure` only | |
+| 2.6 | Brush + Geometric shapes submenu | `linetool-group-geometric-shapes` | 🔧 `polygon` group — missing Brush, Ellipse, Polygon, Polyline | |
+| 2.7 | Text + Annotation submenu | `linetool-group-annotation` | ❌ | |
+| 2.8 | Icon + Icons submenu (font icons) | `linetool-group-font-icons` | ❌ | |
+| 2.9 | Measure button (Shift+Click) | `data-name="measure"` | ✅ `DrawingBar` measure button + Shift+Click on chart canvas | `measure` |
+| 2.10 | Zoom in button | `data-name="zoom"` | ✅ `DrawingBar` zoom button — `zoomAtCoordinate(1.2, center)` | `DrawingBar` |
+| 2.11 | Magnet mode button (Ctrl) | `data-name="magnet-button"` | ✅ `DrawingBar` magnet + `DrawingSnapper` | `DrawingSnapper` |
+| 2.12 | Keep drawing (sticky) button | `data-name="drawginmode"` | 🔧 `DrawingBar` keepDrawing toggle exists; re-trigger on drawing-end deferred until engine event support | `DrawingBar` |
+| 2.13 | Lock all drawings button | `data-name="lockAllDrawings"` | ✅ `DrawingBar` lock + `lockAllDrawings()` | `lockAllDrawings()` |
+| 2.14 | Hide all drawings button (Ctrl+Alt+H) | `data-name="hide-all"` | ✅ `DrawingBar` visible toggle + `Ctrl+Alt+H` in `hooks.ts` | `DrawingBar` |
+| 2.15 | Remove objects button | `data-name="removeAllDrawingTools"` | ✅ `DrawingBar` remove | |
+| 2.16 | Favorite drawings toolbar toggle | `#drawing-toolbar-favorite-drawings` | ❌ | |
+
+## 3. Right rail — `#right-toolbar` toggle bar + panels  →  `tv-functions-skill.md` §3.17
+
+TV's right rail is a **vertical toggle bar** (`#right-toolbar`, 11 buttons) that switches which panel shows. Astroneum puts panels directly in the sidebar slot with no toggle bar.
+
+### 3a. Right toolbar toggle bar
+
+| # | TV element | data-name | Astroneum design | Inside function |
+|---|---|---|---|---|
+| 3.1 | Vertical toggle bar container | `#right-toolbar` | ✅ `TerminalShell` sidebar strip — `term-sidebar-strip` (52px vertical, 7 icon+label tabs) | |
+| 3.2 | Watchlist/details/news toggle (active) | `base` | ✅ `WatchlistPanel` — toggle button in `term-sidebar-strip` | `WatchlistPanel` |
+| 3.3 | Alerts toggle | `alerts` | ✅ `AlertsPanel` — toggle button in `term-sidebar-strip` | `AlertsPanel` |
+| 3.4 | Object tree + data window toggle | `object_tree` | ❌ | |
+| 3.5 | Chats toggle | `union_chats` | ⟫ | |
+| 3.6 | Filler (spacer) | `filler-Sc5Go8G8` | ✅ CSS | |
+| 3.7 | Screeners toggle | `screener-dialog-button` | ⟫ | |
+| 3.8 | Pine toggle | `pine-dialog-button` | 🔧 `PineEditorPanel` — exists in bottom dock, not right rail | `PineEditorPanel` |
+| 3.9 | Calendars toggle | `calendar-dialog-button` | 🔧 `StubPanel` placeholder in sidebar strip | `StubPanel` |
+| 3.10 | Community toggle (with badge counter) | `community-hub-button` | ⟫ | |
+| 3.11 | Notifications toggle | `notifications-button` | ❌ | |
+| 3.12 | Products menu toggle | `products-button` | ❌ | |
+| 3.13 | Separator | `separator-VRj5pi98` | — | |
+| 3.14 | Help Center toggle | `help-button` | 🔧 `demo/src/app/support/` route — not as rail toggle | |
+
+### 3b. Watchlist panel content (when 3.2 active)
+
+| # | TV element | Astroneum design | Inside function |
+|---|---|---|---|
+| 3.15 | Multiple watchlists (tabs) | 🔧 `WatchlistPanel` supports multiple persisted, collapsible lists; TV-style tabs remain deferred | `WatchlistManager` |
+| 3.16 | Add/remove symbol | ✅ | `WatchlistManager` |
+| 3.17 | Reorder (drag rows) | ✅ native HTML drag/drop for lists and symbols | `WatchlistManager.reorderLists/reorderSymbols` |
+| 3.18 | Details panel (OHLC + P&L + desc) | 🔧 live OHLC snapshot + symbol metadata; fundamentals and P&L await data sources | `DetailsPanel` |
+| 3.19 | Highlight selected row | ✅ | |
+
+## 4. Bottom dock — `#footer-chart-panel` tab bar  →  `tv-functions-skill.md` §3.13/3.15/3.20
+
+TV's bottom dock is a **tab bar** with strategy report tabs + open/maximize toggles. Astroneum's dock has a tab bar (Pine Editor / Strategy Tester / Trading Panel) + a collapse toggle.
+
+| # | TV element | data-name / qa-id | Astroneum design | Inside function |
+|---|---|---|---|---|
+| 4.1 | Tab bar container | `#footer-chart-panel` | ✅ `TerminalShell` dock slot + `DockContent` `term-dock-tabs` | `DockContent` |
+| 4.2 | Strategy report tab (icon + title + context menu) | `data-qa-id="backtesting"` | 🔧 `StrategyTesterPanel` has accessible Summary/Performance/Trades/Equity/Properties sample report tabs; runtime data binding remains | `StrategyTesterPanel` |
+| 4.3 | Tab context menu (rename/close/duplicate) | `data-qa-id="tab-menu-trigger"` | ❌ | |
+| 4.4 | "More tabs" button (3 dots) | `menuButtonWrap-jogw41q5` | ❌ | |
+| 4.5 | Open panel toggle (chevron) | `toggle-visibility-button` | ✅ `DockContent` collapse toggle (`term-icon-btn`) | `DockContent` |
+| 4.6 | Maximize panel toggle | `toggle-maximize-button` | ❌ | |
+| 4.7 | Pine Editor tab | (when Pine open) | ✅ `PineEditorPanel` — tab in `term-dock-tabs` | `PineEditorPanel` |
+| 4.8 | Trading Panel tab | (when broker connected) | ✅ `TradingPanel` stub — tab present, content is empty state | `TradingPanel` |
+| 4.9 | Resize handle (dock height) | ❌ | |
+
+## 5. Chart pane overlays  →  `design-astroneum.md` §11
+
+| # | TV element | Astroneum design | Inside function |
+|---|---|---|---|
+| 5.1 | OHLC legend (top-left) | ⏳ v1-in-scope — not built | |
+| 5.2 | Right-click context menu | ⏳ v1-in-scope — not built | |
+| 5.3 | Crosshair + labels | ✅ `Crosshair` engine | `Crosshair` |
+| 5.4 | Y-axis scale controls (linear/log/%/indexed) | ✅ `PriceScaleTransform` | `PriceScaleTransform` |
+| 5.5 | X-axis time controls | ✅ engine native | |
+| 5.6 | Data window panel (in right rail — see 3.4) | ❌ | |
+| 5.7 | Last price line + label | ✅ engine native | |
+| 5.8 | Trade markers (entry/exit arrows) | ❌ | |
+| 5.9 | Symbol watermark | ✅ engine native | |
+| 5.10 | Session visualizer lines | ✅ `SessionVisualizer` | `SessionVisualizer` |
+
+## 6. Footer — date range navigator  →  `design-astroneum.md` §4
+
+| # | TV element | Astroneum design | Inside function |
+|---|---|---|---|
+| 6.1 | Date range navigator bar | ✅ `DateRangeNavigator` in `TerminalShell` footer slot — live visible-range readout (scroll/zoom aware via `onVisibleRangeChange`/`onZoom` actions) | `DateRangeNavigator` |
+| 6.2 | Range presets (1D/1W/1M/3M/1Y/5Y/ALL) | ✅ `DateRangeNavigator` — 7 preset buttons, anchor-to-realtime + `zoomAtDataIndex` | `DateRangeNavigator` |
+
+## 7. Modals & dialogs  →  `STRUCTURE.md` §3.4
+
+| # | TV dialog | Astroneum design | Inside function |
+|---|---|---|---|
+| 7.1 | Indicators dialog | ✅ `IndicatorModal` | `IndicatorModal` |
+| 7.2 | Indicator settings (Inputs/Style/Visibility) | 🔧 `IndicatorSettingModal` partial | |
+| 7.3 | Alert dialog | ✅ canonical `AlertModal` used by chart chrome and terminal alert panel | `AlertModal` |
+| 7.4 | Chart settings / properties | ✅ `SettingModal` | `SettingModal` |
+| 7.5 | Screenshot | ✅ `ScreenshotModal` | `ScreenshotModal` |
+| 7.6 | Symbol search | ✅ `SymbolSearchModal` | `SymbolSearchModal` |
+| 7.7 | Timezone | ✅ `TimezoneModal` | `TimezoneModal` |
+| 7.8 | Script editor (Pine) | ✅ `ScriptEditorModal` | `ScriptEditorModal` |
+| 7.9 | Layout templates manager | ❌ | |
+| 7.10 | Indicator templates manager | ❌ | |
+
+## 8. Mobile-specific  →  `design-astroneum.md` §12
+
+| # | TV element | Astroneum design | Inside function |
+|---|---|---|---|
+| 8.1 | Mobile trade pill (`#header-toolbar-trade-mobile`) | ❌ | |
+| 8.2 | Mobile publish button | ⟫ | |
+| 8.3 | Full mobile/touch UX | ⟫ | |
+
+## 9. Structural primitives (shared across all regions)
+
+| # | TV element | TV class | Astroneum design | Inside function |
+|---|---|---|---|---|
+| 9.1 | Vertical separator | `separator-LLZAbs0G` | ✅ `DrawingBar` `.split-line` | |
+| 9.2 | Group container | `group-LLZAbs0G` | ✅ `DrawingBar` item `role=group` | |
+| 9.3 | Fill-spacer (push right) | `fill-dlFDN0Zd` | ✅ CSS flex auto | |
+| 9.4 | scrollWrap + noScrollBar | `scrollWrap-wXGVFOC9` | ❌ | |
+| 9.5 | Tooltip system (data-tooltip + hotkey) | apply-common-tooltip | 🔧 class now applied on 1.1 Symbol Search (PeriodBar); rich tooltip layer + hotkey display still missing | |
+| 9.6 | `aria-haspopup="menu"` dropdowns | multiple | 🔧 some modals, menu dropdowns incomplete | |
+| 9.7 | `aria-pressed` toggles | multiple | ✅ `DrawingBar` | |
+| 9.8 | `role=toolbar/radiogroup/group` | multiple | ✅ `PeriodBar` + `DrawingBar` | |
+| 9.9 | Hotkey system (data-tooltip-hotkey) | multiple | 🔧 `useKeyboardShortcuts` chart-nav only | `useKeyboardShortcuts` |
+| 9.10 | SVG icon system (28×28, currentColor) | multiple | ✅ | |
+| 9.11 | Notification badge counter (e.g. Community "5") | `counter-DHGll3AY` | ❌ | |
+
+## 10. Design tokens & CSS  →  `design-astroneum.md` §2/§3/§7
+
+| # | TV element | Astroneum design | Inside function |
+|---|---|---|---|
+| 10.1 | Hashed class names (`button-HdKhcTye`) | ✅ `--astroneum-*` tokens (intentional) | |
+| 10.2 | TV dark palette | ✅ `design-astroneum.md` §2 | |
+| 10.3 | Typography (Trebuchet MS + Inter) | ✅ `design-astroneum.md` §3 | |
+| 10.4 | Motion (none/minimal) | ✅ `design-astroneum.md` §7 | |
+| 10.5 | Light theme | ⟫ | |
+| 10.6 | High-contrast theme | ✅ | `theme="high-contrast"` |
+| 10.7 | 18 locale JSON files | 🔧 16 fall back to en-US for new keys | |
+
+---
+
+## Maintenance policy
+
+Mirrors `TODO.md` and `STRUCTURE.md` §11. **Update this file on every UI/layout/design change.**
+
+### Triggers — re-scan and patch when any of these change
+
+- New / removed / renamed widget in `src/widget/` or component in `demo/src/app/components/`
+- New / removed drawing tool in `src/extension/`
+- New modal / dialog / overlay / panel
+- TopBar / LeftToolbar / RightToolbar / Dock / Footer layout change
+- New hotkey or shortcut (update §9.9 + the relevant §1/§2 row)
+- New tooltip / aria / a11y pattern
+- Theme / palette / typography / motion change
+- New locale or i18n key batch affecting UI strings
+- New chart pane overlay (legend / context menu / data window / markers)
+- Mobile-specific surface added
+- `TerminalShell` slot change
+- New right-rail panel or bottom-dock tab
+- **When a function gets implemented** — fill the "Inside function" cell (was blank)
+
+### Re-scan model
+
+On invocation ("refresh design todo"), re-scan live tree (`src/widget/`, `src/extension/`, `demo/src/app/components/`, `src/chart/hooks.ts`), diff against this file, patch rows, append dated changelog entry.
+
+### Consistency check (each refresh)
+
+- Every `✅` row still exists in source
+- Every `❌` / `🔧` row hasn't been silently fixed
+- `src/widget/index.tsx` barrel matches `docs/STRUCTURE.md` §3.4
+- `src/extension/index.ts` matches `docs/STRUCTURE.md` §3.7
+- `src/chart/hooks.ts` hotkey list matches §9.9 + §1/§2 hotkey rows
+- "Inside function" cells: blank = no function; filled = function wired. Update when a function lands.
+- Cross-link to `design-astroneum.md` §11/§12 for in-scope/deferred status
+- Cross-link to `tv-functions-skill.md` §3 for TV function catalog
+
+---
+
+## Changelog
+- **2026-07-11 (b)** — Removed dead `term-rail` from `TerminalShell`. The 60px left rail (`RailContent()` in `ChartTerminal.tsx`) was a Phase 1 placeholder with 7 non-functional buttons (cursor/watchlist/alerts/data/strategy/pine/trading) that only set local state — no panel opened, no cursor changed. All entries duplicated existing functional surfaces (sidebar tabs + dock tabs). Semantically wrong position too: TV panel toggles belong on the right rail, not left. Removed: `RailContent()` function, `rail` prop from `TerminalShell`, all `.term-rail*` CSS rules, `--term-rail-w` token from `globals.css`, grid-template-areas/columns updated from 3-col to 2-col. Cleaned 4 unused Icon components (Cursor/Data/Strategy/Pine). **0.2 promoted to ✅** — `DrawingBar` is now the sole left rail. Demo rebuilt + restarted, verified (HTTP 200, no `term-rail*` in SSR HTML, PM2 clean).
+- **2026-07-11** — §2 left drawing toolbar Batch A: bug fixes + Tier 1 quick wins. **Bug fixes:** (1) SCSS `.icon-overlay` class mismatch — replaced inline `style={{32x32}}` with `className="icon-overlay"` on all DrawingBar spans (hover/`.selected` visual states now functional). (2) Missing `groupId: DRAWING_GROUP_ID` on submenu item `onDrawingItemClick` calls — submenu-launched overlays now properly group-tagged. (3) `Escape` key in `hooks.ts` was nuking ALL drawings (`removeOverlay({groupId})`) — now only cancels the in-progress drawing via `currentStep > 0` check + `removeOverlay({id})`. (4) Magnet snap wiring confirmed: engine `OverlayView.ts:346-380` already snaps to OHLC when `mode` is `weak_magnet`/`strong_magnet`; `snapToOhlc`/`snapAngle` in `DrawingSnapper.ts` are utility exports (engine handles runtime snapping natively). **New features:** **2.1** Cursors group — Cross/Dot/Arrow/Eraser submenu, `onCursorChange` sets CSS cursor. **2.9** Measure button — orphaned `measure.ts` extension wired to DrawingBar + Shift+Click on chart canvas. **2.10** Zoom in button — `zoomAtCoordinate(1.2, center)`. **2.12** Keep drawing toggle — UI toggle (re-trigger on drawing-end deferred, no engine event). **2.14** Ctrl+Alt+H — toggles `overrideOverlay({groupId, visible})`. New i18n keys + 7 new SVG icons. Icon sizing fixed: `.icon-overlay` 52x38 hit area, inner SVGs 28px. Library + demo rebuilt, deployed, verified (HTTP 200, SSR HTML has `draw.cursor`/`draw.measure`/`draw.zoom`/`draw.keep_drawing`, PM2 error log empty). Remaining: 2.3/2.4/2.6 stay partial (Batch B), 2.5/2.7/2.8/2.16 stay missing (Tier 3).
+- **2026-07-10** - §1.1 Symbol Search parity pass. PeriodBar symbol trigger now uses title(symbol_search), data-semantic-id(header.symbol_search), and apply-common-tooltip; responsive compact behavior added in period-bar/index.scss (hide symbol text at max-width:600px). Updated §1.1 + §9.5.
+
+- **2026-07-08 (d)** — §1 top toolbar: undo/redo + save/load batch (demo-side, no library/`tsup`). **1.12/1.13 ⚠️→✅** — `UndoManager` wired: brand-bar undo/redo buttons (disabled when stack empty) + `Ctrl+Z` / `Ctrl+Y` / `Ctrl+Shift+Z` in `ChartTerminal`'s hotkey `useEffect` (input-field guard so Pine editor/save-prompt aren't hijacked). `record()` via a 600ms poll — `drawing-end` is not emitted (the `EventBus` is defined but never instantiated, and `ActionType` has no overlay action), so mutations are captured by polling `record()` which no-ops when overlays are unchanged (`serializeState` excludes candle data, so cheap); baseline seeded on mount. **1.16/1.17 🔧/❌→✅ + 1.9 🔧→✅** — folded into one `SaveLoadMenu.tsx` (new) backed by `ChartTemplateManager`: "Unnamed" label + Save-as / Load / Clear-drawings / Delete dropdown. **1.5** stays 🔧 — deferred to a library `PeriodBar` pass (overflow dropdown + `,` hotkey). **1.8** ❌→🟦 v1.1 (favorites model). **1.22** ❌→⟫ (mobile). New `terminal.css` `.term-menu*` + `:disabled` rules. Library `hooks.ts` left untouched (Ctrl+Z comment stays — undo is demo-owned, consistent with `/`/`Alt+A`/`Shift+F`). Built (6.2s, types valid) + restarted + verified (HTTP 200, undo button SSR-rendered disabled, PM2 error log empty).
+- **2026-07-08 (c)** — §0 shell grid/behavior aligned to `design-astroneum.md` §4. **G1 dimensions:** `globals.css` tokens 48/60/300/300px+200ms → 44/48/260/220px+240ms (footer 28px unchanged). **G2 sidebar animation:** removed inline `display:none` on `.term-sidebar` (was defeating the grid-track transition → snap instead of slide); added `min-width:0`. **G3 responsive <lg:** `@media(max-width:1024px)` now hides `.term-rail`, forces `--term-sidebar-w:0` + `--term-dock-h:collapsed`, and slims topbar via `.term-spacer ~ *{display:none}` (symbol/timeframe live in the chart's `PeriodBar`). FAB overlay deferred 🟦 v1.1. **G4 persistence:** `TerminalShell` now restores/writes sidebar+dock collapse state to `localStorage` key `astroneum:shell` (decoupled from chart `serializeState` — chrome ≠ chart state); restore deferred to `useEffect` to avoid SSR hydration mismatch. **G5 docs:** fixed stale CSS header comment (footer 22→28px), §0 dimension cells (0.1 42→44, 0.2 52→48), added shell-behavior note + per-row slide/persist annotations; updated `design-astroneum.md` §4 (serializeState wording → localStorage; FAB marked v1.1) + `TODO.md` (shell persistence row). 0.1/0.2 stay 🔧 (content gaps live in §1/§2).
+- **2026-07-08 (b)** — §1 top toolbar audit + build. Three hotkeys wired at library level in `AstroneumChart.tsx` (modal-toggle `useEffect`): 1.7 `/` (indicators), 1.10 `Alt+A` (alerts), 1.20 `Shift+F` (fullscreen) — promoted 🔧→✅. Built **1.18 Quick Search (Ctrl+K)** — `CommandPalette.tsx` in demo: symbol search + timeframe switch + action toggles, `Ctrl+K` listener in `ChartTerminal`. Found 1.15 LayoutPicker stale (already built) — promoted 🟦→✅. Also patched `AstroneumHandle` `useImperativeHandle` (local clone was behind server — missing `createIndicator`/`removeIndicator`/`createOverlay`/`removeOverlay`/`getDataList`/`setData`/`resize`). Library + demo rebuilt, deployed, verified (HTTP 200). Remaining §1 gaps: 1.5 (`,` interval dropdown), 1.16 (save/load UI), 1.12/1.13 (undo/redo buttons), 1.2/1.8/1.17/1.22 (missing).
+- **2026-07-08** — §0 shell regions audit + build. Found server demo ahead of doc: right-rail toggle bar (`SidebarContent` `term-sidebar-strip`, 7 tabs) and bottom-dock tab bar (`DockContent` `term-dock-tabs`, 3 tabs + collapse) already shipped — promoted 0.4, 0.5, 3.1, 3.2, 3.3, 4.1, 4.2, 4.5, 4.7, 4.8 from 🔧/❌ to ✅. Built the one genuinely-missing shell piece: **§0.6 footer date-range navigator** (`DateRangeNavigator.tsx`). 7 presets (1D/1W/1M/3M/1Y/5Y/ALL) anchor to realtime then `zoomAtDataIndex`; live visible-range readout subscribes to engine `onVisibleRangeChange`/`onZoom` actions. Engine bridge via a `ChartPlugin` (`onInit` captures the full `Chart` — `AstroneumHandle` doesn't expose scroll/zoom). Footer token bumped 22px→28px. Deployed + verified (HTTP 200, `term-daterange-*` classes in SSR HTML, no PM2 errors).
+- **2026-07-07** — Initial draft. Design/layout focus — "Inside function" column blank where Astroneum has no function wired. Sourced from three TV HTML snapshots (top toolbar, left drawing toolbar, right toolbar + bottom dock), `docs/STRUCTURE.md`, `docs/tv-functions-skill.md`, `docs/design-astroneum.md`, `INDICATOR_COMPARISON.md`, `docs/TODO.md`, `src/chart/hooks.ts` (hotkey audit), and live source (`src/widget/`, `src/extension/`, `demo/src/app/components/`). 10 sections + shell + maintenance policy. ~110 rows. Hotkey audit confirmed: only chart-nav hotkeys wired; all modal/dialog hotkeys missing. Cross-linked to TODO.md.

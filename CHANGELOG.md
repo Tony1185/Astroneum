@@ -9,6 +9,34 @@ once it reaches v1.0. Until then, minor releases may include breaking changes
 
 ## [Unreleased]
 
+### Changed
+- The right rail now keeps its 52px toggle strip on the viewport's outer-right edge; panels open immediately to its left and collapse without hiding the strip.
+- The Watchlist panel now uses Watchlist/Details/News sub-tabs, horizontal list tabs, sortable configurable quote columns, Simple/Advanced presets, list colors, validated symbol search, context actions, and same-list/cross-list symbol drag.
+- The Details sub-tab follows the active chart symbol and shows current OHLC data and metadata; News remains an honest provider-dependent empty state.
+- Hidden panel content is inert and excluded from keyboard navigation while the collapsed rail remains interactive.
+
+### Added — Watchlist live quotes and persistence
+- Added optional `Datafeed.getQuotes?(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]>`.
+- Added Binance, Bitget, and OKX ticker snapshots to `StandardCryptoDatafeed`.
+- Extended `WatchlistManager` with symbol metadata, cross-list moves, persisted columns/sort/colors, and non-persisted live quote updates.
+- Added watchlist manager and quote batching tests; the suite now passes 38 tests.
+
+### Added — Forecasting group + popup clipping fix (drawing tools 20 to 32)
+- 12 new drawing overlays in `src/extension/`: `longPosition`, `shortPosition`, `positionForecast`, `barsPattern`, `ghostFeed`, `sector`, `anchoredVwap`, `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, `priceRange`, `dateRange`, `dateAndPriceRange`.
+- New `forecasting` group in `DrawingBar` with 3 section headers (Forecasting, Volume-based, Measurers) using `isHeader` on `SelectDataSourceItem`.
+- 13 new SVG icons extracted from TV reference. 15 new i18n keys in `en-US.json`.
+- Fixed popup clipping: `demo/terminal.css` `.astroneum-drawing-bar` overflow override moved to `@media(max-height:620px)` ??? all drawing-bar popups now visible on normal viewports, scroll preserved on short ones.
+- Fixed 3 pre-existing lint errors in `AstroneumChart.tsx` (unnecessary type assertions).
+
+### Added — TV mirror workspace and strategy foundation
+- Default demo route now mounts the terminal workspace with dismissible curtains and in-app split view.
+- Unified terminal alert creation with the library `AlertModal`; drawing controls now expose semantic accessibility state.
+- Added deterministic backtest types/core, bounded `strategySignals()` compilation, strategy tests, and the initial strategy report UI.
+- Wired compiled strategies to current chart history in the terminal and replaced fixture-only strategy reports with runtime results.
+- Added persistent dock report tabs with Rename/Duplicate/Close, More, keyboard navigation, resize, and maximize/restore.
+- Fixed dock/rail geometry: explicit CSS Grid chart+dock rows prevent chart bleed; the real left drawing rail remains pinned through dock height, scrolls on short viewports, and dock maximize no longer reflows it.
+- Added `docs/WORKSTREAMS.md` and the strategy-builder agent for scoped AI handoffs.
+
 ### Added — Full Indicator Parity (50 total, +23 new)
 
 Astroneum now ships **50 technical indicators** — up from 27 — achieving full

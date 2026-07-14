@@ -179,6 +179,8 @@ Empty states:
 - Notifications: explanation + relevant exploration action;
 - Watchlist: Add symbol.
 
+The Watchlist panel has a full anatomy, control inventory (`watchlist.list_selector`, `watchlist.add_symbol`, `watchlist.advanced_view`, `watchlist.settings`, `watchlist.column_header`, `watchlist.row`, `watchlist.details_metrics`), sortable-column and quote-state model in [watchlist.md](watchlist.md). Row DOM, the row context menu, list-menu contents, and the News sub-view are `not captured` there.
+
 ### 6.2 Product curtain
 
 Screeners, Pine Editor, Calendars, and Community open above the workspace with Close and Move overlay to split-view.

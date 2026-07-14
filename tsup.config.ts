@@ -13,6 +13,7 @@ export default defineConfig({
     'src/entries/replay.ts',
     'src/entries/multichart.ts',
     'src/entries/watchlist.ts',
+    'src/entries/workspace.ts',
     'src/entries/portfolio.ts',
     'src/entries/alerts.ts',
     'src/entries/script.ts',

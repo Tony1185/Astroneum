@@ -1,5 +1,5 @@
-import ChartDemo from './components/ChartDemo'
+import ChartTerminal from './components/ChartTerminal'
 
 export default function Page() {
-  return <ChartDemo />
+  return <ChartTerminal />
 }

@@ -13,7 +13,7 @@ Every catalog row carries one of these six statuses. The status dictates what to
 
 | Bucket | Meaning | Action |
 |---|---|---|
-| `widget-native` | TV widget provides it; Astroneum just doesn't disable it | Ensure widget config flag is `true`; do not rebuild |
+| `widget-native` | The Astroneum library/component already provides it | Use the existing prop, method, manager, plugin, or widget; do not rebuild |
 | `native-chrome` | Astroneum rebuilds it in surrounding chrome | Build per `docs/design-astroneum.md` §5 |
 | `api-bridged` | Existing backend API already mirrors it | Reuse; do not rebuild |
 | `v1-in-scope` | Spec'd for v1 per `design-astroneum.md` §11 | Build now |
@@ -65,9 +65,9 @@ Row format: `| Function | TV behavior | Status | Pointer | Notes |`. Pointer = w
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Candles | OHLC candle body + wick | `widget-native` | `style:"1"` in widget config | v21 uses candles |
-| Hollow Candles | Body hollow on up | `widget-native` | `style:"9"` | |
-| Heikin Ashi | HA-transformed candles | `widget-native` | `style:"8"` | |
+| Candles | OHLC candle body + wick | `widget-native` | `AstroneumChart` `barStyle` / `ChartTypeDropdown` | v21 uses candles |
+| Hollow Candles | Body hollow on up | `v1-deferred` | ? | Not exposed in current demo selector |
+| Heikin Ashi | HA-transformed candles | `widget-native` | `AstroneumChart` `barStyle="heikin_ashi"` / `ChartTypeDropdown` | |
 | Line | Close-price line | `widget-native` | `style:"2"` | |
 | Area | Line + fill | `widget-native` | `style:"3"` | |
 | Baseline | Line vs baseline threshold | `widget-native` | `style:"10"` | |
@@ -76,22 +76,22 @@ Row format: `| Function | TV behavior | Status | Pointer | Notes |`. Pointer = w
 | Point & Figure | X/O columns | `widget-native` | `style:"6"` | |
 | Line Break | N-line reversal | `widget-native` | `style:"7"` | |
 | Range | Range-bars | `widget-native` | `style:"12"` | |
-| Chart-type selector | Top-bar dropdown | `native-chrome` | `src/components/astroneum/TopBar.tsx` | Mirrors TV top-bar |
+| Chart-type selector | Top-bar dropdown | `native-chrome` | `demo/src/app/components/ChartTypeDropdown.tsx` | Mirrors TV top-bar |
 
 ### 3.2 Timeframes
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| 1s, 1m, 5m, 15m, 30m, 1h, 4h, 1D, 1W, 1M | Standard resolutions | `widget-native` | `interval` param | v21 runs on `240` (4h) |
-| Range bars | Price-range aggregation | `widget-native` | `interval="R"` | |
+| 1s, 1m, 5m, 15m, 30m, 1h, 4h, 1D, 1W, 1M | Standard resolutions | `widget-native` | `AstroneumChart` `period` prop + `setPeriod()` | v21 runs on 4h |
+| Range bars | Price-range aggregation | `widget-native` | `NonTimeBars` | |
 | Custom seconds/minutes | User-defined | `v1-deferred` | — | §12 |
-| Timeframe selector | Top-bar buttons | `native-chrome` | `TopBar.tsx` | Hotkeys `1`-`9` (§8 of design) |
+| Timeframe selector | Top-bar buttons | `native-chrome` | `src/widget/period-bar` | Period buttons shipped; overflow dropdown + `,` hotkey remain a TODO-DESIGN gap |
 
 ### 3.3 Chart layouts / multi-chart
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Single pane | One chart | `widget-native` | default | v1 ships single only |
+| Single pane | One chart | `widget-native` | `AstroneumChart` default | |
 | 2×1, 1×2, 2×2, 3×1, 3×2, 4×4 grids | Multi-pane | `v1-deferred` | — | §12; v2 rebuild |
 | Sync crosshair across panes | Linked | `v1-deferred` | — | |
 | Layout selector | Grid picker | `v1-deferred` | — | |
@@ -178,18 +178,18 @@ v21 uses: BB, SMMA (RMA), SAR, ADX/DI, MACD, RSI, ATR, EMA(1D), Choppiness Index
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Inputs tab | Length, source, params | `v1-deferred` | — | Widget-provided when studies UI on |
+| Inputs tab | Length, source, params | `v1-deferred` | ? | `IndicatorSettingModal` is partial; full Inputs/Style/Visibility parity remains deferred |
 | Style tab | Color, width, plot visibility | `v1-deferred` | — | |
 | Visibility tab | Per-timeframe show/hide | `v1-deferred` | — | |
 
 ### 3.10 Drawing tools (~50)
 
-Astroneum ships a left vertical toolbar (`src/components/astroneum/LeftToolbar.tsx`) mirroring TV's drawing-tool dock. Most tools are `widget-native` when TV's side toolbar is shown; Astroneum v1 keeps TV's side toolbar visible (`hide_side_toolbar: false` in widget config — see §5) and re-implements the dock selector as `native-chrome`.
+Astroneum ships a left vertical toolbar (`src/widget/drawing-bar`) mirroring TV's drawing-tool dock. Drawing primitives live under `src/extension/` (32 overlays); the library owns the rail and the demo shell preserves it through the dock height, with internal scrolling on short viewports only (`@media max-height:620px`).
 
 | Tool | TV behavior | Status | Pointer |
 |---|---|---|---|
-| Cursor / pointer | Default select | `native-chrome` | `LeftToolbar.tsx` |
-| Trend line | Two-point line | `widget-native` | TV side toolbar |
+| Cursor / pointer | Default select | `native-chrome` | `src/widget/drawing-bar` |
+| Trend line | Two-point line | `widget-native` | `src/extension` |
 | Horizontal line | Price level | `widget-native` | |
 | Vertical line | Time marker | `widget-native` | |
 | Fibonacci retracement | Fib levels | `widget-native` | |
@@ -200,6 +200,18 @@ Astroneum ships a left vertical toolbar (`src/components/astroneum/LeftToolbar.t
 | Rectangle | Box shape | `widget-native` | |
 | Ellipse | Oval | `widget-native` | |
 | Triangle / polygon / arrow | Shapes | `widget-native` | |
+| Long position | Risk/reward entry to stop to target | `native-chrome` | `src/extension/longPosition` |
+| Short position | Inverted risk/reward | `native-chrome` | `src/extension/shortPosition` |
+| Position forecast | Projection cone | `native-chrome` | `src/extension/positionForecast` |
+| Bars pattern | Replay candles at new position | `native-chrome` | `src/extension/barsPattern` |
+| Ghost feed | Translucent candle copy | `native-chrome` | `src/extension/ghostFeed` |
+| Sector | Arc/fan from pivot | `native-chrome` | `src/extension/sector` |
+| Anchored VWAP | Cumulative VWAP from anchor | `native-chrome` | `src/extension/anchoredVwap` |
+| Fixed range volume profile | Horizontal histogram in range | `native-chrome` | `src/extension/fixedRangeVolumeProfile` |
+| Anchored volume profile | Cumulative volume profile | `native-chrome` | `src/extension/anchoredVolumeProfile` |
+| Price range | 2 price lines + delta label | `native-chrome` | `src/extension/priceRange` |
+| Date range | 2 date lines + delta label | `native-chrome` | `src/extension/dateRange` |
+| Date and price range | Rectangle + 4 labels | `native-chrome` | `src/extension/dateAndPriceRange` |
 | Brush / bezier / freehand | Free draw | `widget-native` | |
 | Text / note / label | Annotation | `widget-native` | |
 | Measure | Range + % tool | `widget-native` | |
@@ -209,7 +221,7 @@ Astroneum ships a left vertical toolbar (`src/components/astroneum/LeftToolbar.t
 | Hide all drawings | Toggle | `widget-native` | |
 | Show/Hide price/coordinate fields | Inputs | `widget-native` | |
 | Object tree | Layers panel | `v1-deferred` | — | §12 |
-| Drawing settings popover | Stroke/color/magnet | `native-chrome` | `LeftToolbar.tsx` (hover popover) | |
+| Drawing settings popover | Stroke/color/magnet | `native-chrome` | `src/widget/drawing-bar` | |
 
 ### 3.11 Alerts (general)
 
@@ -268,7 +280,7 @@ All 25 `alert()` calls in the v21 source. Action × side × stage × reason. The
 
 ### 3.14 Pine Script functions — function-level reference
 
-Signatures + whether v21 uses it. Status: `widget-native` (TV runtime) for all; Astroneum does not host a Pine runtime.
+Signatures + whether v21 uses it. Status: `widget-native` (TV runtime) for all; Astroneum does not host a Pine runtime. Astroneum additionally has a deliberately narrower `strategySignals()` contract in `ScriptEngine.compileStrategy()`; it is not a Pine `strategy.*` implementation.
 
 #### `strategy.*` (strategy context)
 
@@ -450,11 +462,11 @@ Signatures + whether v21 uses it. Status: `widget-native` (TV runtime) for all; 
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Backtest engine | Replays trades on history | `widget-native` | | v21 is a `strategy()` — runs in tester |
-| Performance summary | Net profit, PF, expected payoff, B&H, drawdown, sharpe, sortino | `v1-deferred` | — | §12; widget-provided |
-| Trade list | Per-trade entry/exit/P&L | `v1-deferred` | — | |
-| Equity curve | Equity over time | `v1-deferred` | — | |
-| Drawdown curve | DD over time | `v1-deferred` | — | |
+| Backtest engine | Replays trades on history | `native-chrome` | `src/strategy/BacktestEngine.ts` | Deterministic bar-close fills, commission, slippage, trades, equity, and drawdown; chart-replay bridge remains |
+| Performance summary | Net profit, PF, expected payoff, B&H, drawdown, sharpe, sortino | `native-chrome` | `StrategyTesterPanel` | Runtime report is fed by compiled `strategySignals()` against chart history |
+| Trade list | Per-trade entry/exit/P&L | `native-chrome` | `StrategyTesterPanel` | Runtime data; filtering/pagination remain deferred |
+| Equity curve | Equity over time | `native-chrome` | `BacktestResult.equity` | Typed series available; chart visual remains |
+| Drawdown curve | DD over time | `native-chrome` | `BacktestResult.equity` | Typed series available; chart visual remains |
 | Trade markers on chart | Arrows on entry/exit | `widget-native` | | |
 | Strategy properties | Commission, slippage, capital, sizing | `widget-native` | | v21 sets these in `strategy()` |
 | Currency conversion | Convert to display ccy | `v1-deferred` | — | |
@@ -507,13 +519,27 @@ The v21 strategy emits a `table.new` overlay with 38 rows. This is the strategy'
 
 ### 3.17 Watchlists
 
+Behavioral evidence: `tv-mirror-reference/watchlist.md` (panel anatomy, control inventory, sortable-column and quote-state model, gaps).
+
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Multiple watchlists | Tabs of lists | `native-chrome` | `RightRail.tsx` / `Watchlist.tsx` | |
-| Add/remove symbol | Edit list | `native-chrome` | `Watchlist.tsx` | |
-| Reorder | Drag rows | `native-chrome` | | |
-| Details panel | OHLC + P&L + description | `native-chrome` | `RightRail.tsx` | Uses the demo app's own state (NOT `useTradingStore` — that's Trading-Bot-V2) |
-| Highlight selected | Active row | `native-chrome` | | 2px accent left-edge |
+| Multiple watchlists | Tabs of lists | `native-chrome` | `demo/src/app/components/panels/WatchlistPanel.tsx`, `WatchlistManager` | Persisted horizontal tabs with one active list and an overflow selector at six lists. |
+| Add/remove symbol | Edit list | `native-chrome` | `WatchlistPanel.tsx`, `WatchlistManager`, `SymbolSearchModal` | Validated search stores full metadata; context menu removes symbols. |
+| Reorder | Drag rows | `native-chrome` | `WatchlistPanel.tsx`, `WatchlistManager` | Same-list and cross-list symbol drag ship; list-tab reorder remains. |
+| Details panel | OHLC + P&L + description | `native-chrome` | `DetailsPanel` / `WatchlistPanel` sub-tab | Live OHLC + metadata ship; fundamentals and P&L remain 🟦 v1.1 pending data sources. |
+| Highlight selected | Active row | `native-chrome` | `WatchlistPanel.tsx` | Indigo tint + 1px inset signal; tabular figures on numeric columns. |
+| Last price column | Live last price per row | `native-chrome` | `WatchlistPanel.tsx`, `Datafeed.getQuotes?` | Right-aligned tabular figures with precision metadata and `—` fallback. |
+| Column header + sort | Click to sort asc/desc | `native-chrome` | `WatchlistPanel.tsx`, `WatchlistManager.setSort` | Sticky accessible headers and per-list persistence ship. |
+| Row context menu | Right-click actions | `v1-in-scope` | `WatchlistPanel.tsx` | Copy, alert, move, remove, and keyboard invocation ship; inferred Hide/Lock remain. |
+| Header toolbar actions | Tabs + add + settings + more | `native-chrome` | `WatchlistPanel.tsx` | Add, settings, view preset, Rename/Delete/Duplicate/Export, and list colors ship. |
+| Empty-state CTA | Add-symbol prompt | `native-chrome` | `WatchlistPanel.tsx` | Empty-state action opens validated symbol search. |
+| Cross-list drag | Move symbol between lists | `native-chrome` | `WatchlistManager.moveSymbol` | Tab drop targets call persisted cross-list moves. |
+| Per-list color dot | Visual list identifier | `native-chrome` | `WatchlistManager.setColor` | Six-color palette and list dots ship. |
+| Advanced/Simple toggle | Column preset switch | `native-chrome` | `WatchlistPanel.tsx` | Per-list Simple and Advanced presets ship. |
+| Column chooser popover | Toggle columns | `native-chrome` | `WatchlistManager.setColumns` | Persisted chooser with reset and keyboard dismissal ships. |
+| Live quote polling | Multi-symbol price stream | `api-bridged` | `Datafeed.getQuotes?`, `StandardCryptoDatafeed`, `WatchlistManager.updateQuotes` | Binance/Bitget/OKX quotes poll every 2s while visible. |
+| No-matches + retry | Error recovery | `native-chrome` | `WatchlistPanel.tsx`, `SymbolSearchModal` | Search no-match and quote Retry states ship. |
+| News sub-tab | Symbol-filtered news | `v1-deferred` | `WatchlistPanel.tsx` | Folded into the panel with an honest empty state until a news provider is connected. |
 
 ### 3.18 Screener
 
@@ -572,7 +598,7 @@ The v21 strategy emits a `table.new` overlay with 38 rows. This is the strategy'
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Symbol search | Ticker picker | `native-chrome` | `SymbolSearch.tsx` | `/` hotkey, command-palette style |
+| Symbol search | Ticker picker | `native-chrome` | `src/widget/symbol-search-modal`, `src/widget/period-bar` | `/` hotkey; PeriodBar trigger carries `title`, `data-semantic-id`, `apply-common-tooltip`, and mobile compact text behavior |
 | TV search (everything) | Global search | `v1-deferred` | — | |
 | Command palette | App-level actions | `native-chrome` | build in `/opt/astroneum/demo/src/app/_components/` | `Cmd/Ctrl-K`. Do NOT inherit from CryptoBot — separate project. |
 
@@ -622,26 +648,24 @@ Source: v21 Pine source. Single envelope; one `alert()` call per event. All even
 
 ---
 
-## 5. Widget config flag map
+## 5. React prop / chrome hand-off map
 
-Every `TradingView.widget({...})` option that controls whether a TV function is `widget-native` vs `native-chrome`. From `design-astroneum.md` §6. All three "hand-off" flags must be set together.
+Astroneum does not embed `TradingView.widget`. Configuration is via React props, instance methods, managers, and demo chrome. This map replaces the old widget-flag model.
 
-| Flag | Value | Effect | Hands off to Astroneum |
-|---|---|---|---|
-| `hide_top_toolbar` | `true` | Hides TV top bar | `TopBar.tsx` |
-| `hide_legend` | `true` | Hides TV OHLC legend | `OhlcLegend.tsx` (§11) |
-| `disable_native_context_menu` | `true` | Hides TV right-click menu | `ContextMenu.tsx` (§11) |
-| `hide_side_toolbar` | `false` | Keeps TV drawing toolbar visible | — (drawing tools remain `widget-native`) |
-| `allow_symbol_change` | `false` | Blocks in-widget symbol change | `SymbolSearch.tsx` |
-| `allow_popups_and_modify` | `false` | Blocks in-widget popups | — |
-| `withdateranges` | `true` | Shows date-range footer | — (kept `widget-native`) |
-| `theme` | `"dark"` | Locks theme | — (Astroneum is dark-only v1) |
-| `style` | `"1"` | Candles | user-controlled via `TopBar.tsx` |
-| `interval` | route param | Timeframe | user-controlled via `TopBar.tsx` |
-| `symbol` | `mapPairToTvSymbol(pair)` | Symbol | user-controlled via `Watchlist.tsx` |
-| `studies` | user prefs | Active indicators | user-controlled via indicators button |
-| `save_load_adapter` | `undefined` | No save/load | v1-deferred |
-| `details_modifiers` | `undefined` | No details overrides | — |
+| Surface / behavior | Astroneum control | Native chrome owner |
+|---|---|---|
+| Top toolbar | Demo shell, `PeriodBar`, `ChartTypeDropdown`, modal triggers | `demo/src/app/components/ChartTerminal.tsx` |
+| OHLC legend | Not built yet | `OhlcLegend.tsx` (section 11) |
+| Right-click context menu | Not built yet | `ContextMenu.tsx` (section 11) |
+| Left drawing toolbar | `drawingBarVisible`, `src/widget/drawing-bar`, `src/extension/*` (32 overlays) | Library-owned `DrawingBar` with 6 groups (cursor, singleLine, moreLine, polygon, fibonacci, wave) + forecasting group (12 tools in 3 sections); `TerminalShell` insets the dock to preserve the rail |
+| Symbol change | `symbol` prop, `setSymbol()` | `src/widget/symbol-search-modal`, `PeriodBar`, `WatchlistPanel` |
+| Date-range footer | `DateRangeNavigator` plus `ChartPlugin` engine bridge | `demo/src/app/components/DateRangeNavigator.tsx` |
+| Theme | `theme` prop | v1 dark; high-contrast supported |
+| Chart type | `barStyle` / chart-type state | `demo/src/app/components/ChartTypeDropdown.tsx` |
+| Timeframe | `period` prop, `setPeriod()` | `src/widget/period-bar` |
+| Indicators | `mainIndicators`, `subIndicators`, indicator widgets | `IndicatorModal`, `IndicatorSettingModal` |
+| Save/load | `serializeState()`, `loadState()`, `ChartTemplateManager` | `demo/src/app/components/SaveLoadMenu.tsx` |
+| Shell collapse | CSS grid vars + `localStorage` key `astroneum:shell` | `demo/src/app/components/TerminalShell.tsx` |
 
 ---
 
@@ -673,9 +697,9 @@ When working on `/astroneum`:
 1. Identify the TV function being mirrored.
 2. Find it in §3 (catalog).
 3. Read its status:
-   - `widget-native` → ensure the widget flag in §5 is set correctly. Do not rebuild.
+   - `widget-native` -> use the existing Astroneum prop, method, manager, plugin, or widget. Do not rebuild.
    - `api-bridged` → reuse the path in §2. Do not rebuild.
-   - `native-chrome` → build per `design-astroneum.md` §5, file in `src/components/astroneum/`.
+   - `native-chrome` -> build per `design-astroneum.md` ?5, usually in `demo/src/app/components/` or `src/widget/`.
    - `v1-in-scope` → build now per `design-astroneum.md` §11.
    - `v1-deferred` → do not build; note for v2.
    - `v2-future` → note only.
@@ -701,6 +725,6 @@ When working on `/astroneum`:
 - [ ] Every §3.12 webhook event maps 1:1 to an `alert()` call in the v21 source.
 - [ ] Every §3.16 dashboard row maps 1:1 to a `table.cell` call in the v21 source.
 - [ ] Every §11/§12 item in `design-astroneum.md` is linked from §6 of this doc.
-- [ ] Every §5 widget flag matches the config block in `design-astroneum.md` §6.
+- [ ] Every ?5 React prop / chrome hand-off maps to the current demo or library source.
 - [ ] Every `api-bridged` pointer resolves to a file that exists under `src/app/api/` or `src/lib/`.
-- [ ] Every `native-chrome` pointer resolves to a planned file under `src/components/astroneum/` (per `design-astroneum.md` §10).
+- [ ] Every `native-chrome` pointer resolves to a planned or existing file under `demo/src/app/components/` or `src/widget/`.

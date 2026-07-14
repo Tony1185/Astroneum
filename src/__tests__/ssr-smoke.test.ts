@@ -18,6 +18,7 @@ const entries = [
   '../../dist/entries/replay.js',
   '../../dist/entries/multichart.js',
   '../../dist/entries/watchlist.js',
+  '../../dist/entries/workspace.js',
   '../../dist/entries/portfolio.js',
   '../../dist/entries/alerts.js',
   '../../dist/entries/script.js',
@@ -57,5 +58,12 @@ test('root entry exposes the documented top-level API', async () => {
   ]
   for (const name of expected) {
     assert.ok(name in mod, `expected export "${name}" missing from root entry`)
+  }
+})
+
+test('workspace entry exposes the canonical shell API', async () => {
+  const mod = await import('../../dist/entries/workspace.js')
+  for (const name of ['WorkspaceShell', 'useWorkspaceShell', 'LayerProvider', 'useLayerProvider']) {
+    assert.ok(name in mod, `expected workspace export "${name}" missing`)
   }
 })

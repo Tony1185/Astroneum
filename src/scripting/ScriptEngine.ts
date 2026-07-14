@@ -24,6 +24,8 @@
 
 import { registerIndicator, type CandleData } from '@/engine'
 import type { IndicatorTemplate, IndicatorFigure } from '@/engine/component/Indicator'
+import { runBacktest, type StrategySignal } from '@/strategy'
+import type { BacktestConfig, BacktestResult } from '@/strategy'
 
 // ---------------------------------------------------------------------------
 // Public script API types
@@ -288,6 +290,12 @@ export interface CompiledIndicator extends IndicatorTemplate {
   _source: string
 }
 
+export interface CompiledStrategy {
+  name: string
+  source: string
+  run: (bars: CandleData[], config?: Partial<BacktestConfig>) => BacktestResult
+}
+
 export class ScriptEngine {
   private static _instance: ScriptEngine | null = null
   private _registry = new Map<string, CompiledIndicator>()
@@ -365,6 +373,43 @@ export class ScriptEngine {
     this._registry.set(indicatorName, template)
     registerIndicator(template)
     return template
+  }
+
+  compileStrategy(source: string, name = 'Strategy'): CompiledStrategy {
+    const forbidden = FORBIDDEN.map(key => `const ${key} = undefined;`).join(' ')
+    let factory: (open: number[], high: number[], low: number[], close: number[], volume: number[], taApi: typeof TA) => unknown
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      factory = new Function('open', 'high', 'low', 'close', 'volume', 'TA', `"use strict"; ${forbidden} ${source}; return typeof strategySignals === 'function' ? strategySignals({ open, high, low, close, volume, ta: TA }) : null`) as typeof factory
+    } catch (error) {
+      throw new Error(`Strategy syntax error: ${(error as Error).message}`)
+    }
+
+    return {
+      name,
+      source,
+      run: (bars, config) => {
+        const raw = factory(
+          bars.map(bar => bar.open),
+          bars.map(bar => bar.high),
+          bars.map(bar => bar.low),
+          bars.map(bar => bar.close),
+          bars.map(bar => bar.volume ?? 0),
+          TA,
+        )
+        if (!Array.isArray(raw)) {
+          throw new Error('Strategy must declare strategySignals(context) and return an array of signals')
+        }
+        const signals = raw.filter((signal): signal is StrategySignal => {
+          if (signal === null || typeof signal !== 'object') return false
+          const value = signal as Record<string, unknown>
+          return typeof value.index === 'number' &&
+            (value.action === 'enter' || value.action === 'exit') &&
+            (value.action !== 'enter' || value.side === 'long' || value.side === 'short')
+        })
+        return runBacktest(bars, signals, config)
+      },
+    }
   }
 
   /** Get a previously compiled template by name */

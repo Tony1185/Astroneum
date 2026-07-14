@@ -82,7 +82,7 @@ Canvas behavior is gesture-driven and is not represented by the button count. Se
 
 The vertical rail switches between:
 
-- Watchlist, details, and news;
+- Watchlist, details, and news (full panel anatomy in [watchlist.md](watchlist.md));
 - Alerts;
 - Object tree and data window;
 - Chats;
@@ -95,7 +95,7 @@ The vertical rail switches between:
 
 There are two presentation families:
 
-1. **Docked widget panel** — Watchlist, Alerts, Object tree, Chats.
+1. **Docked widget panel** — Watchlist (see [watchlist.md](watchlist.md)), Alerts, Object tree, Chats.
 2. **Product curtain** — Screeners, Pine Editor, Calendars, Community.
 
 Product curtains include `Move overlay to split-view` and Close. Some also include fullscreen, view toggles, save, filters, or tab navigation.
@@ -130,12 +130,21 @@ Only one transient menu/flyout should be active per interaction layer. Opening a
 
 ### 4.1 Symbol and compare search
 
-Symbol Search is a centered dialog with:
+`observed` 2026-07-13 via CDP (port 9223, chart `8Wh6yRIo`, BTC.D active):
 
-- searchbox placeholder `Symbol, ISIN, or CUSIP`;
-- asset-class tabs: All, Stocks, Funds, Futures, Forex, Crypto, Indices, Bonds, Economy, Options, More;
-- spread-operator disclosure;
-- virtualized result list and expandable result rows.
+Symbol Search is a centered dialog (`[data-name="symbol-search-items-dialog"]`, `role="dialog"`, 840x680px) with:
+
+- title "Symbol search" + Close button (`[data-qa-id="close"]`, text "Close menu");
+- searchbox (`[data-qa-id="symbol-search-input"]`, `role="searchbox"`, placeholder `Symbol, ISIN, or CUSIP`);
+- asset-class tabs (`[role="tablist"]`): All, Stocks, Funds, Futures, Forex, Crypto, Indices, Bonds, Economy, Options, More — each `[role="tab"]` with `aria-selected`, 28px height;
+- result rows (`[data-name="symbol-search-dialog-content-item"]`) in a scrollable listContainer — 51 rows observed, each row has 4 cells:
+  1. ticker (bold, e.g. "BTCUSD") — `itemInfoCell` class;
+  2. description (muted, e.g. "Bitcoin / U.S. dollar") — `descriptionCell` class;
+  3. exchange (smaller muted, e.g. "spot crypto defiBitstamp") — `exchangeCell` class;
+  4. actions (empty, hover-revealed) — `emptyActions` class;
+- active row has indigo tint (`active` class modifier);
+- footer: "Search using ISIN and CUSIP codes";
+- spread-operator disclosure (`not captured` in this pass — inferred from prior evidence).
 
 Compare Symbols reuses the search pattern but adds a series rather than replacing the primary symbol.
 

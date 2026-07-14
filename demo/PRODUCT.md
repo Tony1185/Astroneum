@@ -69,8 +69,9 @@ productivity." The interface speaks in data and state, not adjectives.
 4. **Honesty.** Real data, real state, real numbers. No placeholder metrics, no
    fake activity, no loading theater. If something is empty, say what would
    fill it.
-5. **Calm motion.** 100–200ms state transitions, ease-out, no bounce, no
-   orchestrated page loads. A trader in flow never waits for choreography.
+5. **Calm motion.** 100-240ms state transitions, ease-out, no bounce. Menus,
+   dialogs, split surfaces, and panel controls acknowledge state changes;
+   chart data and page load never wait for choreography.
 
 ## Accessibility & Inclusion
 
@@ -88,3 +89,29 @@ productivity." The interface speaks in data and state, not adjectives.
   documented shortcuts.
 - **Focus visibility.** 2px solid accent focus ring, offset 2px, on every
   interactive element — already enforced by the library's base styles.
+
+## UX Translation
+
+Astroneum uses the category's learned workspace model: a dominant chart,
+stable tool placement, dense controls, anchored menus, docked analysis panels,
+and in-app split views for larger product surfaces. It does not imitate
+TradingView's brand, prose, logo, or color system. Familiarity comes from
+predictable behavior, not visual impersonation.
+
+- One logical control remains one action across responsive variants. Hidden
+  variants never receive focus.
+- Menus, dialogs, panels, curtains, and split views follow a documented layer
+  order and `Escape` closes the frontmost eligible surface.
+- Opening analysis tools preserves symbol, interval, viewport, drawings, and
+  panel state unless the action is explicitly destructive.
+- Every network or delayed action exposes loading, success, failure, and
+  recovery. Local work survives network loss and session recovery where safe.
+- Expert speed includes keyboard paths, visible focus, dense target sizing, and
+  state labels; it does not mean hover-only controls or unlabeled icons.
+
+### Voice in state copy
+
+State copy is short, factual, and actionable: `No alerts for BTCUSDT`, `Could
+not save layout. Retry`, `Replay paused`, `No matching symbols`. Avoid generic
+encouragement, market claims, urgency, and borrowed category copy. Astroneum
+is calm when an operation succeeds and precise when it fails.

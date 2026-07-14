@@ -15,7 +15,7 @@ pnpm verify
 Requirements:
 
 - **Node.js ≥ 18** (matches the `engines` field).
-- **pnpm 10+** (the lockfile is pnpm v10).
+- **pnpm 9+** (the repository declares pnpm 9).
 
 `pnpm verify` runs the full gate: `lint → typecheck → build → test`. Every
 change must keep this green.
@@ -30,6 +30,7 @@ change must keep this green.
 | [src/extension](src/extension) | Built-in drawing tool overlays (18 tools). |
 | [src/plugin](src/plugin) | Public indicator plugin system. |
 | [src/scripting](src/scripting) | Sandboxed indicator scripting engine. |
+| [src/strategy](src/strategy) | Deterministic backtest core and shared strategy-report types. |
 | [src/entries](src/entries) | Subpath export entry points (e.g. `astroneum/replay`). |
 | [src/i18n](src/i18n) | 19 locale dictionaries (lazy-loaded on demand). |
 | [src/store](src/store) | React state stores (chart, indicator, UI). |
@@ -40,9 +41,10 @@ change must keep this green.
 
 1. **Create a branch** off `main`: `git checkout -b feat/<thing>` or
    `fix/<thing>`.
-2. **Edit code and tests in lockstep.** New features need at least one
+2. **Claim the relevant row in [docs/WORKSTREAMS.md](docs/WORKSTREAMS.md)** before changing shared files.
+3. **Edit code and tests in lockstep.** New features need at least one
    unit test in [src/__tests__](src/__tests__).
-3. **Run the gate locally:** `pnpm verify`.
+4. **Run the gate locally:** `pnpm verify`.
 4. **Run bundle-size check** when changing shipped entries: `pnpm size`.
    Update [.size-limit.json](.size-limit.json) only with reviewer approval.
 5. **Update [CHANGELOG.md](CHANGELOG.md)** under `## [Unreleased]`. Use

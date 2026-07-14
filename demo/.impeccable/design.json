@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-06T00:00:00Z",
+  "title": "Design System: Astroneum Terminal",
+  "extensions": {
+    "colorMeta": {
+      "primary":           { "role": "primary",  "displayName": "Cosmic Indigo",   "canonical": "oklch(62% 0.19 267)", "tonalRamp": ["#1e1b4b","#312e81","#3730a3","#4338ca","#4f46e5","#6366f1","#818cf8","#a5b4fc"] },
+      "up":                { "role": "semantic", "displayName": "Up Green",         "canonical": "#26a69a", "tonalRamp": ["#0d3b36","#13524a","#1a6b60","#218376","#289c8c","#26a69a","#4dbaa9","#7dccc0"] },
+      "down":              { "role": "semantic", "displayName": "Down Red",         "canonical": "#ef5350", "tonalRamp": ["#4d1311","#6e1b18","#8f2420","#b02d28","#d03c37","#ef5350","#f47773","#f9a3a0"] },
+      "app-bg":            { "role": "neutral",  "displayName": "Terminal Black",   "canonical": "#131722", "tonalRamp": ["#0a0c11","#0d1016","#131722","#1a1f2b","#222736","#2a3142","#3a4254","#525c70"] },
+      "panel-bg":          { "role": "neutral",  "displayName": "Panel Slate",      "canonical": "#1e222d", "tonalRamp": ["#131722","#171b24","#1e222d","#252a36","#2c323f","#333a48","#3b4352","#444d5d"] },
+      "panel-bg-elevated": { "role": "neutral",  "displayName": "Elevated Slate",   "canonical": "#2a2e39", "tonalRamp": ["#1e222d","#232732","#2a2e39","#313643","#383e4d","#404757","#485061","#525b6e"] },
+      "text-primary":      { "role": "neutral",  "displayName": "Primary Text",     "canonical": "#d1d4dc", "tonalRamp": ["#787b86","#9499a5","#aeb0bb","#c2c5cf","#d1d4dc","#d8dae2","#e0e2e8","#e8eaef"] },
+      "text-secondary":    { "role": "neutral",  "displayName": "Secondary Text",   "canonical": "#787b86", "tonalRamp": ["#4d5260","#5d6371","#69707d","#787b86","#878b97","#979aa5","#a8abb5","#babbcc"] }
+    },
+    "shadows": [
+      { "name": "modal-lift", "value": "0 10px 40px rgba(0,0,0,0.5)", "purpose": "Modals and symbol-search dropdown — the only elements that float above the terminal." },
+      { "name": "popover",    "value": "0 2px 10px rgba(0,0,0,0.3)",  "purpose": "Context menus and hover popovers escaping the chrome." }
+    ],
+    "motion": [
+      { "name": "state-fast",    "value": "background-color 100ms ease-out, color 100ms ease-out", "purpose": "Hover/active state changes on buttons, chips, tabs, rail items." },
+      { "name": "panel-slide",   "value": "transform 200ms ease-out, width 200ms ease-out",         "purpose": "Sidebar/dock open/close and resize." },
+      { "name": "modal-in",      "value": "opacity 150ms ease-out, transform 150ms ease-out",       "purpose": "Modal entrance (translateY 8px -> 0 + opacity)." },
+      { "name": "tooltip-delay", "value": "400ms", "purpose": "Hover tooltip show delay; hide is instant on mouseout." }
+    ],
+    "breakpoints": [
+      { "name": "dock-collapse", "value": "1100px", "purpose": "Right sidebar auto-hides and bottom dock collapses below this width." },
+      { "name": "mobile-gate",   "value": "700px",  "purpose": "Below this, show reduced single-chart view (TV convention)." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button", "kind": "button", "refersTo": "button-primary",
+      "description": "The one primary action per surface (e.g. alert dialog Create).",
+      "html": "<button class=\"ds-btn-primary\">Create</button>",
+      "css": ".ds-btn-primary { background: var(--astroneum-primary-color, #6366f1); color: #fff; border: none; border-radius: 4px; padding: 6px 12px; font: 600 13px/1.4 'Trebuchet MS', -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif; cursor: pointer; transition: background-color 100ms ease-out; } .ds-btn-primary:hover { background: #4f46e5; } .ds-btn-primary:focus-visible { outline: 2px solid var(--astroneum-primary-color, #6366f1); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Ghost Toolbar Button", "kind": "button", "refersTo": "button-ghost",
+      "description": "Default toolbar button (Indicators, Alert, Settings).",
+      "html": "<button class=\"ds-btn-ghost\">Indicators</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: var(--astroneum-text-color, #d1d4dc); border: none; border-radius: 4px; padding: 6px 10px; font: 400 13px/1.4 'Trebuchet MS', -apple-system, sans-serif; cursor: pointer; transition: background-color 100ms ease-out; } .ds-btn-ghost:hover { background: var(--astroneum-hover-background-color, #2a2e39); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--astroneum-primary-color, #6366f1); outline-offset: 2px; }"
+    },
+    {
+      "name": "Icon Button (rail/toolbar)", "kind": "button", "refersTo": "button-icon",
+      "description": "32px square icon button; rail items use 44px hit area.",
+      "html": "<button class=\"ds-btn-icon\" aria-label=\"Settings\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\"><circle cx=\"10\" cy=\"10\" r=\"3\" stroke=\"currentColor\" stroke-width=\"1.5\"/><path d=\"M10 2v3M10 15v3M2 10h3M15 10h3M4.2 4.2l2.1 2.1M13.7 13.7l2.1 2.1M15.8 4.2l-2.1 2.1M6.3 13.7l-2.1 2.1\" stroke=\"currentColor\" stroke-width=\"1.5\"/></svg></button>",
+      "css": ".ds-btn-icon { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: transparent; color: var(--astroneum-text-second-color, #787b86); border: none; border-radius: 4px; cursor: pointer; transition: background-color 100ms ease-out, color 100ms ease-out; } .ds-btn-icon:hover { background: var(--astroneum-hover-background-color, #2a2e39); color: var(--astroneum-text-color, #d1d4dc); } .ds-btn-icon.is-active { background: rgba(99,102,241,0.15); color: var(--astroneum-primary-color, #6366f1); } .ds-btn-icon:focus-visible { outline: 2px solid var(--astroneum-primary-color, #6366f1); outline-offset: 2px; }"
+    },
+    {
+      "name": "Delta Chip", "kind": "chip", "refersTo": "chip-up",
+      "description": "Delta% chip with sign so direction survives color blindness.",
+      "html": "<span class=\"ds-chip ds-chip-up\">+2.47%</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 2px; background: var(--astroneum-hover-background-color, #2a2e39); color: var(--astroneum-text-color, #d1d4dc); border-radius: 3px; padding: 1px 8px; font: 600 11px/1.4 'Trebuchet MS', -apple-system, sans-serif; font-variant-numeric: tabular-nums; } .ds-chip-up { background: rgba(38,166,154,0.12); color: #26a69a; } .ds-chip-down { background: rgba(239,83,80,0.12); color: #ef5350; }"
+    },
+    {
+      "name": "Search Input", "kind": "input", "refersTo": "input",
+      "description": "Symbol search / watchlist filter input.",
+      "html": "<input class=\"ds-input\" placeholder=\"Search...\" />",
+      "css": ".ds-input { background: var(--astroneum-background-color, #131722); color: var(--astroneum-text-color, #d1d4dc); border: 1px solid var(--astroneum-border-color, #2a2e39); border-radius: 4px; height: 30px; padding: 0 10px; font: 400 13px/1.4 'Trebuchet MS', -apple-system, sans-serif; box-shadow: none; box-sizing: border-box; } .ds-input::placeholder { color: var(--astroneum-text-second-color, #787b86); } .ds-input:focus { outline: none; border-color: var(--astroneum-primary-color, #6366f1); box-shadow: 0 0 0 2px rgba(99,102,241,0.2); }"
+    },
+    {
+      "name": "Dock Tab", "kind": "nav", "refersTo": "tab",
+      "description": "Bottom-dock / sidebar tab with 2px bottom or 3px left accent on active.",
+      "html": "<button class=\"ds-tab is-active\">Pine Editor</button>",
+      "css": ".ds-tab { background: transparent; color: var(--astroneum-text-second-color, #787b86); border: none; border-bottom: 2px solid transparent; padding: 0 14px; height: 36px; font: 400 13px/1.4 'Trebuchet MS', -apple-system, sans-serif; cursor: pointer; transition: color 100ms ease-out; } .ds-tab:hover { color: var(--astroneum-text-color, #d1d4dc); } .ds-tab.is-active { color: var(--astroneum-text-color, #d1d4dc); border-bottom-color: var(--astroneum-primary-color, #6366f1); } .ds-tab:focus-visible { outline: 2px solid var(--astroneum-primary-color, #6366f1); outline-offset: -2px; }"
+    },
+    {
+      "name": "Rail Item", "kind": "nav", "refersTo": "rail-item",
+      "description": "60px left-rail icon item with 3px left accent on active.",
+      "html": "<button class=\"ds-rail-item is-active\" aria-label=\"Watchlist\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\"><rect x=\"4\" y=\"5\" width=\"16\" height=\"14\" rx=\"1\" stroke=\"currentColor\" stroke-width=\"1.5\"/></svg></button>",
+      "css": ".ds-rail-item { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: transparent; color: var(--astroneum-text-second-color, #787b86); border: none; border-radius: 4px; cursor: pointer; transition: background-color 100ms ease-out, color 100ms ease-out; } .ds-rail-item:hover { background: rgba(255,255,255,0.04); color: var(--astroneum-text-color, #d1d4dc); } .ds-rail-item.is-active { background: rgba(99,102,241,0.15); color: var(--astroneum-primary-color, #6366f1); } .ds-rail-item.is-active::before { content: ''; position: absolute; left: -8px; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--astroneum-primary-color, #6366f1); } .ds-rail-item:focus-visible { outline: 2px solid var(--astroneum-primary-color, #6366f1); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Instrument",
+    "overview": "Astroneum Terminal is a dark trading terminal for traders who read fast and act faster. It is an instrument, not a surface: every pixel carries data or makes a control reachable. It mirrors the interaction grammar of the category's reference tool — a 48px top toolbar, 60px left rail, flex chart, 300px right sidebar, 300px bottom dock — because familiarity is the feature and strangeness is the failure. It rejects AI slop and SaaS marketing dressing; motion conveys state only. The chrome is a thin layer over the Astroneum charting library and references its --astroneum-* tokens so shell and canvas stay in lockstep, with a single Cosmic Indigo accent replacing the default blue.",
+    "keyCharacteristics": ["dark", "dense", "flat", "tabular-numeric", "one accent", "calm motion", "keyboard-first", "library-token-aligned"],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "Cosmic Indigo is the only accent. <=10% of any screen, only on primary actions, current selection, and active state.", "section": "colors" },
+      { "name": "The No-Decoration Rule", "body": "Up green and down red carry direction only. Never color a surface, border, or label that is not directional data.", "section": "colors" },
+      { "name": "The Tabular-Data Rule", "body": "Every vertically stacked numeric value uses tabular-nums. Numbers that don't align are broken.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Shadow only on elements that physically float (modals, popovers). Panels, cards, buttons, rows are never shadowed.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do reference var(--astroneum-*) for every chrome color so the shell tracks the library and high-contrast theme.",
+      "Do override --astroneum-primary-color: #6366f1 once at the demo root to re-skin chart + chrome together.",
+      "Do use tabular-nums on every stacked numeric value.",
+      "Do carry + / - on every Delta chip so direction survives color blindness.",
+      "Do keep the accent to <=10% of any screen.",
+      "Do ship every interactive state: default, hover, focus-visible, active, disabled."
+    ],
+    "donts": [
+      "Don't use TradingView's wordmark, logo, marketing voice, or its exact blue #2962ff.",
+      "Don't use gradient text, glassmorphism, side-stripe accent borders, or eyebrow kickers.",
+      "Don't shadow panels, cards, buttons, or rows — flat by default.",
+      "Don't use display fonts in labels, buttons, or data.",
+      "Don't animate layout properties or add decorative motion.",
+      "Don't color a surface with up-green or down-red.",
+      "Don't invent custom scrollbars, form controls, or modal patterns.",
+      "Don't ship placeholder metrics or fake activity."
+    ]
+  }
+}

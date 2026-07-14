@@ -2,7 +2,7 @@
 
 > Living reference for the Astroneum project deployed at **https://72.62.73.180/astroneum/**.
 > Documents *what lives where*. For design rationale see `docs/design-astroneum.md`.
-> Last updated: **2026-07-10**. Keep this file in sync on every structural change (see §11).
+> Last updated: **2026-07-12**. Keep this file in sync on every structural change (see §11).
 
 ## 1. Overview
 
@@ -25,7 +25,7 @@
 ├── src/                  # library source (see §3)
 ├── dist/                 # compiled output: ESM js + astroneum.css + .d.ts + locale chunks (gitignored, build artifact)
 ├── demo/                 # Next.js showcase app "astroneum-demo-next" (see §5)
-├── docs/                 # developer docs (see §9)
+├── docs/                 # developer docs (see §9; WORKSTREAMS owns delivery claims)
 ├── .opencode/            # AI OS config (fork-only, never PR to upstream)
 │   ├── opencode.json     # references (11 docs), permissions, skills path
 │   ├── agents/           # 6 subagents: builder, demo-builder, deployer, doc-syncer, parity-checker, auditor
@@ -56,8 +56,8 @@ Root files: `index.ts` (public barrel), `types.ts`, `utils.ts`, `constants.ts`, 
 `AstroneumChart.tsx` (main React component), `index.ts`, `hooks.ts`, plus feature modules:
 `AlertManager`, `BarReplay`, `ChartTemplateManager`, `CompareOverlay`, `DOMPane`, `DrawingSnapper`, `DrawingTemplates`, `EventBus`, `MultiChartLayout`, `MultiPeriodLayout`, `MultiTimeframe`, `NonTimeBars`, `PatternRecognition`, `PerformanceMode`, `PointAndFigure`, `PortfolioTracker`, `PositionVisualizer`, `PriceScaleTransform`, `SessionVisualizer`, `UndoManager`, `VolumeProfilePlugin`, `WatchlistManager`, `ZigzagPattern`.
 
-### 3.2 `component/` — primitive UI (9 atoms)
-Each is a `index.tsx` + `index.scss` pair: `button`, `checkbox`, `empty`, `input`, `list`, `loading`, `modal`, `select`, `switch`. Root `index.tsx` + `index.scss` barrel.
+### 3.2 `component/` — primitive UI (10 atoms)
+Each is a `index.tsx` + `index.scss` pair: `button`, `checkbox`, `dropdown`, `empty`, `input`, `list`, `loading`, `modal`, `select`, `switch`. Root `index.tsx` + `index.scss` barrel.
 
 ### 3.3 `engine/` — rendering core
 Root: `Chart.ts`, `Event.ts`, `Options.ts`, `Store.ts`, `index.ts`.
@@ -69,31 +69,34 @@ Root: `Chart.ts`, `Event.ts`, `Options.ts`, `Store.ts`, `index.ts`.
 - `workers/` — `IndicatorWorkerPool`, `TypedArrayIndicators`, `WasmIndicators`.
 - `extension/` — extension registries: `figure`, `i18n`, `indicator`, `overlay`, `styles`, `x-axis`, `y-axis`.
 
-### 3.4 `widget/` — UI modals & bars (11)
-Each `index.tsx` + `index.scss` (some with `data.ts`/`types.ts`/`icons/`): `alert-modal`, `drawing-bar` (+`icons/`), `indicator-modal`, `indicator-setting-modal` (+`data.ts`,`types.ts`), `period-bar`, `screenshot-modal`, `script-editor-modal`, `setting-modal` (+`data.ts`), `symbol-search-modal`, `timezone-modal` (+`data.ts`), `watchlist`. Root `index.tsx` + `index.scss`.
+### 3.4 `widget/` - UI modals & bars (11)
+Each `index.tsx` + `index.scss` (some with `data.ts`/`types.ts`/`icons/`): `alert-modal`, `drawing-bar` (+`icons/`; sole left rail after dead demo `term-rail` removal; cursor submenu, measure, zoom, keep-drawing toggle, hide-all, forecasting group with 12 tools in 3 sections), `indicator-modal`, `indicator-setting-modal` (+`data.ts`,`types.ts`), `period-bar`, `screenshot-modal`, `script-editor-modal`, `setting-modal` (+`data.ts`), `symbol-search-modal`, `timezone-modal` (+`data.ts`), `watchlist`. `WatchlistManager` now ships `moveSymbol`/`setSort`/`setColumns`/`setColor`/`updateQuotes`/`addSymbolFromInfo`; `Datafeed.getQuotes?` supplies optional live snapshots. Root `index.tsx` + `index.scss`.
 
 ### 3.5 `datafeed/` — data transport
-`DefaultDatafeed.ts`, `StandardCryptoDatafeed.ts` (Binance/Bitget/OKX USDT), `WebSocketDatafeed.ts`, `WebTransportDatafeed.ts`, `OPFSCache.ts` (off-thread cache), `codec/BarsCodec.ts`, `index.ts`.
+`DefaultDatafeed.ts`, `StandardCryptoDatafeed.ts` (Binance/Bitget/OKX USDT history, streams, and batched quote snapshots), `WebSocketDatafeed.ts`, `WebTransportDatafeed.ts`, `OPFSCache.ts` (off-thread cache), `codec/BarsCodec.ts`, `index.ts`.
 
 ### 3.6 `entries/` — subpath entry bundles
 `replay.ts`, `multichart.ts`, `watchlist.ts`, `portfolio.ts`, `alerts.ts`, `script.ts`, `datafeeds/polygon.ts`, `datafeeds/crypto.ts`. (Mirror the `exports` map in §4.)
 
-### 3.7 `extension/` — drawing tools (20 + utils + index)
-`abcd`, `xabcd`, `arrow`, `circle`, `rect`, `triangle`, `parallelogram`, `pitchfork`, `measure`, `waves`, `gannBox`, `gannFan`, `fibonacciCircle`, `fibonacciExtension`, `fibonacciSegment`, `fibonacciSpeedResistanceFan`, `fibonacciSpiral`; `utils.ts`, `index.ts`.
+### 3.7 `extension/` — drawing tools (32 + utils + index)
+`abcd`, `xabcd`, `arrow`, `circle`, `rect`, `triangle`, `parallelogram`, `pitchfork`, `measure`, `waves`, `gannBox`, `gannFan`, `fibonacciCircle`, `fibonacciExtension`, `fibonacciSegment`, `fibonacciSpeedResistanceFan`, `fibonacciSpiral`, `longPosition`, `shortPosition`, `positionForecast`, `barsPattern`, `ghostFeed`, `sector`, `anchoredVwap`, `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, `priceRange`, `dateRange`, `dateAndPriceRange`; `utils.ts`, `index.ts`.
 
-### 3.8 `scripting/` — `ScriptEngine.ts` (Pine-like scripting runtime).
+### 3.8 `scripting/` — `ScriptEngine.ts` (Pine-like indicator runtime plus bounded `strategySignals()` compilation).
 
-### 3.9 `store/` — state: `chartStore.ts`, `indicatorStore.ts`, `uiStore.ts`, `index.ts`.
+### 3.9 `strategy/` — deterministic backtest core
+`BacktestEngine.ts` runs bar-close fills, commission, slippage, trade accounting, equity, and drawdown without browser/network state. `types.ts` owns the report contract shared by demo UI and future worker execution.
 
-### 3.10 `i18n/` — 18 locales + `format.ts` + `index.ts`
+### 3.10 `store/` — state: `chartStore.ts`, `indicatorStore.ts`, `uiStore.ts`, `index.ts`.
+
+### 3.11 `i18n/` - 18 locale JSON files + `format.ts` + `index.ts`
 `ar-SA, de-DE, en-US, es-ES, fr-FR, hi-IN, id-ID, it-IT, ja-JP, ko-KR, nl-NL, pl-PL, pt-BR, ru-RU, th-TH, tr-TR, vi-VN, zh-CN`.
 
-### 3.11 Misc
+### 3.12 Misc
 - `plugin/index.ts` — plugin API surface.
 - `jsx/` — `jsx-runtime.ts`, `jsx-dev-runtime.ts` (custom JSX runtime; tsconfig `jsxImportSource: @/jsx`).
 - `styles/` — `base.scss`, `index.scss` (built to `dist/astroneum.css`).
 - `assets/` — `logo.svg`, `iconfonts/{fonts, style.css}`.
-- `__tests__/` — `adjustFromTo`, `datafeed-contract`, `pagination`, `persistence`, `plugin`, `script-engine`, `ssr-smoke`, `utils` (`.test.ts`), + `perf/`.
+- `__tests__/` — `adjustFromTo`, `datafeed-contract`, `persistence`, `plugin`, `script-engine`, `ssr-smoke`, `strategy`, `utils`, `watchlist` (`.test.ts`), + `perf/`.
 
 ## 4. Public API surface (`package.json` `exports`)
 
@@ -119,15 +122,15 @@ tsup entries (single source of truth for the above): `src/index.ts` + the 8 `src
 
 Next.js 15 + React 19 showcase. Private workspace package, depends on `astroneum: workspace:*`.
 
-- `package.json` — scripts: `dev`, `build`, `start` (= `next start -p 3002 -H 127.0.0.1`). Deps: `next ^15.3.1`, `react ^19.2`, `astroneum workspace:*`.
+- `package.json` — scripts: `dev`, `build`, `start` (= `next start -p 3002`). Deps: `next ^15.3.1`, `react ^19.2`, `astroneum workspace:*`.
 - `next.config.ts` — `transpilePackages: ['astroneum']`, `basePath: NEXT_PUBLIC_BASE_PATH` (=`/astroneum` in prod), `trailingSlash: true`, `outputFileTracingRoot: ../`.
 - `src/app/` routes (App Router):
   - `layout.tsx`, `page.tsx`, `globals.css`
   - `_components/alerts/` — `AlertDialog`, `ErrorBoundary`, `NotificationsDialog`, `Popover` + `alert-dialog.css`
   - `alerts/page.tsx`
   - `api/alerts/email/route.ts`, `api/alerts/webhook/route.ts`
-  - `components/` — `ChartDemo`, `ChartTerminal`, `ChartTypeDropdown`, `CommandPalette`, `DateRangeNavigator`, `ErrorBoundary`, `MultiChartView`, `PatternDialog`, `ReplayToolbar`, `SaveLoadMenu`, `TerminalShell` + `enhancements.css`, `terminal.css`
-  - `components/panels/` — `PineEditorPanel`, `WatchlistPanel` + `panels.css`
+  - `components/` — `ChartDemo`, `ChartTerminal`, `ChartTypeDropdown`, `CommandPalette`, `DateRangeNavigator`, `ErrorBoundary`, `MultiChartView`, `PatternDialog`, `ReplayToolbar`, `SaveLoadMenu`, `TerminalShell` + `enhancements.css`, `terminal.css`; `SidebarContent` renders panel body first and the persistent 52px rail last so it stays on the outer-right edge
+  - `components/panels/` — `PineEditorPanel`, `WatchlistPanel` (Watchlist/Details/News; live quotes, list tabs, sorting/settings/context actions), `DetailsPanel`, `AlertsPanel` + `panels.css`
   - `support/` — `layout.tsx`, `support.css`, `_components/{ArticleBody, Breadcrumb}`, `_lib/{articles/, articles-data.json, data.ts}`, `categories/alerts/page.tsx`, `folders/[folder]/page.tsx`, `solutions/[slug]/page.tsx`
   - `mockDatafeed.ts`, `types/css-imports.d.ts`
 - Other: `.env`, `.gitignore`, `.impeccable/`, `.next/` (build out), `DESIGN.md`, `PRODUCT.md`, `README.md`, `next-env.d.ts`, `tsconfig.json`, `package.json.bak.`.
@@ -201,6 +204,7 @@ ssh 72.62.73.180 "pm2 restart astroneum-demo"                                   
 | `plugin-development.md` | Plugin authoring guide | API signatures → `api.md` |
 | `TODO.md` | Actionable function-gap backlog | Status authority → `tv-functions-skill.md` · Design → `TODO-DESIGN.md` |
 | `TODO-DESIGN.md` | Design/layout gap backlog | Function gaps → `TODO.md` · Status authority → `tv-functions-skill.md` |
+| `WORKSTREAMS.md` | Ownership, sequencing, dependencies, and handoffs | Feature status or detailed gap tables |
 | `INDICATOR_COMPARISON.md` | Indicator parity table (50/50) | Other features → `tv-functions-skill.md` §3 |
 | `demo/DESIGN.md` | Demo app design system | Library UX spec → `design-astroneum.md` |
 | `demo/PRODUCT.md` | Product framing | Design system → `demo/DESIGN.md` |
@@ -227,5 +231,12 @@ This file is the source of truth for *where things live* in the deployed Astrone
 
 ## 12. Change log
 
+- **2026-07-13** — Watchlist implementation and right-rail placement sync. Documented shipped `WatchlistManager` configuration/live-quote APIs, `Datafeed.getQuotes?`, Binance/Bitget/OKX snapshots, `watchlist.test.ts`, the 3-sub-tab watchlist panel, and the persistent 52px strip on the viewport's outer-right edge.
+- **2026-07-12** — Watchlist parity spec. `WatchlistPanel` documented as 3-sub-tab container (Watchlist/Details/News) — Details+News folded from sidebar rail tabs into the panel. `watchlist` widget entry updated with spec'd `WatchlistManager` extensions (`moveSymbol`/`setSort`/`setColumns`/`setColor`/`updateQuotes`/`addSymbolFromInfo`) and `Datafeed.getQuotes?` optional polling method. `components/panels/` description updated. No structural change yet — spec only.
+- **2026-07-11 (b)** — Synced DrawingBar Batch A and shell rail cleanup docs. `DrawingBar` is now the sole left rail; dead demo `term-rail`/`RailContent` removed. Added cursor submenu, measure, zoom, keep-drawing toggle, Ctrl+Alt+H hide-all, icon sizing fixes, and new draw i18n keys.
+- **2026-07-12 (b)** ??? Forecasting group + popup clipping fix. 12 new drawing overlays in `src/extension/`. New `forecasting` group in `drawing-bar` with 3 section headers. 13 new SVG icons, 15 new i18n keys. Fixed popup clipping: `demo/terminal.css` overflow moved to `@media(max-height:620px)`. Extension count 20 to 32.
+- **2026-07-12** — Dock/rail geometry pass. `TerminalShell` uses explicit chart/dock CSS Grid rows; the real library `DrawingBar` extends through the dock height while the dock is inset 52px to its right. The rail scrolls internally when its tools exceed a short viewport. Dock maximize is a fixed overlay and leaves chart/rail geometry unchanged.
+- **2026-07-11** — Added TV-mirror workstream ledger, deterministic `src/strategy/` backtest core, bounded strategy script contract, terminal curtain/split-view layer, and sample Strategy Tester report.
+- **2026-07-12** — Wired `PineEditorPanel` bounded strategy compilation through `ChartTerminal` and `AstroneumHandle.getDataList()` to `StrategyTesterPanel`. `DockContent` now owns persistent report tabs, report actions, overflow, resize, and maximize behavior.
 - **2026-07-07** — Initial map generated from live `/opt/astroneum` snapshot: src/ (12 subdirs), demo/ Next.js app, build/tooling, nginx+PM2 topology, docs/meta. Noted: no `.git` on server; 3 overlapping nginx server blocks in `sites-enabled/`.
 - **2026-07-07 (b)** — `src/widget/alert-modal` rewritten: now ships full Notifications UX (Webhook URL with SSRF guard + status writeback, in-app, toast, email, plain-text email, sound title/duration, notification schedule, message template, expiration, trigger frequency) using library `Modal`/`Input`/`Checkbox` primitives + `--astroneum-*` tokens. New i18n keys in `en-US.json` + `zh-CN.json` (other 16 locales fall back to en-US). Engine (`AlertManager`) + server relay (`demo/src/app/api/alerts/{webhook,email}/route.ts`) were already capable — this change exposes them in the chart-mounted widget. Also fixed `.alert-section-label` No-Eyebrow Rule violation (was `text-transform: uppercase`). design-astroneum.md section 12 updated.

@@ -31,6 +31,7 @@ This revision separates:
 | P2 | `chart-screenshot.png` was cited but absent | Removed as active evidence and documented the stale reference |
 | P2 | `ref-icons.html` and `ref-alert-notifications.html` existed but were absent from provenance | Added to README evidence manifest |
 | P2 | Coordinates were treated as selector-like facts | Reframed as capture evidence only |
+| P2 | Watchlist panel was a single one-line nested-controls entry | Added [watchlist.md](watchlist.md) with full anatomy, control inventory (`watchlist.list_selector`, `watchlist.add_symbol`, `watchlist.advanced_view`, `watchlist.settings`, `watchlist.column_header`, `watchlist.details_metrics`), sortable-column and quote-state model; row DOM, row context menu, list-menu contents, and News sub-view remain `not captured` |
 
 ## 3. Necessary controls missing from the original inventory
 
@@ -81,7 +82,7 @@ This revision separates:
 | Indicators | loading, no results, paid/permission, script error, limit |
 | Replay | selecting, paused, playing, endpoint, stopped |
 | Network actions | loading, success announcement, recoverable failure |
-| Empty content | Alerts, Chats, Notifications, Watchlist |
+| Empty content | Alerts, Chats, Notifications, Watchlist (full panel in [watchlist.md](watchlist.md)) |
 
 ## 5. Remaining issues
 
@@ -158,6 +159,7 @@ These are recommendations, not claims about exact TradingView behavior:
 - [ ] Dark-theme contrast and state parity.
 - [ ] Clipboard/download failure feedback.
 - [ ] Offline/session-expiry recovery.
+- [ ] Watchlist row DOM, row context menu, list-selector menu, settings/column-chooser contents, Advanced-view presets, section groups, Details metrics grid, and News sub-view (see [watchlist.md](watchlist.md) 8).
 
 ## 8. Positive findings
 

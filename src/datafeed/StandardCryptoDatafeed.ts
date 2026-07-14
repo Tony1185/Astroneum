@@ -3,8 +3,10 @@ import type {
   Datafeed,
   DatafeedSubscribeCallback,
   Period,
+  QuoteSnapshot,
   SymbolInfo,
 } from '@/types'
+import { asPrice, asTimestamp, asVolume } from '@/utils'
 
 import { WebSocketDatafeed } from './WebSocketDatafeed'
 
@@ -385,6 +387,7 @@ function parseOkxRows(payload: unknown): CandleData[] {
 export interface ExchangeAdapter {
   readonly id: string
   getHistoryBars(symbol: SymbolInfo, period: Period, from: number, to: number): Promise<CandleData[]>
+  getQuotes?(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]>
   getWebSocketUrl(symbol: SymbolInfo, period: Period): string
   parseMessage(event: MessageEvent, symbol: SymbolInfo, period: Period): CandleData | null
   onOpen?(ws: WebSocket, symbol: SymbolInfo, period: Period): void
@@ -392,6 +395,32 @@ export interface ExchangeAdapter {
 
 export const BinanceAdapter: ExchangeAdapter = {
   id: 'BINANCE',
+
+  async getQuotes(symbols) {
+    const rows: Array<QuoteSnapshot | null> = await Promise.all(symbols.map(async symbol => {
+      const url = new URL(`${BINANCE_REST_BASE_URL}/ticker/24hr`)
+      url.searchParams.set('symbol', symbolVenueCode(symbol))
+      const payload = await fetchJson(url.toString()) as Record<string, unknown> | null
+      const last = toNumber(payload?.lastPrice)
+      if (last === null) return null
+      const open = toNumber(payload?.openPrice)
+      const high = toNumber(payload?.highPrice)
+      const low = toNumber(payload?.lowPrice)
+      const volume = toNumber(payload?.volume)
+      return {
+        ticker: symbol.ticker,
+        last: asPrice(last),
+        change: toNumber(payload?.priceChange) ?? undefined,
+        changePercent: toNumber(payload?.priceChangePercent) ?? undefined,
+        volume: volume === null ? undefined : asVolume(volume),
+        open: open === null ? undefined : asPrice(open),
+        high: high === null ? undefined : asPrice(high),
+        low: low === null ? undefined : asPrice(low),
+        timestamp: asTimestamp(toNumber(payload?.closeTime) ?? Date.now()),
+      } satisfies QuoteSnapshot
+    }))
+    return rows.filter((row): row is QuoteSnapshot => row !== null)
+  },
 
   async getHistoryBars(symbol, period, from, to) {
     const interval = toBinanceInterval(period)
@@ -484,6 +513,35 @@ export const BinanceAdapter: ExchangeAdapter = {
 export const BitgetAdapter: ExchangeAdapter = {
   id: 'BITGET',
 
+  async getQuotes(symbols) {
+    const rows: Array<QuoteSnapshot | null> = await Promise.all(symbols.map(async symbol => {
+      const url = new URL(`${BITGET_REST_BASE_URL}/ticker`)
+      url.searchParams.set('symbol', symbolVenueCode(symbol))
+      url.searchParams.set('productType', symbolProductTypeRest(symbol))
+      const payload = await fetchJson(url.toString()) as { data?: Array<Record<string, unknown>> } | null
+      const row = payload?.data?.[0]
+      const last = toNumber(row?.lastPr)
+      if (last === null) return null
+      const open = toNumber(row?.open24h)
+      const high = toNumber(row?.high24h)
+      const low = toNumber(row?.low24h)
+      const volume = toNumber(row?.baseVolume)
+      const changePercent = toNumber(row?.change24h)
+      return {
+        ticker: symbol.ticker,
+        last: asPrice(last),
+        change: open === null ? undefined : last - open,
+        changePercent: changePercent === null ? undefined : changePercent * 100,
+        volume: volume === null ? undefined : asVolume(volume),
+        open: open === null ? undefined : asPrice(open),
+        high: high === null ? undefined : asPrice(high),
+        low: low === null ? undefined : asPrice(low),
+        timestamp: asTimestamp(toNumber(row?.ts) ?? Date.now()),
+      } satisfies QuoteSnapshot
+    }))
+    return rows.filter((row): row is QuoteSnapshot => row !== null)
+  },
+
   async getHistoryBars(symbol, period, from, to) {
     const granularity = toBitgetInterval(period)
     if (granularity === null) {
@@ -564,6 +622,33 @@ export const BitgetAdapter: ExchangeAdapter = {
 
 export const OkxAdapter: ExchangeAdapter = {
   id: 'OKX',
+
+  async getQuotes(symbols) {
+    const rows: Array<QuoteSnapshot | null> = await Promise.all(symbols.map(async symbol => {
+      const url = new URL(`${OKX_REST_BASE_URL}/ticker`)
+      url.searchParams.set('instId', symbolInstId(symbol))
+      const payload = await fetchJson(url.toString()) as { data?: Array<Record<string, unknown>> } | null
+      const row = payload?.data?.[0]
+      const last = toNumber(row?.last)
+      if (last === null) return null
+      const open = toNumber(row?.open24h)
+      const high = toNumber(row?.high24h)
+      const low = toNumber(row?.low24h)
+      const volume = toNumber(row?.vol24h)
+      return {
+        ticker: symbol.ticker,
+        last: asPrice(last),
+        change: open === null ? undefined : last - open,
+        changePercent: open === null || open === 0 ? undefined : ((last - open) / open) * 100,
+        volume: volume === null ? undefined : asVolume(volume),
+        open: open === null ? undefined : asPrice(open),
+        high: high === null ? undefined : asPrice(high),
+        low: low === null ? undefined : asPrice(low),
+        timestamp: asTimestamp(toNumber(row?.ts) ?? Date.now()),
+      } satisfies QuoteSnapshot
+    }))
+    return rows.filter((row): row is QuoteSnapshot => row !== null)
+  },
 
   async getHistoryBars(symbol, period, from, to) {
     const bar = toOkxInterval(period)
@@ -653,6 +738,10 @@ class ExchangeAdapterDatafeed extends WebSocketDatafeed {
   constructor(adapter: ExchangeAdapter, smoothingDuration: number) {
     super({ smoothingDuration })
     this.adapter = adapter
+  }
+
+  getAdapter(): ExchangeAdapter {
+    return this.adapter
   }
 
   async getHistoryBars(symbol: SymbolInfo, period: Period, from: number, to: number): Promise<CandleData[]> {
@@ -748,6 +837,22 @@ export class StandardCryptoDatafeed implements Datafeed {
 
   searchSymbols(search = ''): Promise<SymbolInfo[]> {
     return Promise.resolve(this.symbols.filter(symbol => matchesSearch(search, symbol)))
+  }
+
+  async getQuotes(symbols: SymbolInfo[]): Promise<QuoteSnapshot[]> {
+    const grouped = new Map<string, SymbolInfo[]>()
+    for (const symbol of symbols) {
+      const exchange = this.resolveExchange(symbol)
+      if (!exchange) continue
+      const group = grouped.get(exchange) ?? []
+      group.push(this.normalizeSymbol(symbol))
+      grouped.set(exchange, group)
+    }
+    const batches = await Promise.all([...grouped].map(async ([exchange, group]) => {
+      const adapter = this.liveFeeds.get(exchange)?.getAdapter()
+      return adapter?.getQuotes ? adapter.getQuotes(group) : []
+    }))
+    return batches.flat()
   }
 
   async getHistoryData(symbol: SymbolInfo, period: Period, from: number, to: number): Promise<CandleData[]> {

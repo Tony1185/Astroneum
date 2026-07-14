@@ -1,7 +1,7 @@
 # Astroneum — TODO & Feature-Gap Backlog
 
 > **Actionable gap index.** One row per gap with status + next action. Shipped items (no gap) are omitted — they live in `docs/tv-functions-skill.md` §3 as `widget-native` / `api-bridged`.
-> **Last updated:** 2026-07-08
+> **Last updated:** 2026-07-12
 > Deployed at: `https://72.62.73.180/astroneum/` · Library `astroneum` v0.4.1-beta.2 · Demo app `astroneum-demo-next`
 >
 > **Authority:** TV-vs-Astroneum status lives in `docs/tv-functions-skill.md` §3 (6-bucket taxonomy). This file is the scannable gap index. When statuses conflict, tv-functions-skill.md wins.
@@ -55,7 +55,7 @@
 | # | Feature | Status | Gap / next action |
 |---|---|---|---|
 | 3.4 | `ta.*` subset (sma/ema/rsi/macd/bbands) | 🔧 | Limited set. Expand per §3.14 |
-| 3.5 | `strategy()` + `strategy.*` family | ❌ | No backtest runtime. Blocks #4 |
+| 3.5 | Bounded `strategy()` signal contract | 🔧 | `ScriptEngine.compileStrategy()` accepts deterministic `strategySignals()` output and runs the local backtest core; Pine-compatible `strategy.*` semantics remain incomplete |
 | 3.6 | `request.security` (multi-TF) | ❌ | Library has `resampleBars`/`mtfIndicator` — expose in script |
 | 3.7 | `request.financial / quandl / seed / splits / dividends` | ❌ | v2-future |
 | 3.8 | `table.new / table.cell / merge_cells` | ❌ | Needed for strategy dashboard (#4) |
@@ -71,12 +71,12 @@
 
 | # | Feature | Status | Gap / next action |
 |---|---|---|---|
-| 4.1 | Strategy Tester panel | ❌ | `StrategyTesterPanel` = stub ("No strategy running") |
-| 4.2 | Backtest engine (replay trades on history) | ❌ | Needs `strategy()` runtime (#3.5) |
-| 4.3 | Performance summary (net profit, PF, expected payoff, B&H, DD, sharpe, sortino) | ❌ | — |
-| 4.4 | Trade list (entry/exit/P&L) | ❌ | — |
-| 4.5 | Equity curve | ❌ | — |
-| 4.6 | Drawdown curve | ❌ | — |
+| 4.1 | Strategy Tester panel | ✅ | `PineEditorPanel` compiles bounded strategies and `ChartTerminal` runs them against current chart history; `StrategyTesterPanel` consumes the result |
+| 4.2 | Backtest engine (replay trades on history) | 🔧 | Deterministic bar-close engine is live against current history; replay lifecycle integration remains |
+| 4.3 | Performance summary (net profit, PF, expected payoff, B&H, DD, sharpe, sortino) | ✅ | Runtime report supplies all listed metrics |
+| 4.4 | Trade list (entry/exit/P&L) | 🔧 | Runtime trades render; pagination/filtering remain |
+| 4.5 | Equity curve | 🔧 | Runtime equity values render as a list; visual curve remains |
+| 4.6 | Drawdown curve | 🔧 | Runtime drawdown values render in equity rows; visual curve remains |
 | 4.7 | Trade markers on chart | ❌ | Library has overlay API — add entry/exit arrows |
 | 4.8 | Strategy properties (commission/slippage/capital/sizing) | ❌ | Config UI for `strategy()` args |
 | 4.9 | 38-row on-chart dashboard | ❌ | Needs `table.*` (#3.8). Spec in §3.16 |
@@ -113,8 +113,8 @@
 | 7.1 | Chart right-click context menu | ⏳ | v1-in-scope (design §11). Not built. `ContextMenu.tsx` |
 | 7.2 | Crosshair OHLC legend / data window | ⏳ | v1-in-scope (design §11). Not built. `OhlcLegend.tsx` |
 | 7.3 | TopBar (symbol/timeframe/chart-type/indicators) | 🔧 | Library `PeriodBar` + demo brand bar. Hotkeys: `/` `Alt+A` `Shift+F` `Ctrl+Z/Y`. Undo/redo (`UndoManager`) + Save/Load (`SaveLoadMenu`) wired. Remaining gap: 1.5 `,` interval dropdown (library `PeriodBar` pass). See `TODO-DESIGN.md` §1 |
-| 7.4 | LeftToolbar (drawing tools dock) | 🔧 | Library has 20 tools; dock UI partial. See `TODO-DESIGN.md` §2 |
-| 7.5 | RightRail (watchlist + details) | ✅ | `SidebarContent` toggle bar (7 tabs) + `WatchlistPanel`/`AlertsPanel`/`StubPanel`. See `TODO-DESIGN.md` §3 |
+| 7.4 | LeftToolbar (drawing tools dock) | 🔧 | `DrawingBar` is the sole left rail and remains pinned through the bottom dock. Batch A shipped cursor submenu, measure, zoom, keep-drawing toggle, Ctrl+Alt+H hide-all. Batch B shipped forecasting group (12 tools in 3 sections) + fixed popup clipping (overflow moved to `@media max-height:620px`). Remaining gaps: brush/freehand, text/note/label, favorite drawings, some fib/pattern variants. See `TODO-DESIGN.md` §2. |
+| 7.5 | RightRail (watchlist + details) | 🔧 | Shipped persistent outer-right 5-tab strip with left-opening panel body; Watchlist/Details/News sub-tabs; horizontal list tabs; sortable quote columns; context actions; list toolbar; empty/retry states; cross-list drag; colors; view presets; column chooser; validated search; and live quote polling. Remaining: drag-reorder list tabs and inferred Hide/Lock row actions. Fundamentals/P&L remain 🟦 v1.1. See `TODO-DESIGN.md` §3 |
 | 7.6 | Multi-chart grid (2/4/8/16) | ✅ | `LayoutPicker` in demo topbar (1/2/4/8/16). `MultiChartView` renders grid. See `TODO-DESIGN.md` §1.15 |
 | 7.7 | Multi-period stacked | 🟦 | Library supports (`MultiPeriodLayout`); app deferred v1.1 |
 | 7.8 | Compare / overlay | 🟦 | Library supports (`createCompareIndicator`); app deferred v1.1 |
@@ -123,10 +123,10 @@
 | 7.11 | Light theme | ⟫ | Library supports; v1 dark-only |
 | 7.13 | Full mobile/touch UX | ⟫ | v1 collapses to chart-only <lg |
 | 7.14 | Logo / brand mark | ⟫ | Separate design pass |
-| 7.15 | Drawing tools (20 vs TV ~50) | 🔧 | Missing: brush/freehand, text/note/label, some fib variants. See `TODO-DESIGN.md` §2 |
-| 7.16 | Bottom dock tab bar | ✅ | `DockContent` tab bar (Pine/Strategy/Trading) + collapse toggle. See `TODO-DESIGN.md` §4 |
+| 7.15 | Drawing tools (32 vs TV ~50) | 🔧 | Batch A shipped cursor submenu, measure, zoom, keep-drawing toggle, hide-all hotkey, icon/i18n fixes. Batch B shipped forecasting group (12 tools: long/short position, position forecast, bars pattern, ghost feed, sector, anchored VWAP, fixed/anchored volume profile, price/date/date+price range). Fixed popup clipping bug (demo/terminal.css overflow override moved to @media max-height:620px). Missing: brush/freehand, text/note/label, favorite drawings, some fib/pattern variants. See `TODO-DESIGN.md` §2 |
+| 7.16 | Bottom dock tab bar | ✅ | Persistent Pine/strategy/trading panels, report tab menu, More menu, resize, fixed-overlay maximize, collapse, and keyboard navigation. CSS Grid guarantees the dock begins right of the pinned drawing rail without chart bleed or rail reflow. See `TODO-DESIGN.md` §4 |
 | 7.17 | Footer date-range navigator | ✅ | `DateRangeNavigator` — 7 presets + live visible-range readout. Engine bridge via `ChartPlugin`. See `TODO-DESIGN.md` §6 |
-| 7.18 | Shell collapse persistence + responsive <lg | ✅ | `TerminalShell` sidebar/dock collapse state in `localStorage` key `astroneum:shell` (decoupled from chart `serializeState`). `@media(max-width:1024px)` hides rail, forces sidebar+dock collapsed, slims topbar. FAB overlay deferred v1.1. See `TODO-DESIGN.md` §0 |
+| 7.18 | Shell collapse persistence + responsive <lg | ✅ | `TerminalShell` sidebar/dock collapse state in `localStorage` key `astroneum:shell` (decoupled from chart `serializeState`). On desktop, a collapsed sidebar retains its 52px icon strip; below `1024px`, the rail is hidden and sidebar/dock collapse. FAB overlay deferred v1.1. See `TODO-DESIGN.md` §0 |
 | 7.28 | Pattern dialog / auto-detection | 🔧 | `PatternDialog` exists; auto-detection via `zigzagPlugin` |
 
 ## 8. DB / persistence / auth  →  (no existing doc — new territory)
@@ -163,10 +163,10 @@
 | 10.2 | Playwright visual regression | ❌ | Deferred (CHANGELOG §0.3.0) |
 | 10.3 | Mobile audit | ❌ | Deferred |
 | 10.4 | Storybook site | ❌ | Deferred |
-| 10.5 | i18n — 19 locales | 🔧 | Only en-US + zh-CN carry new alert keys; 16 fall back to en-US. Translate |
+| 10.5 | i18n — 18 locale JSON files | 🔧 | Only en-US + zh-CN carry new alert/drawing keys; 16 fall back to en-US. Translate |
 | 10.8 | Datafeed — WebTransport (HTTP/3) | 🔧 | Experimental `WebTransportDatafeed` |
 | 10.9 | Datafeed — stock/forex/futures (beyond Polygon) | ❌ | — |
-| 10.10 | BYO datafeed docs / examples | 🔧 | 4-method interface exists; `datafeed-guide.md` present. More examples |
+| 10.10 | BYO datafeed docs / examples | 🔧 | Four required methods plus optional `getQuotes?` are documented in `datafeed-guide.md`; add more production REST/WebSocket examples |
 
 ## 11. Out of scope (v2-future — noted, not tracked)
 
@@ -214,6 +214,15 @@ On invocation ("refresh todo"), re-scan the live tree (`/opt/astroneum` + `demo/
 
 ## Changelog
 
+- **2026-07-13** — Watchlist v1 implementation. Shipped horizontal list tabs and overflow, validated symbol search, sortable configurable quote columns, Simple/Advanced presets, list actions and colors, keyboard/context actions, same-list and cross-list symbol drag, Watchlist/Details/News sub-tabs, 5-item rail, and quote error recovery. Added optional `Datafeed.getQuotes`, Binance/Bitget/OKX snapshot adapters, persisted `WatchlistManager` configuration, non-persisted live quote updates, and manager/datafeed tests. Remaining gaps: drag-reorder list tabs, inferred Hide/Lock actions, fundamentals/P&L, and a real news provider.
+
+- **2026-07-12** — §7.5 watchlist full TV parity spec. Three-tier plan: Tier 1 (A1-A8 pure UI), Tier 2 (B1 fold Details+News into watchlist panel as sub-tabs — sidebar 7→5 tabs; B2 Advanced/Simple toggle; B3 column chooser), Tier 3 (C1 `Datafeed.getQuotes?` + 2s quote polling; C2 `SymbolSearchModal` replaces text input; C3 error/retry states; C4 fundamentals/P&L deferred 🟦 v1.1). Added rows 7.5a (getQuotes), 7.5b (WatchlistManager API extensions), 7.5c (quote polling hook), 7.5d (symbol validation). Updated 7.5 🔧→⏳, 10.10 (getQuotes noted). All marked ⏳ (spec'd, not yet built). See `TODO-DESIGN.md` §3b for design rows.
+
+- **2026-07-12** — Dock/runtime pass: bounded scripts compiled in Pine Editor now run through `BacktestEngine` against `AstroneumHandle.getDataList()`. The Strategy Tester consumes the runtime result; performance metrics include expected payoff, Sharpe, and Sortino. Dock report tabs are persistent and support Rename/Duplicate/Close, More, resize, and maximize.
+
+- **2026-07-12** ??? §2.5 forecasting group + popup clipping fix. 12 new drawing overlays in `src/extension/`. New `forecasting` group in `DrawingBar` with 3 section headers (Forecasting, Volume-based, Measurers). 13 new SVG icons, 15 new i18n keys. Fixed popup clipping: `demo/terminal.css` overflow moved to `@media(max-height:620px)`. Drawing tools count 20 to 32. `pnpm verify` passes (35/35 tests). Deployed + verified (HTTP 200, SSR HTML has `draw.forecasting`, no PM2 errors).
+- **2026-07-11** — §2 left drawing toolbar Batch A + shell rail cleanup. `DrawingBar` is now the sole left rail after removing dead demo `term-rail`/`RailContent`. Shipped cursor submenu (Cross/Dot/Arrow/Eraser), measure + Shift-click, zoom-in, keep-drawing UI toggle, Ctrl+Alt+H hide-all, icon sizing fixes, new draw i18n keys, and proper drawing group tagging. `TODO-DESIGN.md` §0.2/§2 updated.
+- **2026-07-12** — Right rail pass: active symbol state now follows chart/watchlist selection, Details shows live OHLC and metadata, and persisted watchlists support rename plus drag reorder. Calendar/News/Ideas remain sidebar-local empty states until their feeds ship. Repeating the active rail tab now collapses only the panel body and retains the 52px icon strip. §7.5 updated; deferred TV surfaces stay deferred.
 - **2026-07-08 (d)** — §1 top toolbar: undo/redo + save/load (demo-side, no library/`tsup`). `UndoManager` wired: brand-bar buttons + `Ctrl+Z`/`Ctrl+Y`/`Ctrl+Shift+Z` in `ChartTerminal` hotkey effect (input-field guard). `record()` via 600ms poll (`drawing-end` not emitted — `EventBus` defined but uninstantiated, no overlay `ActionType`). New `SaveLoadMenu.tsx` backed by `ChartTemplateManager`: "Unnamed" label + Save-as/Load/Clear/Delete dropdown — folds 1.9/1.16/1.17. Closes `TODO-DESIGN.md` 1.9/1.12/1.13/1.16/1.17. 1.5 (`,` interval dropdown) stays 🔧 — deferred to a library `PeriodBar` pass. Built (6.2s, types valid) + restarted + verified (HTTP 200, undo button SSR-rendered, PM2 error log empty).
 - **2026-07-08 (c)** — §0 shell grid/behavior aligned to `design-astroneum.md` §4. Added 7.18 (Shell collapse persistence + responsive <lg) ✅. `globals.css` dimension tokens 48/60/300/300px+200ms → 44/48/260/220px+240ms. Fixed sidebar collapse animation (removed inline `display:none` that defeated the grid-track slide). `TerminalShell` now persists sidebar+dock collapse to `localStorage` `astroneum:shell`. `@media(max-width:1024px)` hides rail + forces sidebar/dock collapsed + slims topbar. FAB overlay deferred v1.1. See `TODO-DESIGN.md` §0 changelog.
 - **2026-07-08 (b)** — §1 top toolbar audit + build. Wired 3 modal hotkeys in library `AstroneumChart.tsx`: 1.7 `/` (indicators), 1.10 `Alt+A` (alerts), 1.20 `Shift+F` (fullscreen). Built 7.9 Command palette (Ctrl+K) — `CommandPalette.tsx`: symbol search + timeframe + actions. Promoted 7.6 (multi-chart grid) 🟦→✅ (LayoutPicker already built). Patched `AstroneumHandle` `useImperativeHandle` (local clone behind server). Library + demo rebuilt, deployed, verified.

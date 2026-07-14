@@ -56,7 +56,7 @@ Missing any one of these breaks the build or the public API.
 
 ## i18n
 
-- 19 locales in `src/i18n/` (`ar-SA, de-DE, en-US, es-ES, fr-FR, hi-IN, id-ID, it-IT, ja-JP, ko-KR, nl-NL, pl-PL, pt-BR, ru-RU, th-TH, tr-TR, vi-VN, zh-CN`).
+- 18 locale JSON files in `src/i18n/` (`ar-SA, de-DE, en-US, es-ES, fr-FR, hi-IN, id-ID, it-IT, ja-JP, ko-KR, nl-NL, pl-PL, pt-BR, ru-RU, th-TH, tr-TR, vi-VN, zh-CN`).
 - New keys go in `en-US.json` first. Other locales fall back to en-US if missing.
 - Only `en-US` and `zh-CN` are kept current with new keys (TODO §10.5).
 
