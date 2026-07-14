@@ -7,10 +7,12 @@ import Button, { type ButtonProps } from '../button'
 export interface ModalProps extends ParentProps {
   width?: number
   title?: JSX.Element
+  headerContent?: JSX.Element
+  onBack?: () => void
   buttons?: ButtonProps[]
   onClose?: () => void
+  onEscape?: () => void
   className?: string
-  /** 'body' focuses the first focusable element inside modal-card-body (e.g. a search input) instead of the header close button. Defaults to 'first'. */
   initialFocus?: 'first' | 'body'
 }
 
@@ -29,6 +31,7 @@ const Modal: ParentComponent<ModalProps> = (props) => {
 
     const onKeyDown = (keyboardEvent: KeyboardEvent): void => {
       if (keyboardEvent.key === 'Escape') {
+        if (props.onEscape) { props.onEscape(); return }
         props.onClose?.()
         return
       }
@@ -70,9 +73,18 @@ const Modal: ParentComponent<ModalProps> = (props) => {
         ref={el => { cardRef.current = el }}
         style={{ width: `${props.width ?? 400}px`, maxWidth: 'calc(100vw - 32px)' }}
         className={`modal-card ${props.className ?? ''}`}>
-        <header
-          className="modal-card-head">
-          <p id={titleId} className="modal-card-title">{props.title}</p>
+        <header className="modal-card-head">
+          {props.onBack && (
+            <button
+              className="modal-back-btn"
+              aria-label="Back"
+              onClick={props.onBack}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M14 7H7.2l2.3-2.3-1.1-1.1L4.3 8l3.9 3.9 1.1-1.1L7.2 8.5H14z"/>
+              </svg>
+            </button>
+          )}
+          {props.headerContent ?? <p id={titleId} className="modal-card-title">{props.title}</p>}
           <button
             className="delete"
             aria-label="close"

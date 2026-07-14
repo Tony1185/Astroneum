@@ -179,6 +179,7 @@
   "alert_expiration_2m": "In 2 months",
   "alert_message": "Message",
   "alert_message_hint": "Sent as the webhook body when a webhook URL is set.",
+  "alert_message_done": "Done",
   "alert_webhook_body": "Webhook body",
   "alert_notifications": "Notifications",
   "alert_back": "Back",

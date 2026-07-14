@@ -1,12 +1,13 @@
 'use client'
 
-import 'astroneum/style.css'
+import '@tony01/astroneum/style.css'
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import {
   AstroneumChart,
   DATAFEED_ERROR_EVENT,
   STANDARD_CRYPTO_SYMBOLS,
   createStandardCryptoDatafeed,
+  AlertModal,
   type AstroneumHandle,
   type DatafeedErrorDetail,
   type SymbolInfo,
@@ -511,25 +512,12 @@ const datafeed = useMemo(() => {
         />
       </div>
       {showAlertDialog && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAlertDialog(false)}>
-          <div style={{ background: '#1d2026', border: '1px solid #2962ff', borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', color: '#d1d4dc', fontFamily: '-apple-system, sans-serif' }} onClick={e => e.stopPropagation()}>
-            <div style={{ fontSize: 15, color: '#8a8f9c', marginBottom: 12 }}>v3-audit â€¢ Create alert on <b style={{ color: '#2962ff' }}>{symbol.ticker}</b></div>
-            <div style={{ fontSize: 13, color: '#8a8f9c', marginBottom: 16 }}>Price: {lastPriceRef.current || 'no ticks yet'}</div>
-            <label style={{ fontSize: 12, color: '#8a8f9c', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Condition</label>
-            <select style={{ width: '100%', padding: 8, background: '#16181d', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, marginBottom: 16 }}>
-              <option>Greater Than</option>
-              <option>Less Than</option>
-              <option>Crossing Up</option>
-              <option>Crossing Down</option>
-            </select>
-            <label style={{ fontSize: 12, color: '#8a8f9c', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Price</label>
-            <input type="text" defaultValue={String(lastPriceRef.current || '')} placeholder="0" style={{ width: '100%', padding: 8, background: '#16181d', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, marginBottom: 16 }} />
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-              <button onClick={() => setShowAlertDialog(false)} style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #2a2e39', borderRadius: 6, color: '#d1d4dc', fontSize: 14, cursor: 'pointer' }}>Cancel</button>
-              <button onClick={() => { try { const mgr = AlertManager.getInstance(); mgr.add({ symbol: symbol.ticker, condition: 'crosses_above', price: lastPriceRef.current || 0, frequency: 'once', soundEnabled: true, notificationEnabled: true }); alert('Alert created!'); setShowAlertDialog(false) } catch(err) { alert('Error: ' + String(err)) } }} style={{ padding: '8px 20px', background: '#2962ff', border: 'none', borderRadius: 6, color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Create</button>
-            </div>
-          </div>
-        </div>
+        <AlertModal
+          locale="en-US"
+          symbol={symbol.ticker}
+          currentPrice={lastPriceRef.current}
+          onClose={() => setShowAlertDialog(false)}
+        />
       )}
     </div>
   )
