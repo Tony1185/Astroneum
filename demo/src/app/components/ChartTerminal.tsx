@@ -1,7 +1,7 @@
 'use client'
 
-import 'astroneum/style.css'
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
+import '@tony01/astroneum/style.css'
+import { type PointerEvent as ReactPointerEvent, useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import {
   AstroneumChart,
   DATAFEED_ERROR_EVENT,
@@ -16,11 +16,15 @@ import {
   type ChartPluginContext,
   type ChartPlugin,
   type DatafeedErrorDetail,
+  type Datafeed,
   type SymbolInfo,
   type Period,
   type CandleData,
+  type IndicatorSourceOption,
 } from '@tony01/astroneum'
 import { AlertManager } from '@tony01/astroneum'
+import type { BacktestResult } from '@tony01/astroneum'
+import type { CompiledStrategy } from '@tony01/astroneum/script'
 import TerminalShell, { useTerminalShell } from './TerminalShell'
 import WatchlistPanel, { AlertsPanel } from './panels/WatchlistPanel'
 import PineEditorPanel, { StrategyTesterPanel, TradingPanel, StubPanel } from './panels/PineEditorPanel'
@@ -39,6 +43,14 @@ registerIndicatorPlugin(patternRecognitionPlugin)
 interface IndicatorDef {
   name: string
   calcParams?: number[]
+}
+
+interface ChartIndicatorSnapshot {
+  name: string
+  paneId?: string
+  shortName?: string
+  figures?: Array<{ key: string }>
+  result?: Array<Record<string, number>>
 }
 
 const PERIODS: Period[] = [
@@ -84,6 +96,7 @@ const INDICATOR_CATALOGUE: IndicatorCatalogueEntry[] = [
   { name: 'ROC', shortName: 'ROC', category: 'Momentum', description: 'Rate of Change', defaultParams: [12] },
   { name: '%R', shortName: '%R', category: 'Momentum', description: 'Williams %R', defaultParams: [14] },
   { name: 'AO', shortName: 'AO', category: 'Momentum', description: 'Awesome Oscillator' },
+  { name: 'SAMPLE', shortName: 'Sample Study', category: 'Momentum', description: 'Sample Study (alertable oscillator, 0-100)', defaultParams: [14] },
   { name: 'BOLL', shortName: 'BOLL', category: 'Volatility', description: 'Bollinger Bands', defaultParams: [20, 2] },
   { name: 'ATR', shortName: 'ATR', category: 'Volatility', description: 'Average True Range', defaultParams: [14] },
   { name: 'HV', shortName: 'HV', category: 'Volatility', description: 'Historical Volatility (annualized)', defaultParams: [20] },
@@ -130,11 +143,6 @@ function isOverlay(name: string): boolean {
 
 // â”€â”€ Icons (inline SVG, 24px) â”€â”€
 const Icon = {
-  Cursor: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M6 3l12 7-5 1 3 6-2 1-3-6-4 4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-    </svg>
-  ),
   Watchlist: () => (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <rect x="4" y="5" width="16" height="14" rx="1" stroke="currentColor" strokeWidth="1.5"/>
@@ -145,23 +153,6 @@ const Icon = {
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <path d="M12 3a6 6 0 016 6v4l2 3H4l2-3V9a6 6 0 016-6z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
       <path d="M10 19a2 2 0 004 0" stroke="currentColor" strokeWidth="1.5"/>
-    </svg>
-  ),
-  Data: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="4" width="16" height="16" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M8 8h8M8 12h8M8 16h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  ),
-  Strategy: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d="M4 16l5-6 4 4 7-9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M16 5h4v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  ),
-  Pine: () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path d="M9 7l-4 8h4l-2 4h6l-2-4h4l-4-8z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
     </svg>
   ),
   Trading: () => (
@@ -195,160 +186,143 @@ const Icon = {
   ),
 }
 
-// â”€â”€ Rail content (Phase 1 placeholder â€” Phase 3 fills with DrawingBar + toggles) â”€â”€
-function RailContent() {
-  const [active, setActive] = useState('cursor')
-  return (
-    <>
-      <div className="term-rail-group">
-        <button className={`term-rail-item ${active === 'cursor' ? 'is-active' : ''}`} onClick={() => setActive('cursor')} title="Cursor / Object Selection (Esc)">
-          <Icon.Cursor />
-        </button>
-      </div>
-      <div className="term-rail-divider" />
-      <div className="term-rail-group">
-        <button className={`term-rail-item ${active === 'watchlist' ? 'is-active' : ''}`} onClick={() => setActive('watchlist')} title="Watchlist">
-          <Icon.Watchlist />
-        </button>
-        <button className={`term-rail-item ${active === 'alerts' ? 'is-active' : ''}`} onClick={() => setActive('alerts')} title="Alerts">
-          <Icon.Alert />
-        </button>
-        <button className={`term-rail-item ${active === 'data' ? 'is-active' : ''}`} onClick={() => setActive('data')} title="Data Window">
-          <Icon.Data />
-        </button>
-        <button className={`term-rail-item ${active === 'strategy' ? 'is-active' : ''}`} onClick={() => setActive('strategy')} title="Strategy Tester">
-          <Icon.Strategy />
-        </button>
-        <button className={`term-rail-item ${active === 'pine' ? 'is-active' : ''}`} onClick={() => setActive('pine')} title="Pine Editor">
-          <Icon.Pine />
-        </button>
-        <button className={`term-rail-item ${active === 'trading' ? 'is-active' : ''}`} onClick={() => setActive('trading')} title="Trading Panel">
-          <Icon.Trading />
-        </button>
-      </div>
-    </>
-  )
-}
-
 // â”€â”€ Sidebar content (Phase 1 placeholder â€” Phase 3 fills with WatchlistWidget etc.) â”€â”€
 const SIDEBAR_TABS = [
   { id: 'watchlist', label: 'Watchlist', icon: Icon.Watchlist },
-  { id: 'details', label: 'Details', icon: Icon.Details },
   { id: 'alerts', label: 'Alerts', icon: Icon.Alert },
   { id: 'calendar', label: 'Calendar', icon: Icon.Calendar },
-  { id: 'news', label: 'News', icon: Icon.News },
   { id: 'ideas', label: 'Ideas', icon: Icon.Ideas },
   { id: 'trading', label: 'Trading', icon: Icon.Trading },
 ] as const
-
-function SidebarContent({ onSymbolSelect, selectedTicker, symbol, getCurrentPrice }: { onSymbolSelect?: (t: string) => void; selectedTicker?: string; symbol?: string; getCurrentPrice?: () => number | undefined }) {
+function SidebarContent({ onSymbolSelect, selectedTicker, symbol, candle, datafeed, getCurrentPrice, getIndicatorSources }: { onSymbolSelect?: (t: string) => void; selectedTicker?: string; symbol?: SymbolInfo; candle?: CandleData | null; datafeed: Datafeed; getCurrentPrice?: () => number | undefined; getIndicatorSources?: () => IndicatorSourceOption[] }) {
   const [active, setActive] = useState('watchlist')
+  const { sidebarOpen, toggleSidebar } = useTerminalShell()
   const activeTab = SIDEBAR_TABS.find(t => t.id === active)
 
-  const renderPanel = () => {
-    switch (active) {
-      case 'watchlist':
-        return <WatchlistPanel onSymbolSelect={onSymbolSelect} selectedTicker={selectedTicker} />
-      case 'alerts':
-        return <AlertsPanel symbol={symbol} getCurrentPrice={getCurrentPrice} />
-      case 'details':
-        return <StubPanel title="Details" icon="â„¹" hint="Fundamentals for the active symbol â€” wired when a fundamentals datafeed is connected" />
-      case 'calendar':
-        return <StubPanel title="Calendar" icon="ðŸ“…" hint="Economic calendar events â€” wired when an economic data feed is connected" />
-      case 'news':
-        return <StubPanel title="News" icon="ðŸ“°" hint="News feed filtered to the active symbol â€” wired when a news feed is connected" />
-      case 'ideas':
-        return <StubPanel title="Ideas" icon="ðŸ’¡" hint="Published community ideas â€” wired when an ideas API is connected" />
-      case 'trading':
-        return <StubPanel title="Trading" icon="ðŸ’¼" hint="Connect a broker to place orders and track positions" />
-      default:
-        return null
+  const selectTab = (id: typeof active) => {
+    if (active === id && sidebarOpen) {
+      toggleSidebar()
+      return
     }
+    if (!sidebarOpen) toggleSidebar()
+    setActive(id)
   }
 
   return (
     <>
-      <div className="term-sidebar-strip">
+      <div className="term-sidebar-body" aria-hidden={!sidebarOpen} inert={!sidebarOpen}>
+        <div className="term-sidebar-header">
+          <span className="term-sidebar-title">{activeTab?.label ?? ''}</span>
+          <button className="term-icon-btn" onClick={toggleSidebar} title="Hide panel" aria-label="Hide panel">×</button>
+        </div>
+        <div className="term-sidebar-content">
+          <div hidden={active !== 'watchlist'} style={{ height: '100%' }}><WatchlistPanel onSymbolSelect={onSymbolSelect} selectedTicker={selectedTicker} selectedSymbol={symbol} candle={candle} datafeed={datafeed} sidebarOpen={sidebarOpen} /></div>
+          <div hidden={active !== 'alerts'} style={{ height: '100%' }}><AlertsPanel symbol={symbol?.ticker} getCurrentPrice={getCurrentPrice} indicatorSources={getIndicatorSources?.()} onSymbolChange={onSymbolSelect} /></div>
+          <div hidden={active !== 'calendar'} style={{ height: '100%' }}><StubPanel title="Calendar" icon="ðŸ“…" hint="Economic calendar events â€” wired when an economic data feed is connected" /></div>
+          <div hidden={active !== 'ideas'} style={{ height: '100%' }}><StubPanel title="Ideas" icon="ðŸ’¡" hint="Published community ideas â€” wired when an ideas API is connected" /></div>
+          <div hidden={active !== 'trading'} style={{ height: '100%' }}><StubPanel title="Trading" icon="ðŸ’¼" hint="Connect a broker to place orders and track positions" /></div>
+        </div>
+      </div>
+      <nav className="term-sidebar-strip" aria-label="Right sidebar">
         {SIDEBAR_TABS.map(tab => {
           const IconComp = tab.icon
           return (
             <button
               key={tab.id}
               className={`term-sidebar-tab ${active === tab.id ? 'is-active' : ''}`}
-              onClick={() => setActive(tab.id)}
+              onClick={() => selectTab(tab.id)}
               title={tab.label}
+              aria-label={tab.label}
+              aria-pressed={active === tab.id && sidebarOpen}
+              data-semantic-id={`sidebar.${tab.id}`}
             >
               <IconComp />
               <span className="term-sidebar-tab-label">{tab.label}</span>
             </button>
           )
         })}
-      </div>
-      <div className="term-sidebar-body">
-        <div className="term-sidebar-header">
-          <span className="term-sidebar-title">{activeTab?.label ?? ''}</span>
-        </div>
-        <div className="term-sidebar-content">
-          {renderPanel()}
-        </div>
-      </div>
+      </nav>
     </>
   )
 }
 
 // â”€â”€ Dock content (Phase 1 placeholder â€” Phase 3 fills with Pine Editor etc.) â”€â”€
-const DOCK_TABS = ['Pine Editor', 'Strategy Tester', 'Trading Panel'] as const
+type DockTab = { id: string; label: string; report?: boolean }
 
-function DockContent({ onPineCompiled }: { onPineCompiled?: (name: string) => void }) {
-  const { dockOpen, toggleDock } = useTerminalShell()
-  const [active, setActive] = useState(0)
+function DockContent({ onPineCompiled, onStrategyCompiled, result, strategyError }: { onPineCompiled?: (name: string) => void; onStrategyCompiled?: (strategy: CompiledStrategy) => void; result?: BacktestResult | null; strategyError?: string | null }) {
+  const { dockOpen, dockMaximized, toggleDock, toggleDockMaximized, setDockHeight } = useTerminalShell()
+  const [reports, setReports] = useState<DockTab[]>([{ id: 'strategy', label: 'Strategy Tester', report: true }])
+  const [active, setActive] = useState('pine')
+  const [menuTab, setMenuTab] = useState<string | null>(null)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const tabs: DockTab[] = [{ id: 'pine', label: 'Pine Editor' }, ...reports, { id: 'trading', label: 'Trading Panel' }]
 
-  const renderDockBody = () => {
-    switch (active) {
-      case 0:
-        return <PineEditorPanel onCompiled={onPineCompiled} />
-      case 1:
-        return <StrategyTesterPanel />
-      case 2:
-        return <TradingPanel />
-      default:
-        return null
+  const selectTab = (id: string, collapseActive = true) => {
+    if (id === active && dockOpen && collapseActive) {
+      toggleDock()
+      return
     }
+    setActive(id)
+    if (!dockOpen) toggleDock()
+    setMoreOpen(false)
+  }
+  const renameReport = (tab: DockTab) => {
+    const label = window.prompt('Report name', tab.label)?.trim()
+    if (label) setReports(current => current.map(item => item.id === tab.id ? { ...item, label } : item))
+    setMenuTab(null)
+  }
+  const duplicateReport = (tab: DockTab) => {
+    const id = `strategy-${Date.now()}`
+    setReports(current => [...current, { id, label: `${tab.label} copy`, report: true }])
+    selectTab(id)
+    setMenuTab(null)
+  }
+  const closeReport = (tab: DockTab) => {
+    setReports(current => current.filter(item => item.id !== tab.id))
+    if (active === tab.id) setActive('pine')
+    setMenuTab(null)
+  }
+  const resizeStart = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    const startY = event.clientY
+    const startHeight = event.currentTarget.parentElement?.getBoundingClientRect().height ?? 220
+    const move = (moveEvent: PointerEvent) => setDockHeight(Math.max(120, Math.min(480, startHeight + startY - moveEvent.clientY)))
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up) }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  }
+  const onStrategy = (strategy: CompiledStrategy) => {
+    onStrategyCompiled?.(strategy)
+    if (reports.length === 0) setReports([{ id: 'strategy', label: 'Strategy Tester', report: true }])
+    selectTab(reports[0]?.id ?? 'strategy')
   }
 
-  return (
-    <>
-      <div className="term-dock-tabs">
-        {DOCK_TABS.map((label, i) => (
-          <button
-            key={label}
-            className={`term-dock-tab ${active === i ? 'is-active' : ''}`}
-            onClick={() => { setActive(i); if (!dockOpen) toggleDock() }}
-          >
-            {label}
-          </button>
-        ))}
-        <div className="term-dock-controls">
-          <button className="term-icon-btn" onClick={toggleDock} title={dockOpen ? 'Minimize' : 'Expand'}>
-            {dockOpen ? (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M4 10l4-4 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
-          </button>
-        </div>
+  return <>
+    <div className="term-dock-resize" onPointerDown={resizeStart} role="separator" aria-label="Resize bottom panel" aria-orientation="horizontal" />
+    <div className="term-dock-tabs" role="tablist" aria-label="Bottom panel">
+      {tabs.map((tab, index) => <div className="term-dock-tab-wrap" key={tab.id}>
+        <button id={`dock-tab-${tab.id}`} role="tab" aria-selected={active === tab.id} aria-controls={`dock-panel-${tab.id}`} className={`term-dock-tab ${active === tab.id ? 'is-active' : ''}`} onClick={() => selectTab(tab.id)} onKeyDown={event => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+          event.preventDefault()
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length
+          selectTab(tabs[next].id, false)
+        }}>{tab.label}</button>
+        {tab.report && <button className="term-dock-tab-menu" aria-label={`Actions for ${tab.label}`} aria-expanded={menuTab === tab.id} onClick={() => setMenuTab(menuTab === tab.id ? null : tab.id)}>•••</button>}
+        {menuTab === tab.id && <div className="term-dock-menu" role="menu"><button role="menuitem" onClick={() => renameReport(tab)}>Rename</button><button role="menuitem" onClick={() => duplicateReport(tab)}>Duplicate</button><button role="menuitem" onClick={() => closeReport(tab)}>Close</button></div>}
+      </div>)}
+      <div className="term-dock-controls">
+        <button className="term-icon-btn" onClick={() => setMoreOpen(v => !v)} title="More tabs" aria-label="More tabs" aria-expanded={moreOpen}>•••</button>
+        {moreOpen && <div className="term-dock-menu term-dock-more" role="menu">{tabs.map(tab => <button key={tab.id} role="menuitem" onClick={() => selectTab(tab.id)}>{tab.label}</button>)}</div>}
+        <button className="term-icon-btn" onClick={toggleDockMaximized} title={dockMaximized ? 'Restore panel' : 'Maximize panel'} aria-label={dockMaximized ? 'Restore panel' : 'Maximize panel'}>{dockMaximized ? '↙' : '↗'}</button>
+        <button className="term-icon-btn" onClick={toggleDock} title={dockOpen ? 'Minimize' : 'Expand'} aria-label={dockOpen ? 'Minimize panel' : 'Expand panel'}>{dockOpen ? '⌃' : '⌄'}</button>
       </div>
-      {dockOpen && (
-        <div className="term-dock-body">
-          {renderDockBody()}
-        </div>
-      )}
-    </>
-  )
+    </div>
+    {dockOpen && <div className="term-dock-body">
+      <section id="dock-panel-pine" role="tabpanel" aria-labelledby="dock-tab-pine" hidden={active !== 'pine'}><PineEditorPanel onCompiled={onPineCompiled} onStrategyCompiled={onStrategy} /></section>
+      {reports.map(tab => <section key={tab.id} id={`dock-panel-${tab.id}`} role="tabpanel" aria-labelledby={`dock-tab-${tab.id}`} hidden={active !== tab.id}><StrategyTesterPanel result={result} error={strategyError} /></section>)}
+      <section id="dock-panel-trading" role="tabpanel" aria-labelledby="dock-tab-trading" hidden={active !== 'trading'}><TradingPanel /></section>
+    </div>}
+  </>
 }
 
 // â”€â”€ Chart engine bridge â”€â”€
@@ -375,10 +349,10 @@ export default function ChartTerminal() {
     [],
   )
 
-  const [symbol] = useState<SymbolInfo>(symbols[0])
+  const [symbol, setSymbol] = useState<SymbolInfo>(symbols[0])
   const [period, setPeriod] = useState<Period>(PERIODS[0])
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const [activeSubIndicators] = useState<string[]>(['VOL'])
+  const [activeSubIndicators] = useState<string[]>(['VOL', 'SAMPLE'])
   const [activeMainIndicators] = useState<string[]>(['EMA'])
   const [datafeedError, setDatafeedError] = useState<string | null>(null)
   const [timezone, setTimezone] = useState('UTC')
@@ -394,6 +368,9 @@ export default function ChartTerminal() {
   const [syncCrosshair, setSyncCrosshair] = useState(true)
   const [syncSymbolPeriod, setSyncSymbolPeriod] = useState(false)
   const lastPriceRef = useRef<number>(0)
+  const [latestCandle, setLatestCandle] = useState<CandleData | null>(null)
+  const [strategyResult, setStrategyResult] = useState<BacktestResult | null>(null)
+  const [strategyError, setStrategyError] = useState<string | null>(null)
 
   const sourceBadgeText = LIVE_EXCHANGES.has(String(symbol.exchange))
     ? `${String(symbol.exchange)} live feed`
@@ -478,7 +455,18 @@ export default function ChartTerminal() {
     base.subscribe = (sym, per, callback) => {
       const wrapped = (data: CandleData) => {
         lastPriceRef.current = data.close
+        setLatestCandle(data)
         AlertManager.getInstance().check({
+          indicatorResolver: source => {
+            if (source.type !== 'indicator') return undefined
+            const h = chartRef.current
+            if (!h?.getIndicators) return undefined
+            const inds = h.getIndicators({ name: source.name }) as unknown as ChartIndicatorSnapshot[]
+            if (!inds || inds.length === 0) return undefined
+            const results = inds[0].result
+            if (!results || results.length === 0) return undefined
+            return results[results.length - 1]?.[source.plot]
+          },
           symbol: sym.ticker,
           price: data.close,
           timestamp: data.timestamp as number,
@@ -676,10 +664,16 @@ export default function ChartTerminal() {
 
   const handleWatchlistSelect = useCallback((ticker: string) => {
     const sym = STANDARD_CRYPTO_SYMBOLS.find(s => s.ticker === ticker)
-    if (sym) chartRef.current?.setSymbol(sym)
+    if (sym) {
+      setSymbol(sym)
+      setLatestCandle(null)
+      chartRef.current?.setSymbol(sym)
+    }
   }, [])
 
   const handleSymbolSelect = useCallback((sym: SymbolInfo) => {
+    setSymbol(sym)
+    setLatestCandle(null)
     chartRef.current?.setSymbol(sym)
   }, [])
 
@@ -690,6 +684,34 @@ export default function ChartTerminal() {
 
   const handlePineCompiled = useCallback((name: string) => {
     void name
+  }, [])
+
+  const handleStrategyCompiled = useCallback((strategy: CompiledStrategy) => {
+    const bars = chartRef.current?.getDataList() ?? []
+    if (bars.length === 0) {
+      setStrategyResult(null)
+      setStrategyError('Chart history is still loading. Try again when candles are visible.')
+      return
+    }
+    try {
+      setStrategyResult(strategy.run(bars))
+      setStrategyError(null)
+    } catch (error) {
+      setStrategyResult(null)
+      setStrategyError((error as Error).message)
+    }
+  }, [])
+
+  const getIndicatorSources = useCallback((): IndicatorSourceOption[] => {
+    const h = chartRef.current
+    if (!h?.getIndicators) return []
+    const indicators = h.getIndicators() as unknown as ChartIndicatorSnapshot[]
+    return indicators.flatMap(ind => (ind.figures ?? []).map(figure => ({
+      paneId: ind.paneId ?? '',
+      name: ind.name,
+      plot: figure.key,
+      shortName: ind.shortName ?? ind.name,
+    })))
   }, [])
 
   // Ctrl+K â€” toggle command palette (demo-level hotkey)
@@ -708,9 +730,8 @@ export default function ChartTerminal() {
     <TerminalShell
       theme={theme}
       topbar={topbar}
-      rail={<RailContent />}
-      sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol.ticker} getCurrentPrice={() => lastPriceRef.current} />}
-      dock={<DockContent onPineCompiled={handlePineCompiled} />}
+      sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} candle={latestCandle} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
+      dock={<DockContent onPineCompiled={handlePineCompiled} onStrategyCompiled={handleStrategyCompiled} result={strategyResult} strategyError={strategyError} />}
       footer={<DateRangeNavigator engine={chartEngine} symbol={symbol.ticker} timezone={timezone} />}
     >
       {chartCell}

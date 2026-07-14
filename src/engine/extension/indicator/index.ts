@@ -39,6 +39,7 @@ import priceAndVolumeTrend from './priceAndVolumeTrend'
 import psychologicalLine from './psychologicalLine'
 import rateOfChange from './rateOfChange'
 import relativeStrengthIndex from './relativeStrengthIndex'
+import sampleStudy from './sampleStudy'
 import simpleMovingAverage from './simpleMovingAverage'
 import standardDeviation from './standardDeviation'
 import stoch from './stoch'
@@ -67,7 +68,7 @@ const extensions = [
   linearRegression, momentum, moneyFlowIndex,
   movingAverage, movingAverageConvergenceDivergence, onBalanceVolume, pivotPoints,
   priceAndVolumeTrend, psychologicalLine, rateOfChange, relativeStrengthIndex,
-  simpleMovingAverage, standardDeviation, stoch, stopAndReverse, superTrend,
+  sampleStudy, simpleMovingAverage, standardDeviation, stoch, stopAndReverse, superTrend,
   tripleExponentialMovingAverage, tripleExponentiallySmoothedAverage,
   volume, volumeRateOfChange, volumeRatio, volumeWeightedAveragePrice,
   volumeWeightedMovingAverage, weightedMovingAverage, williamsR, zigzag

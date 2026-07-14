@@ -92,6 +92,8 @@
   "strong_magnet": "Strong Magnet",
   "symbol_search": "Symbol search",
   "symbol_code": "Symbol, ISIN, or CUSIP",
+  "sample_study": "Sample Study",
+  "sample_study_desc": "Alertable oscillator (0-100) demonstrating indicator-based alerts",
   "params_1": "Parameter 1",
   "params_2": "Parameter 2",
   "params_3": "Parameter 3",
