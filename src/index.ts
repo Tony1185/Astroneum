@@ -21,6 +21,7 @@ import WatchlistManager from './chart/WatchlistManager'
 import PortfolioTracker from './chart/PortfolioTracker'
 import PerformanceMode from './chart/PerformanceMode'
 import { AlertModal, SymbolSearchModal } from './widget'
+import { LayerProvider, useLayer, useLayerProvider } from './component/layer'
 
 import { load, loadLocale, BUILTIN_LOCALES } from './i18n'
 import {
@@ -75,6 +76,9 @@ export {
   BarReplay,
   DrawingTemplates,
   AlertManager,
+  LayerProvider,
+  useLayer,
+  useLayerProvider,
   ScriptEngine,
   WatchlistManager,
   PortfolioTracker,

@@ -3,6 +3,7 @@ import { useMemo, useState, useCallback } from 'react'
 import { type Component } from '@/react-shared'
 
 import { Modal, Input, Checkbox, Dropdown } from '@/component'
+import { useLayer } from '@/component/layer'
 import i18n from '@/i18n'
 import AlertManager, {
   type Alert,
@@ -133,6 +134,7 @@ function condId(): string {
 }
 
 const AlertModal: Component<AlertModalProps> = props => {
+  useLayer('alert-modal', true, props.onClose)
   const manager = AlertManager.getInstance()
   const isEdit = !!props.editAlert
 

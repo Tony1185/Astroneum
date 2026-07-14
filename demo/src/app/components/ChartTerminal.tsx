@@ -5,6 +5,7 @@ import './terminal.css'
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import {
   AstroneumChart,
+  LayerProvider as ChartLayerProvider,
   DATAFEED_ERROR_EVENT,
   STANDARD_CRYPTO_SYMBOLS,
   createStandardCryptoDatafeed,
@@ -730,36 +731,38 @@ export default function ChartTerminal() {
 
   return (
     <LayerProvider>
-      <WorkspaceShell
-        theme={theme}
-        toolbar={topbar}
-        sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
-        dock={<DockContent onPineCompiled={handlePineCompiled} onStrategyCompiled={handleStrategyCompiled} result={strategyResult} strategyError={strategyError} />}
-        footer={<DateRangeNavigator engine={chartEngine} symbol={symbol.ticker} timezone={timezone} />}
-      >
-        {chartCell}
-        {patternDialogOpen && (
-          <PatternDialog
-            enabledMask={patternMask}
-            onToggle={togglePattern}
-            onClose={() => setPatternDialogOpen(false)}
+      <ChartLayerProvider>
+        <WorkspaceShell
+          theme={theme}
+          toolbar={topbar}
+          sidebar={<SidebarContent onSymbolSelect={handleWatchlistSelect} selectedTicker={symbol.ticker} symbol={symbol} datafeed={datafeed} getCurrentPrice={() => lastPriceRef.current} getIndicatorSources={getIndicatorSources} />}
+          dock={<DockContent onPineCompiled={handlePineCompiled} onStrategyCompiled={handleStrategyCompiled} result={strategyResult} strategyError={strategyError} />}
+          footer={<DateRangeNavigator engine={chartEngine} symbol={symbol.ticker} timezone={timezone} />}
+        >
+          {chartCell}
+          {patternDialogOpen && (
+            <PatternDialog
+              enabledMask={patternMask}
+              onToggle={togglePattern}
+              onClose={() => setPatternDialogOpen(false)}
+            />
+          )}
+          <CommandPalette
+            open={cmdkOpen}
+            onClose={() => setCmdkOpen(false)}
+            onSymbolSelect={handleSymbolSelect}
+            onPeriodChange={handlePeriodChange}
+            onToggleTheme={toggleTheme}
+            onToggleReplay={toggleReplay}
+            onToggleVolumeProfile={toggleVolumeProfile}
+            onToggleDOM={toggleDOM}
+            onTogglePatterns={openPatternDialog}
+            periods={PERIODS}
+            currentSymbol={symbol.ticker}
+            currentPeriod={period.text}
           />
-        )}
-        <CommandPalette
-          open={cmdkOpen}
-          onClose={() => setCmdkOpen(false)}
-          onSymbolSelect={handleSymbolSelect}
-          onPeriodChange={handlePeriodChange}
-          onToggleTheme={toggleTheme}
-          onToggleReplay={toggleReplay}
-          onToggleVolumeProfile={toggleVolumeProfile}
-          onToggleDOM={toggleDOM}
-          onTogglePatterns={openPatternDialog}
-          periods={PERIODS}
-          currentSymbol={symbol.ticker}
-          currentPeriod={period.text}
-        />
-      </WorkspaceShell>
+        </WorkspaceShell>
+      </ChartLayerProvider>
     </LayerProvider>
   )
 }

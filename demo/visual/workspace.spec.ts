@@ -28,3 +28,20 @@ test('Escape closes only the top workspace layer', async ({ page }) => {
   await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden()
   await expect(trigger).toBeFocused()
 })
+
+test('toolbar dialogs register with the workspace layer manager', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('', { waitUntil: 'networkidle' })
+
+  const symbolTrigger = page.locator('.term-toolbar-control').first()
+  await symbolTrigger.click()
+  await expect(page.locator('.astroneum-symbol-search-modal')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.astroneum-symbol-search-modal')).toBeHidden()
+
+  const alertTrigger = page.getByRole('button', { name: 'Create alert' })
+  await alertTrigger.click()
+  await expect(page.locator('.astroneum-alert-modal')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.astroneum-alert-modal')).toBeHidden()
+})

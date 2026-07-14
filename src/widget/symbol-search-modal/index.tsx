@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { type Component } from '@/react-shared'
 
 import { Modal, Input } from '@/component'
+import { useLayer } from '@/component/layer'
 
 import i18n from '@/i18n'
 
@@ -36,6 +37,7 @@ function filterByTab (symbols: SymbolInfo[], tab: AssetTab): SymbolInfo[] {
 }
 
 const SymbolSearchModal: Component<SymbolSearchModalProps> = props => {
+  useLayer('symbol-search', true, props.onClose)
   const [value, setValue] = useState('')
   const [symbolList, setSymbolList] = useState<SymbolInfo[]>([])
   const [loading, setLoading] = useState(false)

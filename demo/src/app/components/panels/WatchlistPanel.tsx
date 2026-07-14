@@ -4,6 +4,7 @@ import './panels.css'
 import { useState, useEffect, useCallback, useRef, Fragment } from 'react'
 import { createPortal } from 'react-dom'
 import { WatchlistManager, AlertManager, SymbolSearchModal, type Watchlist, type WatchSymbol, type WatchlistColumn, type Alert, type Datafeed } from '@tony01/astroneum'
+import { useLayer } from '@tony01/astroneum/workspace'
 import { AlertModal, type CandleData, type SymbolInfo, type IndicatorSourceOption } from '@tony01/astroneum'
 
 const manager = WatchlistManager.getInstance()
@@ -67,6 +68,10 @@ export default function WatchlistPanel({ onSymbolSelect, selectedTicker, selecte
   const [listMenuOpen, setListMenuOpen] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
 
+  useLayer('watchlist-list-menu', listMenuOpen, () => setListMenuOpen(false))
+  useLayer('watchlist-columns-menu', settingsOpen, () => setSettingsOpen(false))
+  useLayer('watchlist-context-menu', !!context, () => setContext(null))
+
   useEffect(() => {
     const unsub = manager.onChange(updated => {
       setLists([...updated])
@@ -100,18 +105,6 @@ export default function WatchlistPanel({ onSymbolSelect, selectedTicker, selecte
     const interval = window.setInterval(() => { void refresh() }, 2000)
     return () => { active = false; window.clearInterval(interval) }
   }, [activeListId, activeList?.symbols.map(symbol => symbol.ticker).join('|'), datafeed, retryKey, section, sidebarOpen])
-
-  useEffect(() => {
-    if (!context && !settingsOpen && !listMenuOpen) return
-    const close = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setContext(null)
-      setSettingsOpen(false)
-      setListMenuOpen(false)
-    }
-    document.addEventListener('keydown', close)
-    return () => document.removeEventListener('keydown', close)
-  }, [context, settingsOpen, listMenuOpen])
 
   const commitRename = useCallback((id: string) => {
     manager.renameList(id, editingValue)

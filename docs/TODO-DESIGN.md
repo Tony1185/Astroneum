@@ -298,9 +298,9 @@ right-panel deep-dive).
 | # | Reference contract | Astroneum design | Inside function |
 |---|---|---|---|
 | 11.1 | One logical control across responsive presentations; hidden copies inert | ? Required for every responsive terminal control; audit wide/compact markup before shipping new toolbar work | |
-| 11.2 | Layer order: canvas -> panels/split -> menus -> dialog -> toast/tooltip | ?? Terminal surfaces exist; no shared overlay manager contract is wired | |
-| 11.3 | Only one transient menu/flyout per layer; dialog closes peer menus | ? Required shared behavior for all modal/menu work | |
-| 11.4 | Escape closes frontmost layer and restores focus | ?? Chart hotkeys exist; focus restoration and cross-surface dismissal need audit | `useKeyboardShortcuts` |
+| 11.2 | Layer order: canvas -> panels/split -> menus -> dialog -> toast/tooltip | 🔧 Shared ordered layer manager now owns workspace dialogs and Watchlist menus; tooltip/toast integration remains | `component/layer` |
+| 11.3 | Only one transient menu/flyout per layer; dialog closes peer menus | 🔧 Symbol Search, AlertModal, and Watchlist list/settings/context menus register with the shared manager; peer-menu closing remains to be standardized | `useLayer` |
+| 11.4 | Escape closes frontmost layer and restores focus | 🔧 Registered layers close topmost-first and restore the trigger; remaining overlay families need migration | `useLayer` |
 | 11.5 | Anchored menus/flyouts flip, clamp, and support keyboard selection | ?? Individual modals exist; menu geometry and roving focus are incomplete | |
 | 11.6 | Dialog focus trap, initial field focus, internal short-viewport scroll | ?? Modal inventory exists; verify each dialog before promotion | |
 | 11.7 | Docked panel switch preserves prior state; repeated active rail target collapses body | ? Sidebar persistence/collapse implemented; per-panel scroll/filter restoration remains data-dependent | `TerminalShell` |
