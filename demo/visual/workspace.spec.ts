@@ -78,3 +78,35 @@ test('chart layouts restore indicator settings', async ({ page }) => {
 
   expect(restored).toContainEqual({ name: 'BOLL', calcParams: [34, 3], visible: true })
 })
+
+test('active layouts autosave and restore on reload', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('', { waitUntil: 'networkidle' })
+  await page.waitForFunction(() => Boolean((window as unknown as { __astroneum?: unknown }).__astroneum))
+  await page.getByTitle('Save / Load chart layout').click()
+  await page.getByRole('textbox', { name: 'Layout name' }).fill('Persistent layout')
+  await page.getByRole('menuitem', { name: 'Save' }).click()
+  await expect(page.locator('.term-saveload-name')).toHaveText('Persistent layout')
+  await page.evaluate(() => {
+    const chart = (window as unknown as { __astroneum: {
+      createIndicator: (indicator: { name: string; calcParams: number[] }, isStack?: boolean, paneOptions?: { id: string }) => string | null
+    } }).__astroneum
+    chart.createIndicator({ name: 'BOLL', calcParams: [34, 3] }, true, { id: 'candle_pane' })
+  })
+  await page.waitForFunction(() => {
+    const templates = JSON.parse(localStorage.getItem('astroneum-chart-templates') ?? '[]') as Array<{
+      name: string
+      state: { mainIndicators: Array<{ name: string; calcParams?: number[] }> }
+    }>
+    return templates.some(template => template.name === 'Persistent layout' && template.state.mainIndicators.some(indicator => indicator.name === 'BOLL' && indicator.calcParams?.join(',') === '34,3'))
+  })
+
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.waitForFunction(() => {
+    const chart = (window as unknown as { __astroneum?: {
+      getIndicators: () => Array<{ name: string; calcParams: number[] }>
+    } }).__astroneum
+    return chart?.getIndicators().some(indicator => indicator.name === 'BOLL' && indicator.calcParams.join(',') === '34,3')
+  })
+  await expect(page.locator('.term-saveload-name')).toHaveText('Persistent layout')
+})

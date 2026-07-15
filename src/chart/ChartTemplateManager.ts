@@ -1,6 +1,7 @@
 import type { AstroneumHandle, SerializedChartState } from '@/types'
 
 const STORAGE_KEY = 'astroneum-chart-templates'
+const ACTIVE_TEMPLATE_STORAGE_KEY = 'astroneum-active-chart-template'
 
 export interface ChartTemplate {
   id: string
@@ -69,6 +70,7 @@ export class ChartTemplateManager {
     this._templates = this._templates.filter(t => t.name !== name)
     if (this._templates.length < prev) {
       this._persist()
+      if (this.getActiveName() === name) this.clearActiveName()
       return true
     }
     return false
@@ -87,6 +89,31 @@ export class ChartTemplateManager {
   /** Get all templates. */
   getAll(): ChartTemplate[] {
     return [...this._templates]
+  }
+
+  setActiveName(name: string): boolean {
+    if (!this._templates.some(template => template.name === name)) return false
+    try {
+      localStorage.setItem(ACTIVE_TEMPLATE_STORAGE_KEY, name)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  getActiveName(): string | null {
+    try {
+      const name = localStorage.getItem(ACTIVE_TEMPLATE_STORAGE_KEY)
+      return name && this._templates.some(template => template.name === name) ? name : null
+    } catch {
+      return null
+    }
+  }
+
+  clearActiveName(): void {
+    try {
+      localStorage.removeItem(ACTIVE_TEMPLATE_STORAGE_KEY)
+    } catch { }
   }
 
   private _persist(): void {

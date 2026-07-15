@@ -23,6 +23,26 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
   useEffect(() => { refresh() }, [refresh])
 
   useEffect(() => {
+    const manager = ChartTemplateManager.getInstance()
+    const activeName = manager.getActiveName()
+    if (!activeName) return
+    let timeout = 0
+    const restore = () => {
+      const chart = chartRef.current
+      if (!chart || chart.getIndicators().length === 0) {
+        timeout = window.setTimeout(restore, 100)
+        return
+      }
+      if (manager.load(activeName, chart)) {
+        setName(activeName)
+        setStatus('saved')
+      }
+    }
+    restore()
+    return () => window.clearTimeout(timeout)
+  }, [chartRef])
+
+  useEffect(() => {
     const timer = window.setInterval(() => {
       const chart = chartRef.current
       const saved = name === 'Unnamed' ? undefined : ChartTemplateManager.getInstance().get(name)
@@ -30,6 +50,23 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
     }, 750)
     return () => window.clearInterval(timer)
   }, [chartRef, name])
+
+  useEffect(() => {
+    if (name === 'Unnamed' || status !== 'dirty') return
+    const timer = window.setTimeout(() => {
+      const chart = chartRef.current
+      if (!chart) return
+      setStatus('saving')
+      try {
+        const manager = ChartTemplateManager.getInstance()
+        manager.save(name, chart.serializeState())
+        manager.setActiveName(name)
+        setStatus('saved')
+        refresh()
+      } catch { setStatus('error') }
+    }, 1_500)
+    return () => window.clearTimeout(timer)
+  }, [chartRef, name, refresh, status])
 
   // Dismiss on outside click / Escape.
   useEffect(() => {
@@ -54,6 +91,7 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
     setStatus('saving')
     try {
       ChartTemplateManager.getInstance().save(trimmed, chart.serializeState())
+      ChartTemplateManager.getInstance().setActiveName(trimmed)
       setName(trimmed)
       setSaveName('')
       setStatus('saved')
@@ -64,7 +102,11 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
   const load = useCallback((n: string) => {
     const chart = chartRef.current
     if (!chart) return
-    if (ChartTemplateManager.getInstance().load(n, chart)) { setName(n); setStatus('saved') }
+    if (ChartTemplateManager.getInstance().load(n, chart)) {
+      ChartTemplateManager.getInstance().setActiveName(n)
+      setName(n)
+      setStatus('saved')
+    }
     setOpen(false)
   }, [chartRef])
 
@@ -78,6 +120,7 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
     const chart = chartRef.current
     if (!chart) return
     chart.removeOverlay()
+    ChartTemplateManager.getInstance().clearActiveName()
     setName('Unnamed')
     setOpen(false)
   }, [chartRef])
