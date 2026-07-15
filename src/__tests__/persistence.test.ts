@@ -16,8 +16,8 @@ test('SerializedChartState is JSON-safe', () => {
     symbol: { ticker: 'BTC-USD' },
     period: { multiplier: 1, timespan: 'minute', text: '1m' },
     styles: { candle: { type: 'candle_solid' } },
-    mainIndicators: [{ name: 'EMA', calcParams: [21] }],
-    subIndicators: ['MACD'],
+    mainIndicators: [{ name: 'EMA', calcParams: [21], visible: true }],
+    subIndicators: [{ name: 'MACD', calcParams: [12, 26, 9], visible: false }],
     overlays: [
       { name: 'horizontalStraightLine', points: [{ value: 100 }], lock: false, visible: true },
     ],

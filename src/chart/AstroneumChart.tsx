@@ -26,7 +26,7 @@ import { mountChartPlugins } from '@/plugin'
 
 import { translateTimezone } from '@/widget/timezone-modal/data'
 
-import { type Period, type AstroneumOptions, type AstroneumHandle, type SerializedChartState, type OverlayCreate } from '@/types'
+import { type Period, type AstroneumOptions, type AstroneumHandle, type SerializedChartState, type SerializedIndicator, type OverlayCreate } from '@/types'
 
 import { useChartStore } from '@/store/chartStore'
 import { useIndicatorStore } from '@/store/indicatorStore'
@@ -257,6 +257,13 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
     },
     serializeState: (): SerializedChartState => {
       const widget = widgetRef.current
+      const serializeIndicator = (indicator: { name: string; calcParams: unknown[]; visible: boolean; styles: unknown }): SerializedIndicator => ({
+        name: indicator.name,
+        calcParams: indicator.calcParams.every(param => typeof param === 'number') ? indicator.calcParams : undefined,
+        visible: indicator.visible,
+        styles: indicator.styles === null ? undefined : structuredClone(indicator.styles),
+      })
+      const savedIndicators = widget?.getIndicators() ?? []
       const overlays = widget
         ? widget.getOverlays().map(o => ({
           name: o.name,
@@ -274,8 +281,8 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
         symbol: chart.symbol(),
         period: chart.period(),
         styles: structuredClone(chart.styles() ?? {}),
-        mainIndicators: indicators.mainIndicators().map(i => ({ ...i })),
-        subIndicators: Object.keys(indicators.subIndicators()),
+        mainIndicators: savedIndicators.filter(indicator => indicator.paneId === 'candle_pane').map(serializeIndicator),
+        subIndicators: savedIndicators.filter(indicator => indicator.paneId !== 'candle_pane').map(serializeIndicator),
         overlays,
       }
     },
@@ -292,6 +299,25 @@ const AstroneumChart = forwardRef<AstroneumHandle, AstroneumChartProps>((props, 
       chart.setPeriod(state.period)
       if (state.styles) chart.setStyles(state.styles)
       if (!widget) return
+      const restoreIndicator = (saved: SerializedIndicator | string, paneOptions?: PaneOptions): string | null => {
+        const indicator = typeof saved === 'string' ? { name: saved, visible: true } : saved
+        const id = createIndicator(widget, indicator, true, paneOptions)
+        if (id && (indicator.visible === false || indicator.styles !== undefined)) {
+          widget.overrideIndicator({ id, name: indicator.name, visible: indicator.visible, styles: indicator.styles as never })
+        }
+        return id ? widget.getIndicators({ id })[0]?.paneId ?? null : null
+      }
+      const restoredMain = state.mainIndicators.map(indicator => typeof indicator === 'string' ? { name: indicator, visible: true } : indicator)
+      const restoredSub = (state.subIndicators as Array<SerializedIndicator | string>).map(indicator => typeof indicator === 'string' ? { name: indicator, visible: true } : indicator)
+      widget.removeIndicator()
+      restoredMain.forEach(indicator => { restoreIndicator(indicator, { id: 'candle_pane' }) })
+      const subIndicatorMap: Record<string, string> = {}
+      restoredSub.forEach(indicator => {
+        const paneId = restoreIndicator(indicator)
+        if (paneId) subIndicatorMap[indicator.name] = paneId
+      })
+      indicators.setMainIndicators(restoredMain)
+      indicators.setSubIndicators(subIndicatorMap)
       // Replace overlays: drop existing user drawings, then recreate.
       widget.removeOverlay()
       for (const o of state.overlays) {

@@ -55,3 +55,26 @@ test('Save/Load exposes an inline workspace persistence workflow', async ({ page
   await expect(page.getByRole('button', { name: 'Undo' })).toBeDisabled()
   await expect(page.getByRole('button', { name: 'Redo' })).toBeDisabled()
 })
+
+test('chart layouts restore indicator settings', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('', { waitUntil: 'networkidle' })
+  await page.waitForFunction(() => Boolean((window as unknown as { __astroneum?: unknown }).__astroneum))
+
+  const restored = await page.evaluate(() => {
+    const chart = (window as unknown as { __astroneum: {
+      createIndicator: (indicator: { name: string; calcParams: number[] }, isStack?: boolean, paneOptions?: { id: string }) => string | null
+      getIndicators: () => Array<{ name: string; calcParams: number[]; visible: boolean }>
+      removeIndicator: () => boolean
+      serializeState: () => unknown
+      loadState: (state: unknown) => void
+    } }).__astroneum
+    chart.createIndicator({ name: 'BOLL', calcParams: [34, 3] }, true, { id: 'candle_pane' })
+    const saved = chart.serializeState()
+    chart.removeIndicator()
+    chart.loadState(saved)
+    return chart.getIndicators().map(({ name, calcParams, visible }) => ({ name, calcParams, visible }))
+  })
+
+  expect(restored).toContainEqual({ name: 'BOLL', calcParams: [34, 3], visible: true })
+})

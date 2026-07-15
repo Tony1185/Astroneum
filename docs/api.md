@@ -122,6 +122,7 @@ loadState(state: SerializedChartState): void
 Capture and restore the chart's user-visible state â€” theme, locale,
 timezone, symbol, period, styles, indicators, and drawing overlays â€”
 as a JSON-safe object.
+Indicator entries retain their calculation parameters, visibility, and styles.
 
 ```ts
 // save

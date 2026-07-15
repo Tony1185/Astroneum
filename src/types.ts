@@ -38,6 +38,11 @@ export interface IndicatorDef {
   calcParams?: number[]
 }
 
+export interface SerializedIndicator extends IndicatorDef {
+  visible: boolean
+  styles?: unknown
+}
+
 // ---------------------------------------------------------------------------
 // Template literal types for domain encoding
 // ---------------------------------------------------------------------------
@@ -168,8 +173,8 @@ export interface SerializedChartState {
   symbol: SymbolInfo
   period: Period
   styles: DeepPartial<Styles>
-  mainIndicators: IndicatorDef[]
-  subIndicators: string[]
+  mainIndicators: SerializedIndicator[]
+  subIndicators: SerializedIndicator[]
   overlays: Array<{
     name: string
     points?: ReadonlyArray<{ timestamp?: number; value?: number; dataIndex?: number }>

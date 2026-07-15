@@ -590,9 +590,9 @@ Behavioral evidence: `tv-mirror-reference/watchlist.md` (panel anatomy, control 
 
 | Function | TV behavior | Status | Pointer | Notes |
 |---|---|---|---|---|
-| Save layout | Chart state | `v1-deferred` | — | v2 |
-| Load layout | Restore | `v1-deferred` | — | |
-| Chart templates | Indicator + settings preset | `v1-deferred` | — | |
+| Save layout | Chart state | `native-chrome` | `ChartTemplateManager`, `SaveLoadMenu` | localStorage browser persistence |
+| Load layout | Restore | `native-chrome` | `AstroneumChart.loadState()` | restores chart settings, indicators, and drawings |
+| Chart templates | Indicator + settings preset | `native-chrome` | `ChartTemplateManager` | named local templates |
 
 ### 3.23 Search
 

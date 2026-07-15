@@ -60,6 +60,7 @@ import {
   type AstroneumOptions,
   type AstroneumHandle,
   type SerializedChartState,
+  type SerializedIndicator,
   type CandleData,
   type ChartPlugin,
   type ChartPluginContext,
@@ -122,7 +123,7 @@ export { RingBuffer } from './engine/common/RingBuffer'
 
 export type {
   Datafeed, SymbolInfo, Period, DatafeedSubscribeCallback, QuoteSnapshot, AstroneumOptions, AstroneumHandle, CandleData,
-  ChartPlugin, ChartPluginContext, ChartToolbarActions, SerializedChartState
+  ChartPlugin, ChartPluginContext, ChartToolbarActions, SerializedChartState, SerializedIndicator
 }
 export type { Viewport, IndicatorPlugin, ChartEventMap, Price, Volume, Timestamp } from './types'
 // Note: CSS is shipped as a separate artifact (`astroneum/style.css`) built from
