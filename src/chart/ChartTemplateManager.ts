@@ -8,6 +8,7 @@ export interface ChartTemplate {
   name: string
   state: SerializedChartState
   createdAt: string
+  updatedAt?: string
 }
 
 /**
@@ -37,14 +38,19 @@ export class ChartTemplateManager {
 
   /** Save current chart state as a named template. Overwrites if name exists. */
   save(name: string, state: SerializedChartState): ChartTemplate {
-
-    const existing = this._templates.findIndex(t => t.name === name)
-    const template: ChartTemplate = {
-      id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      name: name.trim(),
-      state,
-      createdAt: new Date().toISOString(),
-    }
+    const trimmed = name.trim()
+    if (!trimmed) throw new TypeError('Template name is required')
+    const existing = this._templates.findIndex(t => t.name === trimmed)
+    const updatedAt = new Date().toISOString()
+    const template: ChartTemplate = existing >= 0
+      ? { ...this._templates[existing], state, updatedAt }
+      : {
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          name: trimmed,
+          state,
+          createdAt: updatedAt,
+          updatedAt,
+        }
 
     if (existing >= 0) {
       this._templates[existing] = template
@@ -91,6 +97,29 @@ export class ChartTemplateManager {
     return [...this._templates]
   }
 
+  rename(name: string, nextName: string): ChartTemplate | null {
+    const index = this._templates.findIndex(template => template.name === name)
+    const trimmed = nextName.trim()
+    if (index < 0 || !trimmed || (trimmed !== name && this._templates.some(template => template.name === trimmed))) return null
+    if (trimmed === name) return this._templates[index]
+    const template = { ...this._templates[index], name: trimmed, updatedAt: new Date().toISOString() }
+    this._templates[index] = template
+    this._persist()
+    if (this.getActiveName() === name) this.setActiveName(trimmed)
+    return template
+  }
+
+  duplicate(name: string): ChartTemplate | null {
+    const template = this.get(name)
+    if (!template) return null
+    let copyName = `${template.name} copy`
+    let index = 2
+    while (this._templates.some(item => item.name === copyName)) {
+      copyName = `${template.name} copy ${index++}`
+    }
+    return this.save(copyName, structuredClone(template.state))
+  }
+
   setActiveName(name: string): boolean {
     if (!this._templates.some(template => template.name === name)) return false
     try {
@@ -134,7 +163,10 @@ export class ChartTemplateManager {
           typeof obj.name === 'string' &&
           typeof obj.state === 'object' && obj.state !== null &&
           typeof obj.createdAt === 'string'
-      }) as ChartTemplate[]
+      }).map((template: Record<string, unknown>) => ({
+        ...template,
+        updatedAt: typeof template.updatedAt === 'string' ? template.updatedAt : template.createdAt,
+      })) as ChartTemplate[]
     } catch { /* corrupt data */ }
   }
 }

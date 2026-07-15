@@ -60,7 +60,7 @@
 | 1.14 | Fill-spacer (push right groups) | `fill-dlFDN0Zd` | ✅ CSS flex auto | |
 | 1.15 | Layout setup (grid picker) | `#header-toolbar-layouts` | ✅ `LayoutPicker` in demo topbar — 1/2/4/8/16 grid | `LayoutPicker` |
 | 1.16 | Save/Load button ("Unnamed" + state) | `#header-toolbar-save-load` | ✅ `SaveLoadMenu` — named layouts with autosave and active-layout recovery via `ChartTemplateManager` | `SaveLoadMenu` |
-| 1.17 | Manage layouts menu | `data-name="save-load-menu"` | ✅ folded into `SaveLoadMenu` dropdown (save-as / load / delete per layout) | `SaveLoadMenu` |
+| 1.17 | Manage layouts menu | `data-name="save-load-menu"` | ✅ `SaveLoadMenu` layout manager: save-as, load, rename, duplicate, timestamped rows, and confirmed delete | `SaveLoadMenu` |
 | 1.18 | Quick search button (Ctrl+K) | `#header-toolbar-quick-search` | ✅ `CommandPalette` — symbol search + actions, Ctrl+K wired in demo | `CommandPalette` |
 | 1.19 | Settings button | `#header-toolbar-properties` | ✅ `SettingModal` | `SettingModal` |
 | 1.20 | Fullscreen button (Shift+F) | `#header-toolbar-fullscreen` | ✅ `PeriodBar` fullscreen — Shift+F hotkey wired in `AstroneumChart.tsx` | `PeriodBar` fullscreen |

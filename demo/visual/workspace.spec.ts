@@ -110,3 +110,26 @@ test('active layouts autosave and restore on reload', async ({ page }) => {
   })
   await expect(page.locator('.term-saveload-name')).toHaveText('Persistent layout')
 })
+
+test('layout manager duplicates, renames, timestamps, and confirms deletion', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('', { waitUntil: 'networkidle' })
+  await page.getByTitle('Save / Load chart layout').click()
+  await page.getByRole('textbox', { name: 'Layout name' }).fill('Layout alpha')
+  await page.getByRole('menuitem', { name: 'Save' }).click()
+  await expect(page.locator('.term-menu time')).toHaveText('Just now')
+  await expect(page.locator('.term-menu')).toHaveScreenshot('layout-manager.png')
+
+  await page.getByRole('button', { name: 'Duplicate Layout alpha' }).click()
+  await expect(page.getByRole('menuitem', { name: /Layout alpha copy/ })).toBeVisible()
+  await page.getByRole('button', { name: 'Rename Layout alpha copy' }).click()
+  await page.getByRole('textbox', { name: 'Rename Layout alpha copy' }).fill('Desk layout')
+  await page.getByRole('button', { name: 'Rename', exact: true }).click()
+  await expect(page.getByRole('menuitem', { name: /Desk layout/ })).toBeVisible()
+
+  await page.getByRole('button', { name: 'Delete Desk layout' }).click()
+  const confirm = page.getByRole('dialog', { name: 'Delete layout' })
+  await expect(confirm).toBeVisible()
+  await confirm.getByRole('button', { name: 'Delete layout' }).click()
+  await expect(page.getByRole('menuitem', { name: /Desk layout/ })).toHaveCount(0)
+})

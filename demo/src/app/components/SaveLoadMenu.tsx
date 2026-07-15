@@ -1,23 +1,40 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, type RefObject } from 'react'
-import { ChartTemplateManager, type AstroneumHandle } from '@tony01/astroneum'
+import { ChartTemplateManager, type AstroneumHandle, type ChartTemplate } from '@tony01/astroneum'
 
 interface SaveLoadMenuProps {
   chartRef: RefObject<AstroneumHandle | null>
 }
 
+function formatSavedAt(value: string): string {
+  const timestamp = new Date(value).getTime()
+  if (Number.isNaN(timestamp)) return ''
+  const minutes = Math.floor((Date.now() - timestamp) / 60_000)
+  if (minutes < 1) return 'Just now'
+  if (minutes < 60) return `${minutes}m ago`
+  if (minutes < 1_440) return `${Math.floor(minutes / 60)}h ago`
+  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(timestamp)
+}
+
+function updatedAt(template: ChartTemplate): string {
+  return template.updatedAt ?? template.createdAt
+}
+
 export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('Unnamed')
-  const [names, setNames] = useState<string[]>([])
+  const [templates, setTemplates] = useState<ChartTemplate[]>([])
   const [saveName, setSaveName] = useState('')
   const [status, setStatus] = useState<'saved' | 'dirty' | 'saving' | 'error'>('saved')
   const [pendingLoad, setPendingLoad] = useState<string | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
+  const [renaming, setRenaming] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
   const wrapRef = useRef<HTMLDivElement>(null)
 
   const refresh = useCallback(() => {
-    setNames(ChartTemplateManager.getInstance().list())
+    setTemplates(ChartTemplateManager.getInstance().getAll().sort((a, b) => updatedAt(b).localeCompare(updatedAt(a))))
   }, [])
 
   useEffect(() => { refresh() }, [refresh])
@@ -111,10 +128,40 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
   }, [chartRef])
 
   const remove = useCallback((n: string) => {
-    ChartTemplateManager.getInstance().delete(n)
-    if (n === name) setName('Unnamed')
-    refresh()
+    try {
+      ChartTemplateManager.getInstance().delete(n)
+      if (n === name) {
+        setName('Unnamed')
+        setStatus('saved')
+      }
+      refresh()
+    } catch { setStatus('error') }
   }, [name, refresh])
+
+  const rename = useCallback((n: string) => {
+    try {
+      const template = ChartTemplateManager.getInstance().rename(n, renameValue)
+      if (!template) {
+        setStatus('error')
+        return
+      }
+      if (n === name) setName(template.name)
+      setRenaming(null)
+      setRenameValue('')
+      setStatus('saved')
+      refresh()
+    } catch { setStatus('error') }
+  }, [name, refresh, renameValue])
+
+  const duplicate = useCallback((n: string) => {
+    try {
+      if (!ChartTemplateManager.getInstance().duplicate(n)) {
+        setStatus('error')
+        return
+      }
+      refresh()
+    } catch { setStatus('error') }
+  }, [refresh])
 
   const clearChart = useCallback(() => {
     const chart = chartRef.current
@@ -151,29 +198,38 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
           <button type="button" className="term-menu-item" role="menuitem" onClick={clearChart}>
             Clear drawings
           </button>
-          {names.length > 0 && (
+          {templates.length > 0 && (
             <>
               <div className="term-menu-sep" />
               <div className="term-menu-label">Saved layouts</div>
-              {names.map(n => (
-                <div key={n} className="term-menu-row">
+              {templates.map(template => renaming === template.name ? (
+                <div key={template.id} className="term-menu-row term-menu-rename-row">
+                  <input aria-label={`Rename ${template.name}`} autoFocus value={renameValue} onChange={event => setRenameValue(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') rename(template.name); if (event.key === 'Escape') setRenaming(null) }} />
+                  <button type="button" className="term-menu-item" onClick={() => rename(template.name)}>Rename</button>
+                  <button type="button" className="term-menu-icon" aria-label={`Cancel rename ${template.name}`} onClick={() => setRenaming(null)}><svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg></button>
+                </div>
+              ) : (
+                <div key={template.id} className="term-menu-row term-menu-layout-row">
                   <button
                     type="button"
-                    className={`term-menu-item term-menu-item-grow${n === name ? ' is-active' : ''}`}
+                    className={`term-menu-item term-menu-item-grow${template.name === name ? ' is-active' : ''}`}
                     role="menuitem"
-                    onClick={() => status === 'dirty' && n !== name ? setPendingLoad(n) : load(n)}
+                    onClick={() => status === 'dirty' && template.name !== name ? setPendingLoad(template.name) : load(template.name)}
                   >
-                    {n}
+                    <span>{template.name}</span>
+                    <time title={new Date(updatedAt(template)).toLocaleString()}>{formatSavedAt(updatedAt(template))}</time>
                   </button>
-                  <button
-                    type="button"
-                    className="term-menu-del"
-                    title={`Delete ${n}`}
-                    aria-label={`Delete ${n}`}
-                    onClick={() => remove(n)}
-                  >
-                    Ã—
-                  </button>
+                  <div className="term-menu-row-actions">
+                    <button type="button" className="term-menu-icon" title={`Duplicate ${template.name}`} aria-label={`Duplicate ${template.name}`} onClick={() => duplicate(template.name)}>
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="2" width="8" height="9" rx="1" stroke="currentColor" strokeWidth="1.2"/><path d="M3 5v8a1 1 0 001 1h6" stroke="currentColor" strokeWidth="1.2"/></svg>
+                    </button>
+                    <button type="button" className="term-menu-icon" title={`Rename ${template.name}`} aria-label={`Rename ${template.name}`} onClick={() => { setRenaming(template.name); setRenameValue(template.name) }}>
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 11.5V13h1.5l7-7-1.5-1.5-7 7zM10.5 4.5l1.5 1.5.8-.8a1.06 1.06 0 000-1.5 1.06 1.06 0 00-1.5 0l-.8.8z" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round"/></svg>
+                    </button>
+                    <button type="button" className="term-menu-icon term-menu-delete" title={`Delete ${template.name}`} aria-label={`Delete ${template.name}`} onClick={() => setPendingDelete(template.name)}>
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 4h10M6 4V2.5h4V4m-6 0 .7 9h6.6l.7-9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                  </div>
                 </div>
               ))}
             </>
@@ -181,6 +237,7 @@ export default function SaveLoadMenu({ chartRef }: SaveLoadMenuProps) {
         </div>
       )}
       {pendingLoad && <div className="term-menu" role="dialog" aria-label="Unsaved changes"><div className="term-menu-label">Discard unsaved changes?</div><button type="button" className="term-menu-item" onClick={() => { load(pendingLoad); setPendingLoad(null) }}>Load layout</button><button type="button" className="term-menu-item" onClick={() => setPendingLoad(null)}>Cancel</button></div>}
+      {pendingDelete && <div className="term-menu" role="dialog" aria-label="Delete layout"><div className="term-menu-label">Delete {pendingDelete}?</div><button type="button" className="term-menu-item term-menu-danger" onClick={() => { remove(pendingDelete); setPendingDelete(null) }}>Delete layout</button><button type="button" className="term-menu-item" onClick={() => setPendingDelete(null)}>Cancel</button></div>}
     </div>
   )
 }

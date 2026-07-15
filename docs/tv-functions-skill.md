@@ -592,7 +592,7 @@ Behavioral evidence: `tv-mirror-reference/watchlist.md` (panel anatomy, control 
 |---|---|---|---|---|
 | Save layout | Chart state | `native-chrome` | `ChartTemplateManager`, `SaveLoadMenu` | localStorage persistence with active-layout autosave |
 | Load layout | Restore | `native-chrome` | `AstroneumChart.loadState()` | restores the active layout on reload with chart settings, indicators, and drawings |
-| Chart templates | Indicator + settings preset | `native-chrome` | `ChartTemplateManager` | named local templates |
+| Chart templates | Indicator + settings preset | `native-chrome` | `ChartTemplateManager` | named local templates with rename, duplicate, timestamps, and confirmed delete |
 
 ### 3.23 Search
 
