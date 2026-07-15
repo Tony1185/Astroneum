@@ -8,6 +8,11 @@ import fibonacciSegment from './fibonacciSegment'
 import fibonacciSpiral from './fibonacciSpiral'
 import fibonacciSpeedResistanceFan from './fibonacciSpeedResistanceFan'
 import fibonacciExtension from './fibonacciExtension'
+import fibonacciChannel from './fibonacciChannel'
+import fibonacciWedge from './fibonacciWedge'
+import fibonacciTimeZones from './fibonacciTimeZones'
+import fibonacciArcs from './fibonacciArcs'
+import fibonacciFan from './fibonacciFan'
 import gannBox from './gannBox'
 import gannFan from './gannFan'
 import pitchfork from './pitchfork'
@@ -33,6 +38,7 @@ export default [
   circle, rect, triangle, parallelogram,
   fibonacciCircle, fibonacciSegment, fibonacciSpiral,
   fibonacciSpeedResistanceFan, fibonacciExtension,
+  fibonacciChannel, fibonacciWedge, fibonacciTimeZones, fibonacciArcs, fibonacciFan,
   gannBox, gannFan, pitchfork,
   threeWaves, fiveWaves, eightWaves, anyWaves, abcd, xabcd,
   measure,

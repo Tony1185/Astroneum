@@ -74,7 +74,7 @@
 |---|---|---|---|---|
 | 2.1 | Cursors group (Cross default + submenu) | `linetool-group-cursors` | ✅ `DrawingBar` cursor group — Cross/Dot/Arrow/Eraser submenu + `onCursorChange` sets CSS cursor | `DrawingBar` |
 | 2.2 | Trendline + Trend tools submenu | `linetool-group-trend-line` | 🔧 `singleLine` group | |
-| 2.3 | Fib retracement + Gann/Fib submenu | `linetool-group-gann-and-fibonacci` | 🔧 `fibonacci` group — missing pure Fib Retracement, Channel, Wedge, Time Zones, Arcs, Fan | |
+| 2.3 | Fib retracement + Gann/Fib submenu | `linetool-group-gann-and-fibonacci` | ✅ `fibonacci` group — 11 tools: `fibonacciLine` (Retracement), `fibonacciSegment`, `fibonacciCircle`, `fibonacciSpiral`, `fibonacciSpeedResistanceFan`, `fibonacciExtension`, `fibonacciChannel`, `fibonacciWedge`, `fibonacciTimeZones`, `fibonacciArcs`, `fibonacciFan`, plus `gannBox`, `gannFan`, `pitchfork` | `DrawingBar` |
 | 2.4 | XABCD pattern + Patterns submenu | `linetool-group-patterns` | 🔧 `wave` group — missing Cypher, Crab, Bat, Butterfly, Three Drives, Elliott Impulse | |
 | 2.5 | Long position + Forecasting submenu | `linetool-group-prediction-and-measurement` | ✅ `DrawingBar` forecasting group - 12 tools in 3 sections (Forecasting, Volume-based, Measurers) with section headers. Overlays in `src/extension/`: `longPosition`, `shortPosition`, `positionForecast`, `barsPattern`, `ghostFeed`, `sector`, `anchoredVwap`, `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, `priceRange`, `dateRange`, `dateAndPriceRange` | `DrawingBar` forecasting group |
 | 2.6 | Brush + Geometric shapes submenu | `linetool-group-geometric-shapes` | 🔧 `polygon` group (circle, rect, triangle, parallelogram) ??? popup now visible after clipping fix. Missing: Brush, Ellipse, Polygon, Polyline | |

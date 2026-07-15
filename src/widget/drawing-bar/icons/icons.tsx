@@ -471,6 +471,56 @@ export const textNote = () => (
   </svg>
 )
 
+export const fibonacciChannel = () => (
+  <svg className="icon-overlay" viewBox="0 0 22 22" width="52" height="38">
+    <path d="M3,7L18,3" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M5,19L20,15" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M3.6,10L18.6,6" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M4.2,13L19.2,9" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M4.6,16L19.6,12" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+  </svg>
+)
+
+export const fibonacciWedge = () => (
+  <svg className="icon-overlay" viewBox="0 0 22 22" width="52" height="38">
+    <path d="M3,18L19,4" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M3,18L19,18" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M3,18L11,11" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M3,18L15,8" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M3,18L7,14.5" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+  </svg>
+)
+
+export const fibonacciTimeZones = () => (
+  <svg className="icon-overlay" viewBox="0 0 22 22" width="52" height="38">
+    <path d="M3,2L3,20" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M5,2L5,20" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M7,2L7,20" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M10,2L10,20" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M14,2L14,20" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M19,2L19,20" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+  </svg>
+)
+
+export const fibonacciArcs = () => (
+  <svg className="icon-overlay" viewBox="0 0 22 22" width="52" height="38">
+    <path d="M4,18 A6,6 0 0,1 16,18" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M6,18 A4,4 0 0,1 14,18" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M8,18 A2,2 0 0,1 12,18" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M4,18L16,18" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.4"/>
+  </svg>
+)
+
+export const fibonacciFan = () => (
+  <svg className="icon-overlay" viewBox="0 0 22 22" width="52" height="38">
+    <path d="M3,18L19,4" fill="none" stroke="currentColor" strokeWidth="1"/>
+    <path d="M3,18L19,8" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M3,18L19,11" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M3,18L19,14" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+    <path d="M3,18L19,18" fill="none" stroke="currentColor" strokeWidth="0.5" strokeOpacity="0.6"/>
+  </svg>
+)
+
 export const forecasting = () => (
   <svg className="icon-overlay" viewBox="0 0 28 28" width="52" height="38">
     <g fill="currentColor">
