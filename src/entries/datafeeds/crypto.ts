@@ -1,5 +1,5 @@
 /**
- * Subpath entry: `astroneum/datafeeds/crypto`
+ * Subpath entry: `@tony01/astroneum/datafeeds/crypto`
  */
 export {
   DATAFEED_ERROR_EVENT,

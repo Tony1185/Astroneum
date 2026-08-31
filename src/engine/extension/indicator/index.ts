@@ -74,9 +74,15 @@ const extensions = [
   volumeWeightedMovingAverage, weightedMovingAverage, williamsR, zigzag
 ]
 
-extensions.forEach((indicator: IndicatorTemplate) => {
-  indicators[indicator.name] = IndicatorImp.extend(indicator)
-})
+let builtInsRegistered = false
+
+function registerBuiltInIndicators(): void {
+  if (builtInsRegistered) return
+  extensions.forEach((indicator: IndicatorTemplate) => {
+    indicators[indicator.name] = IndicatorImp.extend(indicator)
+  })
+  builtInsRegistered = true
+}
 
 function registerIndicator<D = unknown, C = unknown, E = unknown>(indicator: IndicatorTemplate<D, C, E>): void {
   indicators[indicator.name] = IndicatorImp.extend(indicator)
@@ -90,4 +96,4 @@ function getSupportedIndicators(): string[] {
   return Object.keys(indicators)
 }
 
-export { registerIndicator, getIndicatorClass, getSupportedIndicators }
+export { registerBuiltInIndicators, registerIndicator, getIndicatorClass, getSupportedIndicators }

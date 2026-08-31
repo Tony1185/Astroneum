@@ -27,7 +27,7 @@ Follow these when touching any source, config, or build file in the Astroneum re
 
 - tsup `onSuccess` walks `dist/` and prepends `'use client';` to every `.js` file.
 - **Do not** add `'use client'` manually to `src/` files — it's injected at build time.
-- The demo app imports are safe — `transpilePackages: ['astroneum']` in `next.config.ts`.
+- The demo app imports are safe — `transpilePackages: ['@tony01/astroneum']` in `next.config.ts`.
 
 ## Tests
 

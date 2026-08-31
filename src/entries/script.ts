@@ -1,5 +1,5 @@
 /**
- * Subpath entry: `astroneum/script`
+ * Subpath entry: `@tony01/astroneum/script`
  */
 export { default as ScriptEngine } from '../scripting/ScriptEngine'
 export type { CompiledIndicator, CompiledStrategy, StudyOptions, PlotOptions, InputOptions } from '../scripting/ScriptEngine'

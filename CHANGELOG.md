@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 once it reaches v1.0. Until then, minor releases may include breaking changes
 — always check this file before upgrading.
 
-## [Unreleased]
+## [0.4.1-beta.22] - 2026-08-31
+
+### Added — Headless engine package
+- Added `@tony01/astroneum/headless` with a React-free declaration/runtime graph, no native UI, stylesheet, datafeed, keyboard-shortcut, or implicit-network dependency.
+- Added validated host-owned `replaceBars()`, `updateBar()`, and copied `getBars()` data APIs for strictly ascending UTC-millisecond OHLCV data.
+- Added explicit optional indicator/drawing registration and an immutable version-1 capability manifest.
+- Added idempotent duplicate initialization, multiple-container isolation, deterministic teardown, SSR/package isolation, direct-bar, and size tests.
+- Added React-independent typed study-plugin exports and bounded version-1 viewport capture/restore for headless consumers.
+- Added browser coverage for 16 study outputs, 16 host overlays, left-scrolled viewport restoration, and teardown during active animation.
+
+### Changed — Headless engine ownership
+- Engine rendering no longer installs keyboard shortcuts; the existing React host keyboard hook remains the shortcut owner.
+- Headless teardown now cancels chart animations, unsubscribes configured loaders, and ignores late loader and indicator scheduling work.
+- Screenshot export now composites ordered Canvas2D, WebGL, WebGPU, worker-canvas, and GPU-text layers and has browser pixel coverage.
 
 ### Changed
 - The right rail now keeps its 52px toggle strip on the viewport's outer-right edge; panels open immediately to its left and collapse without hiding the strip.
@@ -223,14 +236,14 @@ Still tracked for v0.6 – v1.0; not in this release:
 
 - **Subpath exports** for tree-shakeable, opt-in feature modules
   ([#roadmap-4](README.md#v04--modularization)):
-  - `astroneum/replay` — `BarReplay`
-  - `astroneum/multichart` — `MultiChartLayout`
-  - `astroneum/watchlist` — `WatchlistManager`
-  - `astroneum/portfolio` — `PortfolioTracker`
-  - `astroneum/alerts` — `AlertManager`
-  - `astroneum/script` — `ScriptEngine`
-  - `astroneum/datafeeds/polygon` — `DefaultDatafeed` + `WebSocketDatafeed`
-  - `astroneum/datafeeds/crypto` — `createStandardCryptoDatafeed` + adapters
+  - `@tony01/astroneum/replay` — `BarReplay`
+  - `@tony01/astroneum/multichart` — `MultiChartLayout`
+  - `@tony01/astroneum/watchlist` — `WatchlistManager`
+  - `@tony01/astroneum/portfolio` — `PortfolioTracker`
+  - `@tony01/astroneum/alerts` — `AlertManager`
+  - `@tony01/astroneum/script` — `ScriptEngine`
+  - `@tony01/astroneum/datafeeds/polygon` — `DefaultDatafeed` + `WebSocketDatafeed`
+  - `@tony01/astroneum/datafeeds/crypto` — `createStandardCryptoDatafeed` + adapters
 - **`size-limit` budget** ([.size-limit.json](.size-limit.json)) with one
   budget per entry. Run `pnpm size` after `pnpm build`.
 - **Datafeed contract tests** ([src/__tests__/datafeed-contract.test.ts](src/__tests__/datafeed-contract.test.ts))

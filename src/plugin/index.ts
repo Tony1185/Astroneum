@@ -6,7 +6,8 @@ export { INDICATOR_PLUGIN_RUNTIME_KEY }
 import type { IndicatorTemplate } from '@/engine/component/Indicator'
 import type { CandleData } from '@/engine'
 
-import type { ChartPlugin, ChartPluginContext, IndicatorPlugin, Price, Timestamp, Viewport, Chart } from '@/types'
+import type { ChartPlugin, ChartPluginContext, Chart } from '@/types'
+import type { IndicatorPlugin, Price, Timestamp, Viewport } from './types'
 
 const DEFAULT_FIGURE_KEY = 'value'
 const MAX_FIGURE_KEYS = 16

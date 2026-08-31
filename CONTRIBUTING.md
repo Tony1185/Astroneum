@@ -6,7 +6,7 @@ basics — for the project direction, see the [README](README.md).
 ## Getting started
 
 ```bash
-git clone https://github.com/kowito/astroneum.git
+git clone https://github.com/Tony1185/Astroneum.git
 cd astroneum
 pnpm install
 pnpm verify
@@ -15,7 +15,7 @@ pnpm verify
 Requirements:
 
 - **Node.js ≥ 18** (matches the `engines` field).
-- **pnpm 9+** (the repository declares pnpm 9).
+- **pnpm 10.33.0** (the repository pins the package manager version).
 
 `pnpm verify` runs the full gate: `lint → typecheck → build → test`. Every
 change must keep this green.
@@ -31,7 +31,7 @@ change must keep this green.
 | [src/plugin](src/plugin) | Public indicator plugin system. |
 | [src/scripting](src/scripting) | Sandboxed indicator scripting engine. |
 | [src/strategy](src/strategy) | Deterministic backtest core and shared strategy-report types. |
-| [src/entries](src/entries) | Subpath export entry points (e.g. `astroneum/replay`). |
+| [src/entries](src/entries) | Subpath export entry points (e.g. `@tony01/astroneum/replay`). |
 | [src/i18n](src/i18n) | 19 locale dictionaries (lazy-loaded on demand). |
 | [src/store](src/store) | React state stores (chart, indicator, UI). |
 | [src/__tests__](src/__tests__) | All tests (unit, contract, SSR smoke, perf baseline). |
@@ -63,7 +63,7 @@ change must keep this green.
 - **Engine core** (`src/engine/**`) is `@ts-nocheck` and excluded from lint.
   Prefer changes in `src/chart/**`, `src/plugin/**`, and `src/datafeed/**`.
 - **New chart features** go under `src/chart/` and are imported by the
-  consumer via the main `astroneum` entry. Only subpath-specific features go
+  consumer via the main `@tony01/astroneum` entry. Only subpath-specific features go
   in `src/entries/**`.
 
 ## Tests
@@ -104,9 +104,9 @@ from `../../dist/...` and document the dependency in a top-of-file comment;
 
 ## Reporting bugs
 
-File issues at <https://github.com/kowito/astroneum/issues>. Include:
+File issues at <https://github.com/Tony1185/Astroneum/issues>. Include:
 
-- The version (`astroneum` package version).
+- The `@tony01/astroneum` package version.
 - A minimum reproduction (StackBlitz, CodeSandbox, or a repo).
 - Browser + OS + framework versions.
 - For runtime crashes: the stack trace.

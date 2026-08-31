@@ -165,7 +165,7 @@ export class TextWebGLRenderer {
     const gl = this._canvas.getContext('webgl2', {
       antialias: false,
       premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance'
     })!
     this._gl = gl
@@ -251,6 +251,16 @@ export class TextWebGLRenderer {
    * phase is removed before re-compositing main + overlay items.
    */
   flush (): void {
+    this._render(this._mainItems.concat(this._overlayItems))
+  }
+
+  drawTo (ctx: CanvasRenderingContext2D, width: number, height: number, includeOverlay: boolean): void {
+    this._render(includeOverlay ? this._mainItems.concat(this._overlayItems) : this._mainItems)
+    ctx.drawImage(this._canvas, 0, 0, width, height)
+    if (!includeOverlay) this.flush()
+  }
+
+  private _render (items: TextItem[]): void {
     const gl = this._gl
     if (this._cssW === 0 || this._cssH === 0) return
 
@@ -258,8 +268,7 @@ export class TextWebGLRenderer {
     gl.clearColor(0, 0, 0, 0)
     gl.clear(gl.COLOR_BUFFER_BIT)
 
-    const allItems = this._mainItems.concat(this._overlayItems)
-    if (allItems.length === 0) return
+    if (items.length === 0) return
 
     gl.useProgram(this._program)
     gl.uniform2f(this._uRes, this._cssW, this._cssH)
@@ -271,7 +280,7 @@ export class TextWebGLRenderer {
     // In practice all tick labels share the same (fontSize, fontFamily) → 1 bind.
     type AtlasGroup = { atlas: GlyphAtlas; items: TextItem[] }
     const groups = new Map<string, AtlasGroup>()
-    for (const item of allItems) {
+    for (const item of items) {
       const key = `${item.fontSize}/${item.fontFamily}`
       let g = groups.get(key)
       if (g === undefined) {

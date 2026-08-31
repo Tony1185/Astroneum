@@ -19,7 +19,7 @@ export class IndicatorPluginWebGLRenderer {
     const gl = canvas.getContext('webgl2', {
       antialias: false,
       premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance',
       alpha: true
     })

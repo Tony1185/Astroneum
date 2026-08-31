@@ -3,8 +3,8 @@
 Professional financial charting library for React applications â€” now with
 TradingView-class features, zero licensing fees, and MIT license.
 
-[![npm version](https://img.shields.io/npm/v/astroneum?label=npm)](https://www.npmjs.com/package/astroneum)
-[![npm downloads](https://img.shields.io/npm/dm/astroneum)](https://www.npmjs.com/package/astroneum)
+[![npm version](https://img.shields.io/npm/v/%40tony01%2Fastroneum?label=npm)](https://www.npmjs.com/package/@tony01/astroneum)
+[![npm downloads](https://img.shields.io/npm/dm/%40tony01%2Fastroneum)](https://www.npmjs.com/package/@tony01/astroneum)
 [![React 18-19](https://img.shields.io/badge/react-18%20%7C%2019-149eca)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/typescript-ready-3178c6)](https://www.typescriptlang.org/)
 [![Node >=18](https://img.shields.io/badge/node-%3E%3D18-339933)](https://nodejs.org/)
@@ -65,7 +65,7 @@ TradingView-class features, zero licensing fees, and MIT license.
 
 ### Developer Experience
 - **Fully typed TypeScript** â€” branded financial types (`Price`, `Volume`, `Timestamp`)
-- **8 tree-shakeable subpath exports** â€” import only what you need
+- **10 tree-shakeable subpath exports** â€” import only what you need
 - **18 locale JSON files** ? lazy-loaded on demand, dark/light/high-contrast themes
 - **SSR-safe** â€” `'use client'` on every entry, Next.js App Router compatible
 - **MIT license** â€” no usage limits, no watermark, no "Powered by" branding
@@ -75,7 +75,7 @@ TradingView-class features, zero licensing fees, and MIT license.
 ## Install
 
 ```bash
-npm install astroneum
+npm install @tony01/astroneum
 ```
 
 `react` and `react-dom` â‰¥ 18 are peer dependencies.
@@ -92,7 +92,7 @@ import {
   type Period,
   type SymbolInfo,
 } from '@tony01/astroneum'
-import 'astroneum/style.css'
+import '@tony01/astroneum/style.css'
 
 export default function App() {
   const chartRef = useRef<AstroneumHandle>(null)
@@ -139,6 +139,7 @@ export default function App() {
 import { AstroneumChart, DefaultDatafeed } from '@tony01/astroneum'
 
 // Tree-shakeable subpaths
+import { createChart }          from '@tony01/astroneum/headless'
 import { BarReplay }            from '@tony01/astroneum/replay'
 import { MultiChartLayout }     from '@tony01/astroneum/multichart'
 import { MultiPeriodLayout }    from '@tony01/astroneum'              // same symbol, stacked periods
@@ -169,6 +170,53 @@ import { volumeProfilePlugin, domPlugin, zigzagPlugin,
 import { createCompareIndicator }         from '@tony01/astroneum'  // compare symbols overlay
 ```
 
+## Headless Engine
+
+`@tony01/astroneum/headless` exposes the rendering engine without React,
+Astroneum UI, stylesheets, datafeeds, keyboard shortcuts, or network behavior.
+The host supplies the container, bars, controls, persistence, and lifecycle.
+
+```ts
+import {
+  asPrice,
+  asTimestamp,
+  createChart,
+  destroyChart,
+  registerBuiltInExtensions,
+} from '@tony01/astroneum/headless'
+
+registerBuiltInExtensions()
+
+const chart = createChart(document.getElementById('chart')!)
+chart.replaceBars([{
+  timestamp: asTimestamp(Date.UTC(2026, 7, 29)),
+  open: asPrice(100),
+  high: asPrice(105),
+  low: asPrice(98),
+  close: asPrice(103),
+}])
+
+destroyChart(chart)
+```
+
+Calling `createChart()` twice with the same container returns the same instance.
+`destroyChart()` is idempotent and releases the container for a later mount.
+`replaceBars()` requires strictly ascending, finite UTC-millisecond OHLCV data;
+`updateBar()` may replace the current last bar or append a newer bar. Invalid data
+throws without mutating current bars. Calling either method switches that chart to
+host-owned data and detaches any explicitly configured engine data loader.
+
+Built-in indicator and drawing registration is explicit and process-wide. Call
+`registerBuiltInExtensions()` once before creating studies or drawings. The
+headless entry does not require `style.css`.
+
+Typed `registerIndicatorPlugin()` helpers and raw `registerIndicator()` /
+`registerOverlay()` primitives let the host supply study and drawing behavior.
+`getViewportState()` returns only versioned bar spacing and right-offset bar count;
+`setViewportState()` validates and clamps those fields against current bars and
+container geometry. Restore it after bars load. Screenshot export composites the
+ordered Canvas2D, WebGL, WebGPU, worker-canvas, and GPU-text layers.
+
 `createStandardCryptoDatafeed()` implements batched watchlist snapshots for Binance, Bitget, and OKX. Custom datafeeds can opt in with `getQuotes(symbols)`; consumers without it continue to work and display unavailable quote values.
 
 ## Browser Support
@@ -186,16 +234,17 @@ Graceful fallback: no WebGL2 â†’ Canvas2D, no OPFS â†’ in-memory cache
 
 ```ts
 // next.config.ts
-const nextConfig = { transpilePackages: ['astroneum'] }
+const nextConfig = { transpilePackages: ['@tony01/astroneum'] }
 ```
 
 ```tsx
 // app/layout.tsx
-import 'astroneum/style.css'
+import '@tony01/astroneum/style.css'
 ```
 
 The library ships with `'use client'` built in â€” no extra directive needed.
 
 ## License
 
-MIT â€” use it anywhere, no fees, no limits, no branding requirement.
+MIT â€” use it anywhere, no fees, no limits, no branding requirement. The package
+retains the upstream copyright notice for Kowit Charoenratchatabhan.

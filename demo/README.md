@@ -1,6 +1,6 @@
 # Astroneum — Next.js Demo
 
-A Next.js 15 + React 19 demo for the [astroneum](https://github.com/kowito/astroneum) charting library.
+A Next.js 15 + React 19 demo for the [@tony01/astroneum](https://github.com/Tony1185/Astroneum) charting library.
 
 ## Getting started
 
@@ -40,8 +40,8 @@ The demo uses astroneum's built-in standard crypto datafeed (`createStandardCryp
 ## Next.js notes
 
 - `AstroneumChart` uses canvas + React hooks → rendered inside the `'use client'` terminal component
-- `astroneum/style.css` is imported inside the client component
-- `transpilePackages: ['astroneum']` in `next.config.ts` ensures the ESM-only library is bundled correctly by Next.js
+- `@tony01/astroneum/style.css` is imported inside the client component
+- `transpilePackages: ['@tony01/astroneum']` in `next.config.ts` ensures the ESM-only library is bundled correctly by Next.js
 
 ## Visual regression
 

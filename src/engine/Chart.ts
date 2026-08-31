@@ -59,14 +59,23 @@ export interface DomFilter {
   position?: DomPosition
 }
 
+export interface ChartViewportState {
+  readonly version: 1
+  readonly barSpace: number
+  readonly rightOffsetBarCount: number
+}
+
 export interface Chart extends Store {
   id: string
+  getBars: () => readonly CandleData[]
   getDom: (paneId?: string, position?: DomPosition) => Nullable<HTMLElement>
   getSize: (paneId?: string, position?: DomPosition) => Nullable<Bounding>
   createIndicator: (value: string | IndicatorCreate, isStack?: boolean, paneOptions?: PaneOptions) => Nullable<string>
   getIndicators: (filter?: IndicatorFilter) => Indicator[]
   createOverlay: (value: string | OverlayCreate | Array<string | OverlayCreate>) => Nullable<string> | Array<Nullable<string>>
   getOverlays: (filter?: OverlayFilter) => Overlay[]
+  getViewportState: () => ChartViewportState
+  setViewportState: (state: ChartViewportState) => void
   setPaneOptions: (options: PaneOptions) => void
   getPaneOptions: (id?: string) => Nullable<PaneOptions> | PaneOptions[]
   scrollByDistance: (distance: number, animationDuration?: number) => void
@@ -97,6 +106,7 @@ export default class ChartImp implements Chart {
   private _candlePane: CandlePane
   private _xAxisPane: XAxisPane
   private readonly _separatorPanes = new Map<DrawPane, SeparatorPane>()
+  private readonly _animations = new Set<Animation>()
 
   private _layoutOptions = {
     sort: true,
@@ -110,6 +120,7 @@ export default class ChartImp implements Chart {
 
   private _layoutPending = false
   private _layoutRafId = 0
+  private _destroyed = false
 
   private readonly _cacheYAxisWidth = { left: 0, right: 0 }
 
@@ -785,8 +796,42 @@ export default class ChartImp implements Chart {
     return this._chartStore.getVisibleRange()
   }
 
+  getViewportState (): ChartViewportState {
+    return {
+      version: 1,
+      barSpace: this._chartStore.getBarSpace().bar,
+      rightOffsetBarCount: this._chartStore.getLastBarRightSideDiffBarCount()
+    }
+  }
+
+  setViewportState (state: ChartViewportState): void {
+    if (
+      state.version !== 1 ||
+      !Number.isFinite(state.barSpace) ||
+      state.barSpace < 1 ||
+      state.barSpace > 50 ||
+      !Number.isFinite(state.rightOffsetBarCount)
+    ) {
+      throw new RangeError('viewport state is invalid')
+    }
+    this._chartStore.setViewportState(state.barSpace, state.rightOffsetBarCount)
+  }
+
   resetData (): void {
     this._chartStore.resetData()
+  }
+
+  replaceBars (data: readonly CandleData[]): void {
+    this._resetYAxisAutoCalcTickFlag()
+    this._chartStore.replaceBars(data)
+  }
+
+  updateBar (data: CandleData): void {
+    this._chartStore.updateBar(data)
+  }
+
+  getBars (): readonly CandleData[] {
+    return this._chartStore.getDataList().map(data => ({ ...data }))
   }
 
   getDataList (): CandleData[] {
@@ -1089,7 +1134,7 @@ export default class ChartImp implements Chart {
         const progressDistance = distance * (frameTime / duration)
         this._chartStore.scroll(progressDistance)
       })
-      animation.start()
+      this._startAnimation(animation)
     } else {
       this._chartStore.scroll(distance)
     }
@@ -1128,7 +1173,7 @@ export default class ChartImp implements Chart {
         this._chartStore.zoom(scale, coordinate ?? null, 'main')
         prevProgressBarSpace = progressBarSpace
       })
-      animation.start()
+      this._startAnimation(animation)
     } else {
       this._chartStore.zoom(difSpace / barSpace * SCALE_MULTIPLIER, coordinate ?? null, 'main')
     }
@@ -1281,7 +1326,15 @@ export default class ChartImp implements Chart {
     this._applyResize()
   }
 
+  private _startAnimation (animation: Animation): void {
+    this._animations.add(animation)
+    animation.onFinish(() => { this._animations.delete(animation) })
+    animation.start()
+  }
+
   destroy (): void {
+    if (this._destroyed) return
+    this._destroyed = true
     if (this._layoutRafId !== 0) {
       cancelAnimationFrame(this._layoutRafId)
       this._layoutRafId = 0
@@ -1295,6 +1348,8 @@ export default class ChartImp implements Chart {
     this._intersectionObserver?.disconnect()
     this._perfObserver?.disconnect()
     this._resizeObserver?.disconnect()
+    this._animations.forEach(animation => { animation.cancel() })
+    this._animations.clear()
     this._chartEvent.destroy()
     this._drawPanes.forEach(pane => {
       pane.destroy()

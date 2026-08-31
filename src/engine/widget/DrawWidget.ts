@@ -131,11 +131,19 @@ export default abstract class DrawWidget<P extends DrawPane = DrawPane> extends 
     canvas.height = height * pixelRatio
     ctx.scale(pixelRatio, pixelRatio)
 
-    ctx.drawImage(this._mainCanvas.getElement(), 0, 0, width, height)
-
-    if (includeOverlay) {
-      ctx.drawImage(this._overlayCanvas.getElement(), 0, 0, width, height)
-    }
+    const overlayElement = this._overlayCanvas.getElement()
+    const textElement = this._textRenderer?.getElement()
+    const layers = Array.from(this.getContainer().children)
+      .map((element, index) => ({ element, index }))
+      .filter((entry): entry is { element: HTMLCanvasElement, index: number } => entry.element instanceof HTMLCanvasElement)
+      .filter(entry => includeOverlay || entry.element !== overlayElement)
+      .filter(entry => entry.element !== textElement)
+      .sort((left, right) => {
+        const zIndexDiff = Number(left.element.style.zIndex || 0) - Number(right.element.style.zIndex || 0)
+        return zIndexDiff === 0 ? left.index - right.index : zIndexDiff
+      })
+    layers.forEach(({ element }) => { ctx.drawImage(element, 0, 0, width, height) })
+    this._textRenderer?.drawTo(ctx, width, height, includeOverlay)
     return canvas
   }
 

@@ -24,7 +24,7 @@ Every catalog row carries one of these six statuses. The status dictates what to
 
 ## 2. Existing Astroneum API surface
 
-Astroneum is a **SEPARATE project** from Trading-Bot-V2 (different repo: `github.com/kowito/astroneum` vs `github.com/Tony1185/trading-bot-v2.git`). The Astroneum demo app (`/opt/astroneum/demo/`, the `astroneum-demo-next` Next.js app) is charting-first and has a minimal API surface. Trading-Bot-V2's webhook/positions/orders APIs are NOT available to Astroneum.
+Astroneum is a **SEPARATE project** from Trading-Bot-V2 (different repo: `github.com/Tony1185/Astroneum` vs `github.com/Tony1185/trading-bot-v2.git`). The Astroneum demo app (`/opt/astroneum/demo/`, the `astroneum-demo-next` Next.js app) is charting-first and has a minimal API surface. Trading-Bot-V2's webhook/positions/orders APIs are NOT available to Astroneum.
 
 ### Astroneum demo app API routes (api-bridged)
 
@@ -34,14 +34,14 @@ Astroneum is a **SEPARATE project** from Trading-Bot-V2 (different repo: `github
 
 ### Astroneum library modules (astroneum-native, not API routes)
 
-These are client-side library modules from the `astroneum` npm package, not server API routes:
+These are client-side library modules from the `@tony01/astroneum` npm package, not server API routes:
 
 | Subpath | Role |
 |---|---|
-| `astroneum/alerts` | `AlertManager` — price alert creation and monitoring (client-side). |
-| `astroneum/portfolio` | `PortfolioTracker` — position tracking and P&L (read-only display; not an execution path). |
-| `astroneum/watchlist` | `WatchlistManager` — symbol watchlist with live prices. |
-| `astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed` + `BinanceAdapter` / `BitgetAdapter` / `OkxAdapter` — real-time crypto data. |
+| `@tony01/astroneum/alerts` | `AlertManager` — price alert creation and monitoring (client-side). |
+| `@tony01/astroneum/portfolio` | `PortfolioTracker` — position tracking and P&L (read-only display; not an execution path). |
+| `@tony01/astroneum/watchlist` | `WatchlistManager` — symbol watchlist with live prices. |
+| `@tony01/astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed` + `BinanceAdapter` / `BitgetAdapter` / `OkxAdapter` — real-time crypto data. |
 
 ### Trading-Bot-V2 API surface (SEPARATE project — NOT available to Astroneum)
 
@@ -50,9 +50,9 @@ The following are in the Trading-Bot-V2 project (`/root/Trading-Bot-V2/` or `/op
 | Trading-Bot-V2 path | Role | Astroneum equivalent |
 |---|---|---|
 | `src/app/api/webhooks/tradingview/route.ts` | Ingests TV `alert()` POSTs (5 actions). | None — Astroneum has no webhook ingestion. v21 events are reference-only (see §3.12). |
-| `src/app/api/tv-positions/route.ts` | TV-reported positions. | None — use `astroneum/portfolio` `PortfolioTracker` for read-only display. |
+| `src/app/api/tv-positions/route.ts` | TV-reported positions. | None — use `@tony01/astroneum/portfolio` `PortfolioTracker` for read-only display. |
 | `src/app/api/orders/route.ts` | Order creation (PaperTradingEngine + RiskManager). | None — Astroneum is charting-first; build new if trading is needed. |
-| `src/app/api/portfolio/route.ts` | Portfolio summary. | None — use `astroneum/portfolio` `PortfolioTracker`. |
+| `src/app/api/portfolio/route.ts` | Portfolio summary. | None — use `@tony01/astroneum/portfolio` `PortfolioTracker`. |
 | `src/app/api/integrations/tradingview/route.ts` | Webhook token management. | None — not applicable to Astroneum. |
 
 ---
@@ -570,12 +570,12 @@ Behavioral evidence: `tv-mirror-reference/watchlist.md` (panel anatomy, control 
 | Paper trading | Simulated account | `v1-deferred` | — | §12; Astroneum is charting-first, no trading in v1 |
 | Broker connections | OAuth brokers | `v1-deferred` | — | §12 |
 | Order ticket (market/limit/stop/stop-limit) | Place order | `v1-deferred` | — | Astroneum has no `/api/orders`; build new in `/opt/astroneum/demo/src/app/api/` if needed. Do NOT reuse Trading-Bot-V2's `OrderPanel`. |
-| Positions list | Open positions | `v1-deferred` | — | Use `astroneum/portfolio` `PortfolioTracker` for read-only display. Do NOT reuse Trading-Bot-V2's `OpenPositions` or `/api/tv-positions`. |
+| Positions list | Open positions | `v1-deferred` | — | Use `@tony01/astroneum/portfolio` `PortfolioTracker` for read-only display. Do NOT reuse Trading-Bot-V2's `OpenPositions` or `/api/tv-positions`. |
 | Orders list | Working orders | `v1-deferred` | — | Astroneum has no orders API; build new if needed. |
 | History | Filled/closed | `v1-deferred` | — | Build new in `/opt/astroneum/demo/src/app/api/` if needed. |
 | DOM / depth of market | L2 ladder | `v1-deferred` | — | §12; library supports it, APP defers surface. |
 | On-chart order dragging | Drag SL/TP | `v1-deferred` | — | §12 |
-| Account summary | Balance/equity/margin | `v1-deferred` | — | Use `astroneum/portfolio` `PortfolioTracker`. Do NOT use Trading-Bot-V2's `/api/portfolio`. |
+| Account summary | Balance/equity/margin | `v1-deferred` | — | Use `@tony01/astroneum/portfolio` `PortfolioTracker`. Do NOT use Trading-Bot-V2's `/api/portfolio`. |
 
 ### 3.21 Replay
 

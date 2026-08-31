@@ -43,6 +43,21 @@ jobs:
       - name: Verify package
         run: pnpm verify
 
+      - name: Verify bundle budgets
+        run: pnpm size
+
+      - name: Build demo
+        run: pnpm --filter astroneum-demo-next build
+
+      - name: Install Chromium
+        run: pnpm --filter astroneum-demo-next exec playwright install --with-deps chromium
+
+      - name: Verify headless browser contract
+        run: pnpm --filter astroneum-demo-next exec playwright test visual/headless.spec.ts
+
+      - name: Verify package contents
+        run: pnpm package:check
+
       - name: Determine npm dist-tag
         id: npm_tag
         run: |

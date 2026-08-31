@@ -69,7 +69,7 @@ function init(canvas, sab) {
   gl = canvas.getContext('webgl2', {
     antialias: false,
     premultipliedAlpha: false,
-    preserveDrawingBuffer: false,
+    preserveDrawingBuffer: true,
     powerPreference: 'high-performance',
     alpha: true
   });
@@ -194,11 +194,11 @@ self.onmessage = function(e) {
         renderMode, ohlcHalfSize, panOffset,
         physW, physH, pixelRatio
       } = msg;
-      if (barCount === 0) return;
       gl.viewport(0, 0, physW, physH);
       gl.scissor(0, 0, physW, physH);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
+      if (barCount === 0) return;
       gl.useProgram(program);
       gl.uniform1f(uPriceFrom,    priceFrom);
       gl.uniform1f(uPriceRange,   priceRange);
@@ -441,8 +441,8 @@ export class CandleWorkerRenderer {
   }
 
   // ---------------------------------------------------------------------------
-  // setData — identical fingerprint + pan-offset logic as CandleWebGLRenderer.
-  // Instead of calling gl.bufferSubData, posts 'upload' to the worker.
+  // setData posts every supplied value so replacements cannot be hidden by a
+  // partial rendering fingerprint.
   // ---------------------------------------------------------------------------
 
   setData(rawBars: BarRenderData[]): void {
@@ -463,37 +463,15 @@ export class CandleWorkerRenderer {
     this._barCount = visibleBarCount
     if (visibleBarCount === 0) {
       this._fingerprintBarCount = 0
+      this._vboVersion++
       return
     }
 
     const firstBar = bars[0]
     const lastBar = bars[visibleBarCount - 1]
-    if (
-      visibleBarCount === this._fingerprintBarCount &&
-      firstBar.centerX === this._fingerprintFirstX &&
-      lastBar.centerX === this._fingerprintLastX &&
-      lastBar.close === this._fingerprintLastClose &&
-      lastBar.bodyColor === this._fingerprintLastBodyColor
-    ) return
-
-    // Pan-offset fast path
     const currentBarStep = visibleBarCount >= 2
       ? bars[1].centerX - firstBar.centerX
       : this._fingerprintBarStep
-    if (
-      visibleBarCount === this._fingerprintBarCount &&
-      lastBar.close === this._fingerprintLastClose &&
-      lastBar.bodyColor === this._fingerprintLastBodyColor &&
-      firstBar.open === this._fingerprintFirstOpen &&
-      firstBar.close === this._fingerprintFirstClose &&
-      currentBarStep === this._fingerprintBarStep
-    ) {
-      this._panOffsetCss += firstBar.centerX - this._fingerprintFirstX
-      this._fingerprintFirstX = firstBar.centerX
-      this._fingerprintLastX = lastBar.centerX
-      this._vboVersion++
-      return
-    }
 
     // Full re-upload
     this._panOffsetCss = 0
@@ -576,7 +554,7 @@ export class CandleWorkerRenderer {
     renderMode = 0,
     ohlcHalfSize = 0
   ): void {
-    if (this._barCount === 0 || !this._workerReady) return
+    if (!this._workerReady) return
 
     if (
       this._vboVersion === this._drawnVersion &&

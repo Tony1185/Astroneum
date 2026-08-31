@@ -40,8 +40,8 @@ You build the Astroneum demo app â€” the Next.js terminal at `demo/src/`.
 
 - `'use client'` at top of client components
 - `import { AstroneumChart, ... } from '@tony01/astroneum'` â€” public barrel only
-- `import 'astroneum/style.css'` for chart styles
-- `next.config.ts` has `transpilePackages: ['astroneum']` and `basePath: /astroneum`
+- `import '@tony01/astroneum/style.css'` for chart styles
+- `next.config.ts` has `transpilePackages: ['@tony01/astroneum']` and `basePath: /astroneum`
 - `demo/.env` has `NEXT_PUBLIC_BASE_PATH=/astroneum`
 - API routes use `NextRequest` / `NextResponse` from `next/server`
 - Support center uses `generateStaticParams` for SSG of article pages

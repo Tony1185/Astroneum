@@ -51,6 +51,7 @@ const WHEEL_ZOOM_STEP = 0.15 // zoom factor per wheel tick
  * | Arrow Left / Right  | Pan chart by one step                   |
  * | Page Up / Down      | Scroll by one screen width               |
  * | Home / End          | Jump to start / end of data              |
+ * | Shift + / -         | Zoom in / out                            |
  * | Ctrl+C / Ctrl+V     | Copy / paste drawing overlays            |
  * | Ctrl+Alt+H          | Toggle visibility of all drawings        |
  * | Mouse wheel         | Zoom centered on cursor                  |
@@ -66,6 +67,17 @@ export function useKeyboardShortcuts(widgetRef: React.RefObject<Nullable<Chart>>
       if (tag === 'input' || tag === 'textarea') return
       const widget = widgetRef.current
       if (!widget) return
+
+      if (keyboardEvent.shiftKey && (keyboardEvent.key === '+' || keyboardEvent.key === '=')) {
+        keyboardEvent.preventDefault()
+        widget.zoomAtCoordinate(0.5)
+        return
+      }
+      if (keyboardEvent.shiftKey && keyboardEvent.key === '-') {
+        keyboardEvent.preventDefault()
+        widget.zoomAtCoordinate(-0.5)
+        return
+      }
 
       // Ctrl+Alt+H → toggle visibility of all drawings
       if (keyboardEvent.ctrlKey && keyboardEvent.altKey && (keyboardEvent.key === 'h' || keyboardEvent.key === 'H')) {

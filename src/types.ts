@@ -10,6 +10,7 @@ import type { LineAttrs, PolygonAttrs, TextAttrs, CircleAttrs } from '@/engine'
 import type { TooltipFeatureStyle, LineType, PolygonType, TooltipShowRule, TooltipShowType, FeatureType, TooltipFeaturePosition, CandleType, CandleTooltipRectPosition } from '@/engine'
 import type { DataLoader, DataLoadType, DataLoaderGetBarsParams, DataLoaderSubscribeBarParams } from '@/engine'
 import type { FormatDateType, ZoomAnchor } from '@/engine'
+import type { IndicatorPlugin, Price, Timestamp, Viewport, Volume } from './plugin/types'
 
 export type { CandleData, Styles, DeepPartial, Nullable }
 export type { Chart, DomPosition }
@@ -22,14 +23,11 @@ export type { LineAttrs, PolygonAttrs, TextAttrs, CircleAttrs }
 export type { TooltipFeatureStyle, LineType, PolygonType, TooltipShowRule, TooltipShowType, FeatureType, TooltipFeaturePosition, CandleType, CandleTooltipRectPosition }
 export type { DataLoader, DataLoadType, DataLoaderGetBarsParams, DataLoaderSubscribeBarParams }
 export type { FormatDateType, ZoomAnchor }
+export type { IndicatorPlugin, Price, Timestamp, Viewport, Volume }
 
 // ---------------------------------------------------------------------------
 // Financial primitive brands — never mix raw numbers across domains
 // ---------------------------------------------------------------------------
-export type Price = number & { readonly _brand: 'Price' }
-export type Volume = number & { readonly _brand: 'Volume' }
-export type Timestamp = number & { readonly _brand: 'Timestamp' }
-
 // ---------------------------------------------------------------------------
 // Indicator definition — supports named defaults with calc params
 // ---------------------------------------------------------------------------
@@ -232,50 +230,6 @@ export interface AstroneumHandle {
   getDataList(): CandleData[]
   resetData(): void
   resize(): void
-}
-
-// ---------------------------------------------------------------------------
-// Viewport — represents the currently visible region of the chart canvas.
-// Used for coordinate-space transforms and indicator custom renderers.
-// ---------------------------------------------------------------------------
-export interface Viewport {
-  /** Minimum (bottom) visible price in canvas coordinates. */
-  priceMin: Price
-  /** Maximum (top) visible price in canvas coordinates. */
-  priceMax: Price
-  /** Earliest visible candle timestamp (ms). */
-  timeMin: Timestamp
-  /** Latest visible candle timestamp (ms). */
-  timeMax: Timestamp
-  /** Physical canvas resolution [width, height] in device pixels. */
-  resolution: readonly [width: number, height: number]
-}
-
-// ---------------------------------------------------------------------------
-// IndicatorPlugin — implement to register a custom typed indicator.
-// Choose render method based on point count:
-//   render2D   → suitable for < 10k points (Canvas 2D API)
-//   renderGL   → required for 100k+ points or sub-pixel smooth lines (WebGL2)
-// ---------------------------------------------------------------------------
-export interface IndicatorPlugin<TOutput> {
-  /** Unique registry name — used as the indicator identifier in the engine. */
-  name: string
-  /** Short display name shown in the chart legend. */
-  shortName?: string
-  /** Default calculation parameters (can be overridden by the user). */
-  calcParams?: number[]
-  /**
-   * Pure calculation function. Must NOT mutate `data`.
-   * Called on every data update; keep it fast (O(n) or better).
-   */
-  calc(data: CandleData[], params: number[]): TOutput[]
-  /** Canvas 2D renderer — for lightweight overlays and small datasets. */
-  render2D?(ctx: CanvasRenderingContext2D, output: TOutput[], viewport: Viewport): void
-  /**
-   * WebGL2 renderer — for high-density or GPU-accelerated rendering.
-   * Astroneum reuses a stable per-indicator vbo and falls back to render2D when WebGL2 is unavailable.
-   */
-  renderGL?(gl: WebGL2RenderingContext, output: TOutput[], viewport: Viewport, vbo: WebGLBuffer): void
 }
 
 // ---------------------------------------------------------------------------

@@ -34,7 +34,7 @@ Thumbs.db
 # Nested clones (not part of the library)
 Astroneum/
 
-# TradingView evidence is intentionally versioned under tv-mirror-reference/.
+# TradingView evidence is stored outside product source.
 # It is documentation only: do not import it into source, package it, or treat
 # captured HTML/assets as implementation material. See docs/WORKSTREAMS.md.
 
@@ -47,6 +47,5 @@ Astroneum/
 *.njsproj
 *.sln
 *.sw?
-tv-mirror-reference/.chrome-cdp/
 demo/test-results/
 demo/playwright-report/

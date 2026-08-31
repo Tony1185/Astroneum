@@ -14,6 +14,7 @@ import assert from 'node:assert/strict'
  */
 
 const entries = [
+  '../../dist/entries/headless.js',
   '../../dist/index.js',
   '../../dist/entries/replay.js',
   '../../dist/entries/multichart.js',
@@ -65,5 +66,20 @@ test('workspace entry exposes the canonical shell API', async () => {
   const mod = await import('../../dist/entries/workspace.js')
   for (const name of ['WorkspaceShell', 'useWorkspaceShell', 'LayerProvider', 'useLayerProvider']) {
     assert.ok(name in mod, `expected workspace export "${name}" missing`)
+  }
+})
+
+test('headless entry exposes the documented host API', async () => {
+  const mod = await import('../../dist/entries/headless.js')
+  for (const name of [
+    'createChart',
+    'destroyChart',
+    'registerBuiltInExtensions',
+    'registerIndicatorPlugin',
+    'registerIndicatorPlugins',
+    'createIndicatorTemplateFromPlugin',
+    'HEADLESS_CAPABILITIES',
+  ]) {
+    assert.ok(name in mod, `expected headless export "${name}" missing`)
   }
 })

@@ -1,7 +1,7 @@
 {
   "name": "@tony01/astroneum",
-  "version": "0.4.1-beta.21",
-  "packageManager": "pnpm@9.0.0",
+  "version": "0.4.1-beta.22",
+  "packageManager": "pnpm@10.33.0",
   "description": "Astroneum - Professional financial charting library, ready out of the box.",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,6 +12,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./headless": {
+      "types": "./dist/entries/headless.d.ts",
+      "import": "./dist/entries/headless.js",
+      "default": "./dist/entries/headless.js"
     },
     "./replay": {
       "types": "./dist/entries/replay.d.ts",
@@ -116,6 +121,7 @@
     "test:watch": "tsx --test --watch src/__tests__/*.test.ts",
     "lint": "eslint src",
     "size": "size-limit",
+    "package:check": "node scripts/verify-package.mjs",
     "verify": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "prepublishOnly": "pnpm verify"
   },

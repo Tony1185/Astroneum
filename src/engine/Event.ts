@@ -56,49 +56,6 @@ export default class Event implements EventHandler {
 
   private _mouseMoveTriggerWidgetInfo: EventTriggerWidgetInfo = { pane: null, widget: null }
 
-  private readonly _boundKeyBoardDownEvent: ((event: KeyboardEvent) => void) = (event: KeyboardEvent) => {
-    switch (event.code) {
-      case 'Escape': {
-        const store = this._chart.getChartStore()
-        const progressInfo = store.getProgressOverlayInfo()
-        if (progressInfo !== null) {
-          store.removeOverlay({ id: progressInfo.overlay.id })
-        }
-        break
-      }
-      default: {
-        if (event.shiftKey) {
-          switch (event.code) {
-            case 'Equal': {
-              this._chart.getChartStore().zoom(0.5, null, 'main')
-              break
-            }
-            case 'Minus': {
-              this._chart.getChartStore().zoom(-0.5, null, 'main')
-              break
-            }
-            case 'ArrowLeft': {
-              const store = this._chart.getChartStore()
-              store.startScroll()
-              store.scroll(-3 * store.getBarSpace().bar)
-              break
-            }
-            case 'ArrowRight': {
-              const store = this._chart.getChartStore()
-              store.startScroll()
-              store.scroll(3 * store.getBarSpace().bar)
-              break
-            }
-            default: {
-              break
-            }
-          }
-        }
-        break
-      }
-    }
-  }
-
   constructor (container: HTMLElement, chart: Chart) {
     this._container = container
     this._chart = chart
@@ -106,10 +63,6 @@ export default class Event implements EventHandler {
       treatVertDragAsPageScroll: () => false,
       treatHorzDragAsPageScroll: () => false
     })
-    container.addEventListener('keydown', this._boundKeyBoardDownEvent)
-    // Also listen on window so Escape cancels in-progress drawings even when
-    // focus is on the drawing-bar button or other UI elements.
-    window.addEventListener('keydown', this._boundKeyBoardDownEvent)
   }
 
   pinchStartEvent (): boolean {
@@ -716,8 +669,10 @@ export default class Event implements EventHandler {
   }
 
   destroy (): void {
-    this._container.removeEventListener('keydown', this._boundKeyBoardDownEvent)
-    window.removeEventListener('keydown', this._boundKeyBoardDownEvent)
+    if (this._flingScrollRequestId !== null) {
+      cancelAnimationFrame(this._flingScrollRequestId)
+      this._flingScrollRequestId = null
+    }
     this._event.destroy()
   }
 }

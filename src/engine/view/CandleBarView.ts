@@ -12,7 +12,6 @@ import ChildrenView from './ChildrenView'
 
 import { PaneIdConstants } from '../pane/types'
 import { getOrCreateRenderer, destroyRenderer, type BarRenderData } from '../common/CandleWebGLRenderer'
-import { getOrCreateWorkerRenderer, getWorkerRenderer, destroyWorkerRenderer } from '../common/CandleWorkerRenderer'
 import {
   getWebGPURenderer,
   getOrCreateWebGPURenderer
@@ -107,18 +106,12 @@ export default class CandleBarView extends ChildrenView {
       // First frame under WebGPU: destroy stale Worker/GL canvases to avoid DOM overlap.
       if (!this._webGPUActive) {
         this._webGPUActive = true
-        destroyWorkerRenderer(widget)
         destroyRenderer(widget)
       }
     } else {
-      // ── Worker renderer (OffscreenCanvas) ────────────────────────────────
-      let renderer = getWorkerRenderer(widget)
-      if (renderer === null) {
-        renderer = getOrCreateWorkerRenderer(widget, widget.getContainer())
-      }
-      mainWebGLRenderer = renderer === null ? getOrCreateRenderer(widget, widget.getContainer()) : null
-      if (renderer === null && mainWebGLRenderer === null) return false
-      activeRenderer = (renderer ?? mainWebGLRenderer)!
+      mainWebGLRenderer = getOrCreateRenderer(widget, widget.getContainer())
+      if (mainWebGLRenderer === null) return false
+      activeRenderer = mainWebGLRenderer
     }
 
     // Sync canvas size with the widget bounding box

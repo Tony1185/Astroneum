@@ -134,7 +134,7 @@ Astroneum is a charting-first trading product. The chart is the page; everything
 
 The aesthetic is **dense, precise, instrument-grade**. The operator is a chartist first and a trader second; the interface is built for someone who reads price action, draws levels, and fires orders from the same canvas. Density is allowed because the operator is fluent in this domain and wants to see more, not less. Identity is carried by precision (tabular numerics, hairline borders, exact spacing rhythm, a single accent used sparingly), not by decoration.
 
-**Mount model.** The chart pane is `<AstroneumChart>` from the `astroneum` npm package â€” a MIT-licensed, TV-class React charting library (Canvas2D / WebGL2, Web Workers, OPFS cache, `EventBus`, plugin system, subpath modules for replay/multichart/watchlist/portfolio/alerts/script/crypto datafeeds). Astroneum does NOT embed a TradingView widget; the `astroneum` library IS the chart engine. Everything around it (top bar, left toolbar, right rail, bottom panel, context menu, OHLC legend) is native Next.js chrome, styled to match the library's dark palette so the seam between `<AstroneumChart>` and chrome is invisible. The library is the chart; Astroneum chrome wraps it.
+**Mount model.** The chart pane is `<AstroneumChart>` from the `@tony01/astroneum` npm package â€” a MIT-licensed, TV-class React charting library (Canvas2D / WebGL2, Web Workers, OPFS cache, `EventBus`, plugin system, subpath modules for replay/multichart/watchlist/portfolio/alerts/script/crypto datafeeds). Astroneum does NOT embed a TradingView widget; the library IS the chart engine. Everything around it (top bar, left toolbar, right rail, bottom panel, context menu, OHLC legend) is native Next.js chrome, styled to match the library's dark palette so the seam between `<AstroneumChart>` and chrome is invisible. The library is the chart; Astroneum chrome wraps it.
 
 **Key Characteristics:**
 - Single accent (`#6366F1`, Cosmic Indigo) used on no more than 10% of any screen.
@@ -268,7 +268,7 @@ Each component ships `default`, `hover`, `focus-visible`, `active`, `disabled`, 
 
 ### Charts â€” `<AstroneumChart>` options
 
-The chart pane is `<AstroneumChart>` from the `astroneum` npm package. Configuration is via React props + instance methods, NOT widget config flags.
+The chart pane is `<AstroneumChart>` from the `@tony01/astroneum` npm package. Configuration is via React props + instance methods, NOT widget config flags.
 
 **Mount props** (from `astroneum` API):
 - `symbol: SymbolInfo` â€” ticker + precision + description
@@ -290,20 +290,20 @@ The chart pane is `<AstroneumChart>` from the `astroneum` npm package. Configura
 
 **EventBus** (`new EventBus<ChartEventMap>()`): `symbol-change`, `period-change`, `crosshair-move`, `zoom`, `data-load`, `tick`, `drawing-start`, `drawing-end`, `theme-change`.
 
-**Subpath modules**: `astroneum/replay` (`BarReplay`), `astroneum/multichart` (`MultiChartLayout`), `astroneum/watchlist` (`WatchlistManager`), `astroneum/portfolio` (`PortfolioTracker`), `astroneum/alerts` (`AlertManager`), `astroneum/script` (`ScriptEngine`), `astroneum/datafeeds/polygon`, `astroneum/datafeeds/crypto` (`createStandardCryptoDatafeed`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`).
+**Subpath modules**: `@tony01/astroneum/replay` (`BarReplay`), `@tony01/astroneum/multichart` (`MultiChartLayout`), `@tony01/astroneum/watchlist` (`WatchlistManager`), `@tony01/astroneum/portfolio` (`PortfolioTracker`), `@tony01/astroneum/alerts` (`AlertManager`), `@tony01/astroneum/script` (`ScriptEngine`), `@tony01/astroneum/datafeeds/polygon`, `@tony01/astroneum/datafeeds/crypto` (`createStandardCryptoDatafeed`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`).
 
 ### Context Menu (chart pane right-click) â€” see Â§11
 ### OHLC Legend (chart pane top-left overlay) â€” see Â§11
 
 ## 6. The AstroneumChart Mount
 
-The chart pane is `<AstroneumChart>` from the `astroneum` npm package. Astroneum does not embed a TradingView widget; the `astroneum` library IS the chart engine.
+The chart pane is `<AstroneumChart>` from the `@tony01/astroneum` npm package. Astroneum does not embed a TradingView widget; the Astroneum library IS the chart engine.
 
 ### Install
 ```bash
-pnpm add astroneum
+pnpm add @tony01/astroneum
 ```
-Declared in `/opt/astroneum/demo/package.json` as `"astroneum": "workspace:*"` (the `astroneum-demo-next` workspace package). Pre-v1.0 today; migrate root imports to subpath imports before v1.0 (root re-exports removed at v1.0 â€” see `astroneum` CHANGELOG). Astroneum is a SEPARATE project from Trading-Bot-V2 â€” do not declare the dependency in the Trading-Bot-V2 repo.
+Declared in `/opt/astroneum/demo/package.json` as `"@tony01/astroneum": "workspace:*"` (the `astroneum-demo-next` workspace package). Pre-v1.0 today; migrate root imports to subpath imports before v1.0 (root re-exports removed at v1.0 â€” see the Astroneum CHANGELOG). Astroneum is a SEPARATE project from Trading-Bot-V2 â€” do not declare the dependency in the Trading-Bot-V2 repo.
 
 ### Mount
 ```tsx
@@ -352,14 +352,14 @@ Subscribe to `EventBus` events so Astroneum chrome stays in sync with the chart.
 - Layout save/load -> `SaveLoadMenu` backed by `ChartTemplateManager`, using `serializeState()` / `loadState()` for named chart-state templates.
 
 ### Datafeed
-Use `astroneum/datafeeds/crypto` (`createStandardCryptoDatafeed` with `BinanceAdapter` / `BitgetAdapter` / `OkxAdapter`) for 100+ crypto symbols with real-time WebSocket. This is the default. The Astroneum demo app does NOT proxy through Trading-Bot-V2's `/api/binance` â€” the two projects are separate. For exchange keys / account-specific data, implement a custom `Datafeed` (`searchSymbols` / `getHistoryData` / `subscribe` / `unsubscribe`) inside `/opt/astroneum/demo/src/app/api/`.
+Use `@tony01/astroneum/datafeeds/crypto` (`createStandardCryptoDatafeed` with `BinanceAdapter` / `BitgetAdapter` / `OkxAdapter`) for 100+ crypto symbols with real-time WebSocket. This is the default. The Astroneum demo app does NOT proxy through Trading-Bot-V2's `/api/binance` â€” the two projects are separate. For exchange keys / account-specific data, implement a custom `Datafeed` (`searchSymbols` / `getHistoryData` / `subscribe` / `unsubscribe`) inside `/opt/astroneum/demo/src/app/api/`.
 
 ### Trading & Data Bridge
 The Astroneum demo app is **charting-first** â€” it does NOT have a trading API. The only existing API route is `/api/alerts/email` (in `/opt/astroneum/demo/src/app/api/alerts/`). Trading-Bot-V2's `/api/orders`, `/api/portfolio`, `/api/tv-positions`, `/api/webhooks/tradingview` are in a SEPARATE project and are NOT available to Astroneum.
 
 If trading integration is needed in a future version:
 - Build new API routes in `/opt/astroneum/demo/src/app/api/` (do not import from Trading-Bot-V2).
-- OR use `astroneum/portfolio`'s `PortfolioTracker` (`astroneum/portfolio` subpath) for read-only position/P&L display â€” but it is not an execution path.
+- OR use `@tony01/astroneum/portfolio`'s `PortfolioTracker` for read-only position/P&L display â€” but it is not an execution path.
 
 For v1, the Trading Panel tab in the bottom panel is charting-only (no order placement). The `OrderPanel` and `OpenPositions` components referenced in the original spec are Trading-Bot-V2's and are NOT reused â€” the demo app builds its own.
 
@@ -397,26 +397,26 @@ The keyboard is a first-class input. The terminal is operable without a mouse.
 - **Do** call `chartRef.current.setSymbol()` / `setPeriod()` on change. Do not reboot `<AstroneumChart>`.
 - **Do** clean up `EventBus` subscribers and `ChartPlugin` disposers on unmount.
 - **Do** keep Astroneum separate from Trading-Bot-V2. The demo app is charting-first; if trading is needed, build new API routes in `/opt/astroneum/demo/src/app/api/` â€” do not import from the Trading-Bot-V2 project.
-- **Do** use `astroneum/datafeeds/crypto` (`BinanceAdapter`) as the default datafeed.
+- **Do** use `@tony01/astroneum/datafeeds/crypto` (`BinanceAdapter`) as the default datafeed.
 - **Do** ship every interactive primitive with default, hover, focus-visible, active, disabled, loading, and error states.
 
 ### Don't:
-- **Don't** fork the `astroneum` package. Extend via props, `ChartPlugin`, `registerOverlay`, or `IndicatorPlugin`. If the library lacks a feature, file an issue or write a plugin â€” do not patch the source.
+- **Don't** fork the `@tony01/astroneum` package. Extend via props, `ChartPlugin`, `registerOverlay`, or `IndicatorPlugin`. If the library lacks a feature, file an issue or write a plugin â€” do not patch the source.
 - **Don't** embed a TradingView widget. The `astroneum` library IS the chart engine. Mixing TV-widget flags (`hide_top_toolbar`, `hide_legend`, `disable_native_context_menu`) is wrong â€” those flags do not exist on `<AstroneumChart>`.
 - **Don't** reboot `<AstroneumChart>` on symbol/interval change. Call the instance methods.
 - **Don't** use CryptoBot Console Blue (`#0A21C0`) anywhere in `/astroneum`. Different product, different accent.
 - **Don't** use `backdrop-filter: blur` on panels. Glass is reserved for the command-palette overlay.
 - **Don't** orchestrate page-entrance animations. Motion conveys state, not entry.
 - **Don't** rely on color alone for state. Always pair with sign, label, or icon.
-- **Don't** wire trading through `astroneum/portfolio`'s `PortfolioTracker` for execution. The demo app is charting-first; build new API routes in `/opt/astroneum/demo/src/app/api/` if trading is needed â€” do not import from Trading-Bot-V2.
+- **Don't** wire trading through `@tony01/astroneum/portfolio`'s `PortfolioTracker` for execution. The demo app is charting-first; build new API routes in `/opt/astroneum/demo/src/app/api/` if trading is needed â€” do not import from Trading-Bot-V2.
 
 ## 10. Project layout & components
 
-Astroneum is a **SEPARATE project** from Trading-Bot-V2. It lives at `/opt/astroneum/` on the server (served at `https://72.62.73.180/astroneum/` via nginx â†’ PM2 `astroneum-demo` on port 3002) and `C:\Users\Joooo\Desktop\Astroneum\` locally. The git remote is `github.com/kowito/astroneum` â€” a different repo from Trading-Bot-V2 (`github.com/Tony1185/trading-bot-v2.git`). Do not mix the two.
+Astroneum is a **SEPARATE project** from Trading-Bot-V2. It lives at `/opt/astroneum/` on the server (served at `https://72.62.73.180/astroneum/` via nginx â†’ PM2 `astroneum-demo` on port 3002) and `C:\Users\Joooo\Desktop\Astroneum\` locally. The product remote is `github.com/Tony1185/Astroneum`; its upstream lineage is `github.com/kowito/astroneum`. Do not mix it with Trading-Bot-V2.
 
 ### Structure
-- `/opt/astroneum/` â€” the `astroneum` charting library (npm package, `src/`, `dist/`, `package.json`).
-- `/opt/astroneum/demo/` â€” the `astroneum-demo-next` Next.js 15 app (workspace package, port 3002, the actual terminal served at `/astroneum/`). Dependencies: `astroneum: workspace:*`, `next`, `react@19`.
+- `/opt/astroneum/` â€” the `@tony01/astroneum` charting library (npm package, `src/`, `dist/`, `package.json`).
+- `/opt/astroneum/demo/` â€” the `astroneum-demo-next` Next.js 15 app (workspace package, port 3002, the actual terminal served at `/astroneum/`). Dependencies: `@tony01/astroneum: workspace:*`, `next`, `react@19`.
 - `/opt/astroneum/docs/` â€” engine docs (`api.md`, `datafeed-guide.md`, `plugin-development.md`) + this doc + `tv-functions-skill.md`.
 - `/opt/astroneum/demo/DESIGN.md` + `PRODUCT.md` â€” the demo app's own product/design docs (companion to this doc).
 
@@ -476,10 +476,10 @@ The following surfaces are explicitly **not** part of Astroneum v1. Some are sup
 
 | Surface | Library supports? | v1 status | Reason |
 |---|---|---|---|
-| Multi-chart layouts (2Ã—2, 3Ã—1 grid) | YES (`astroneum/multichart`) | Deferred to v1.1 | v1 ships single-pane; layout selector is a follow-up. |
+| Multi-chart layouts (2Ã—2, 3Ã—1 grid) | YES (`@tony01/astroneum/multichart`) | Deferred to v1.1 | v1 ships single-pane; layout selector is a follow-up. |
 | Compare / overlay / spread symbols | YES (README "Compare/Overlay") | Deferred to v1.1 | Native UX for it deferred. |
 | Indicator settings dialog (Inputs/Style/Visibility) | Partial (via `ChartPlugin`) | Deferred | Native modal out of scope; use `mainIndicators`/`subIndicators` props for v1. |
-| Full alerts flow (modal, log, drag-to-set) | YES (`astroneum/alerts` `AlertManager`) | Deferred to v1.1 | v1 ships the alerts button only; deep UX deferred. |
+| Full alerts flow (modal, log, drag-to-set) | YES (`@tony01/astroneum/alerts` `AlertManager`) | Deferred to v1.1 | v1 ships the alerts button only; deep UX deferred. |
 | Screener, Heatmaps, Calendars, News, Ideas/social | NO | v2-future | Separate products, not charting features. |
 | Broker OAuth connection | NO | v2-future | Astroneum is charting-first; no trading in v1. Build new API routes in `/opt/astroneum/demo/src/app/api/` if trading is needed. |
 | On-chart order dragging (drag SL/TP) | NO | v2-future | Needs `context-menu`/`drawing` event integration. |
@@ -489,7 +489,7 @@ The following surfaces are explicitly **not** part of Astroneum v1. Some are sup
 | Object tree / layers panel | NO | v2-future | Not required for v1 charting-first goal. |
 | Logo / brand mark lockup | n/a | separate design pass | Needs dedicated brand work. |
 
-**Moved OUT of deferred (now native via `astroneum` package):** multi-chart, compare/overlay, alerts, script editor (`astroneum/script` `ScriptEngine`), layouts (`serializeState`/`loadState` + `DrawingTemplates`), DOM â€” all library-supported. They remain v1-deferred at the APP surface level (v1.1 follow-up), not blocked on the library.
+**Moved OUT of deferred (now native via `@tony01/astroneum` package):** multi-chart, compare/overlay, alerts, script editor (`@tony01/astroneum/script` `ScriptEngine`), layouts (`serializeState`/`loadState` + `DrawingTemplates`), DOM â€” all library-supported. They remain v1-deferred at the APP surface level (v1.1 follow-up), not blocked on the library.
 
 ## 13. Reference Workspace Contract
 

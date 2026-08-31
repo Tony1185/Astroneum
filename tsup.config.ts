@@ -10,6 +10,7 @@ const srcDir = fileURLToPath(new URL('./src', import.meta.url))
 export default defineConfig({
   entry: [
     'src/index.ts',
+    'src/entries/headless.ts',
     'src/entries/replay.ts',
     'src/entries/multichart.ts',
     'src/entries/watchlist.ts',

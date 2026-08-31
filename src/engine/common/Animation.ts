@@ -5,6 +5,7 @@ import { requestAnimationFrame } from './utils/compatible'
 import { merge } from './utils/typeChecks'
 
 type AnimationDoFrameCallback = (frameTime: number) => void
+type AnimationFinishCallback = () => void
 
 interface AnimationOptions {
   duration: number
@@ -15,6 +16,7 @@ export default class Animation {
   private readonly _options = { duration: 500, iterationCount: 1 }
 
   private _doFrameCallback: Nullable<AnimationDoFrameCallback>
+  private _finishCallback: Nullable<AnimationFinishCallback>
 
   private _currentIterationCount = 0
   private _running = false
@@ -50,6 +52,11 @@ export default class Animation {
     return this
   }
 
+  onFinish (callback: AnimationFinishCallback): this {
+    this._finishCallback = callback
+    return this
+  }
+
   setDuration (duration: number): this {
     this._options.duration = duration
     return this
@@ -68,9 +75,15 @@ export default class Animation {
   }
 
   stop (): void {
-    if (this._running) {
-      this._doFrameCallback?.(this._options.duration)
-    }
+    if (!this._running) return
+    this._doFrameCallback?.(this._options.duration)
     this._running = false
+    this._finishCallback?.()
+  }
+
+  cancel (): void {
+    if (!this._running) return
+    this._running = false
+    this._finishCallback?.()
   }
 }

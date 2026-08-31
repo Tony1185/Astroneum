@@ -12,6 +12,77 @@ or connect to brokers.
 of `{ index, action: 'enter' | 'exit', side?: 'long' | 'short' }`. Its runner
 uses the same `runBacktest` core. It is not Pine-compatible `strategy.*`.
 
+## Headless engine
+
+The supported `@tony01/astroneum/headless` entry exposes the chart renderer
+without React, native Astroneum UI, stylesheets, datafeeds, keyboard shortcuts,
+or implicit network behavior.
+
+```typescript
+import {
+  asPrice,
+  asTimestamp,
+  createChart,
+  destroyChart,
+  registerBuiltInExtensions,
+} from '@tony01/astroneum/headless'
+
+registerBuiltInExtensions()
+const chart = createChart(container, { timezone: 'UTC', styles: 'dark' })
+
+chart.replaceBars([{
+  timestamp: asTimestamp(1_788_000_000_000),
+  open: asPrice(100),
+  high: asPrice(105),
+  low: asPrice(98),
+  close: asPrice(103),
+}])
+
+chart.updateBar({
+  timestamp: asTimestamp(1_788_000_060_000),
+  open: asPrice(103),
+  high: asPrice(106),
+  low: asPrice(102),
+  close: asPrice(104),
+})
+
+destroyChart(chart)
+```
+
+`createChart(container, options?)` owns one chart per supplied element. A second
+call for the same element is idempotent and returns the existing instance;
+options from the duplicate call are ignored. A container marked by another
+Astroneum module instance fails visibly rather than mounting duplicate DOM.
+`destroyChart(chartOrContainer)` is idempotent and releases all registry ownership.
+
+`replaceBars(bars)` validates the full input before mutation and requires finite,
+internally consistent OHLCV values with unique, strictly ascending safe-integer
+UTC-millisecond timestamps. `updateBar(bar)` accepts only the current last
+timestamp or a newer timestamp. Both methods copy accepted data, reject rather
+than repair invalid input, and switch the chart to host-owned data by detaching
+any explicitly configured engine loader. `getBars()` returns a copy.
+
+`HeadlessChart` also exposes viewport, coordinate conversion, pane, indicator,
+overlay, event, and resize primitives. `getViewportState()` returns the JSON-safe
+version-1 shape `{ version, barSpace, rightOffsetBarCount }`.
+`setViewportState()` accepts only version 1, finite bar spacing from 1 through 50,
+and a finite right-offset bar count; the offset is clamped to the current bars and
+container geometry. Apply recovery state after bars load. It is engine recovery
+data, not semantic chart state.
+
+Optional built-in indicators and drawings use process-wide registries and are
+installed only after `registerBuiltInExtensions()` is called. The headless entry
+also exports typed `registerIndicatorPlugin()` helpers plus raw
+`registerIndicator()` and `registerOverlay()` primitives for host-owned outputs.
+Browser coverage carries 16 study series and 16 overlay instances. Screenshot
+export composites ordered Canvas2D and accelerated canvas layers; browser pixel
+coverage verifies output dimensions and candle pixels from the accelerated layer.
+
+`HEADLESS_CAPABILITIES` is the immutable version-1 runtime capability manifest.
+The entry imports safely when browser globals are absent and does not require the
+package stylesheet. Destroy cancels active chart animations, unsubscribes an
+explicit loader, and rejects late loader callbacks before they mutate state.
+
 ## Constructor
 
 ```typescript
@@ -199,16 +270,17 @@ consumer can pull in just what they need.
 
 | Subpath | Exports |
 | --- | --- |
-| `astroneum/replay` | `BarReplay`, types `BarReplayOptions`, `BarReplayState` |
-| `astroneum/multichart` | `MultiChartLayout`, types `MultiChartCount`, `MultiChartSlot`, `MultiChartLayoutOptions` |
-| `astroneum/watchlist` | `WatchlistManager`, types `Watchlist`, `WatchSymbol`, `WatchlistColumn`, `WatchlistSort`, `WatchlistSortDirection` |
-| `astroneum/portfolio` | `PortfolioTracker`, types `Position`, `PositionSide`, `PnLResult` |
-| `astroneum/alerts` | `AlertManager`, full alert type surface |
-| `astroneum/script` | `ScriptEngine`, types `CompiledIndicator`, `StudyOptions`, `PlotOptions`, `InputOptions` |
-| `astroneum/datafeeds/polygon` | `DefaultDatafeed`, `WebSocketDatafeed`, `WebSocketDatafeedOptions` |
-| `astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed`, `StandardCryptoDatafeed`, `STANDARD_CRYPTO_SYMBOLS`, `DATAFEED_ERROR_EVENT`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`, plus types |
+| `@tony01/astroneum/headless` | `createChart`, `destroyChart`, `registerBuiltInExtensions`, `HEADLESS_CAPABILITIES`, registration/query helpers, branded bar types, engine host types |
+| `@tony01/astroneum/replay` | `BarReplay`, types `BarReplayOptions`, `BarReplayState` |
+| `@tony01/astroneum/multichart` | `MultiChartLayout`, types `MultiChartCount`, `MultiChartSlot`, `MultiChartLayoutOptions` |
+| `@tony01/astroneum/watchlist` | `WatchlistManager`, types `Watchlist`, `WatchSymbol`, `WatchlistColumn`, `WatchlistSort`, `WatchlistSortDirection` |
+| `@tony01/astroneum/portfolio` | `PortfolioTracker`, types `Position`, `PositionSide`, `PnLResult` |
+| `@tony01/astroneum/alerts` | `AlertManager`, full alert type surface |
+| `@tony01/astroneum/script` | `ScriptEngine`, types `CompiledIndicator`, `StudyOptions`, `PlotOptions`, `InputOptions` |
+| `@tony01/astroneum/datafeeds/polygon` | `DefaultDatafeed`, `WebSocketDatafeed`, `WebSocketDatafeedOptions` |
+| `@tony01/astroneum/datafeeds/crypto` | `createStandardCryptoDatafeed`, `StandardCryptoDatafeed`, `STANDARD_CRYPTO_SYMBOLS`, `DATAFEED_ERROR_EVENT`, `BinanceAdapter`, `BitgetAdapter`, `OkxAdapter`, plus types |
 
-All listed symbols also re-export from the root `astroneum` entry today,
+All listed symbols also re-export from the root `@tony01/astroneum` entry today,
 but the root re-exports for these modules will be removed in **v1.0**
 (see the [Roadmap](../README.md#v10--stability)). Migrate to the subpath
 import to be forward-compatible.
@@ -469,7 +541,7 @@ interface IndicatorPlugin<TOutput> {
 }
 ```
 
-Implement this interface to register a custom typed indicator.  
+Implement this interface to register a custom typed indicator.
 Use `render2D` for lightweight overlays (< 10k points) and `renderGL` for high-density or GPU-accelerated rendering.
 When `renderGL` is present, Astroneum executes it on a dedicated WebGL2 layer and reuses a per-indicator `vbo`.
 If WebGL2 is unavailable, `render2D` is used as fallback when available.

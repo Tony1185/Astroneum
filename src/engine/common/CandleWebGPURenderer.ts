@@ -210,6 +210,8 @@ async function _checkGpuSupport(): Promise<boolean> {
 
 // ── Per-widget factory (same pattern as CandleWebGLRenderer) ─────────────────
 const _renderers = new WeakMap<object, CandleWebGPURenderer>()
+const _rendererPromises = new WeakMap<object, Promise<CandleWebGPURenderer | null>>()
+const _destroyedRendererKeys = new WeakSet<object>()
 
 export function getWebGPURenderer(key: object): CandleWebGPURenderer | null {
   return _renderers.get(key) ?? null
@@ -219,18 +221,27 @@ export async function getOrCreateWebGPURenderer(
   key: object,
   container: HTMLElement
 ): Promise<CandleWebGPURenderer | null> {
+  if (_destroyedRendererKeys.has(key)) return null
   const existing = _renderers.get(key)
   if (existing !== undefined) return existing
-  try {
-    const renderer = await CandleWebGPURenderer.create(container)
+  const pending = _rendererPromises.get(key)
+  if (pending !== undefined) return pending
+  const promise = CandleWebGPURenderer.create(container).then(renderer => {
+    if (_destroyedRendererKeys.has(key)) {
+      renderer.destroy()
+      return null
+    }
     _renderers.set(key, renderer)
     return renderer
-  } catch {
-    return null
-  }
+  }).catch(() => null).finally(() => {
+    _rendererPromises.delete(key)
+  })
+  _rendererPromises.set(key, promise)
+  return promise
 }
 
 export function destroyWebGPURenderer(key: object): void {
+  _destroyedRendererKeys.add(key)
   const r = _renderers.get(key)
   if (r !== undefined) {
     r.destroy()
@@ -277,8 +288,9 @@ export class CandleWebGPURenderer {
   private readonly _singleBarF32 = new Float32Array(this._singleBarBuf)
   private readonly _singleBarU8 = new Uint8Array(this._singleBarBuf)
 
-  // Pre-allocated uniform data — avoids a new Float32Array every draw() call.
-  private readonly _uniformData = new Float32Array(UBO_SIZE / 4)
+  private readonly _uniformData = new ArrayBuffer(UBO_SIZE)
+  private readonly _uniformF32 = new Float32Array(this._uniformData)
+  private readonly _uniformU32 = new Uint32Array(this._uniformData)
 
   // Color parse cache
   private readonly _colorCache = new Map<string, readonly [number, number, number, number]>()
@@ -373,6 +385,8 @@ export class CandleWebGPURenderer {
     const canvas = document.createElement('canvas')
     canvas.style.cssText = 'position:absolute;top:0;left:0;z-index:1;pointer-events:none;'
     container.appendChild(canvas)
+    let uniformBuffer: GPUBuffer | null = null
+    try {
 
     const gpuCtx = canvas.getContext('webgpu') as GPUCanvasContext | null
     if (gpuCtx === null) throw new Error('[CandleWebGPURenderer] Cannot get WebGPU canvas context')
@@ -385,7 +399,7 @@ export class CandleWebGPURenderer {
     })
 
     // Uniform buffer
-    const uniformBuffer = device.createBuffer({
+    uniformBuffer = device.createBuffer({
       size: UBO_SIZE,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
     })
@@ -445,6 +459,11 @@ export class CandleWebGPURenderer {
     })
 
     return new CandleWebGPURenderer(canvas, gpuCtx, device, pipeline, uniformBuffer, uniformBindGroup)
+    } catch (error) {
+      uniformBuffer?.destroy()
+      canvas.remove()
+      throw error
+    }
   }
 
   // ── Capability check ──────────────────────────────────────────────────────
@@ -578,39 +597,16 @@ export class CandleWebGPURenderer {
     this._barCount = visibleBarCount
     if (visibleBarCount === 0) {
       this._fingerprintBarCount = 0
+      this._clear()
       return
     }
 
     const firstBar = bars[0]
     const lastBar = bars[visibleBarCount - 1]
 
-    // O(1) fingerprint — identical to WebGL path
-    if (
-      visibleBarCount === this._fingerprintBarCount &&
-      firstBar.centerX === this._fingerprintFirstX &&
-      lastBar.centerX === this._fingerprintLastX &&
-      lastBar.close === this._fingerprintLastClose &&
-      lastBar.bodyColor === this._fingerprintLastBodyColor
-    ) return
-
     const currentBarStep = visibleBarCount >= 2
       ? bars[1].centerX - firstBar.centerX
       : this._fingerprintBarStep
-    // Pure pan → update only pan offset uniform
-    if (
-      visibleBarCount === this._fingerprintBarCount &&
-      lastBar.close === this._fingerprintLastClose &&
-      lastBar.bodyColor === this._fingerprintLastBodyColor &&
-      firstBar.open === this._fingerprintFirstOpen &&
-      firstBar.close === this._fingerprintFirstClose &&
-      currentBarStep === this._fingerprintBarStep
-    ) {
-      this._panOffsetCss += firstBar.centerX - this._fingerprintFirstX
-      this._fingerprintFirstX = firstBar.centerX
-      this._fingerprintLastX = lastBar.centerX
-      this._vboVersion++
-      return
-    }
 
     // Full re-upload
     this._panOffsetCss = 0
@@ -667,6 +663,21 @@ export class CandleWebGPURenderer {
     this._vboVersion++
   }
 
+  private _clear(): void {
+    const commandEncoder = this._device.createCommandEncoder()
+    const renderPass = commandEncoder.beginRenderPass({
+      colorAttachments: [{
+        view: this._context.getCurrentTexture().createView(),
+        loadOp: 'clear',
+        clearValue: { r: 0, g: 0, b: 0, a: 0 },
+        storeOp: 'store'
+      }]
+    })
+    renderPass.end()
+    this._device.queue.submit([commandEncoder.finish()])
+    this._drawnVersion = this._vboVersion
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   draw(
@@ -699,16 +710,15 @@ export class CandleWebGPURenderer {
     const pw = this._canvas.width
     const ph = this._canvas.height
 
-    // Write uniform buffer (float32 layout matching the WGSL struct)
-    this._uniformData[0] = priceFrom
-    this._uniformData[1] = priceRange
-    this._uniformData[2] = pw
-    this._uniformData[3] = ph
-    this._uniformData[4] = pr
-    this._uniformData[5] = barHalfWidth
-    this._uniformData[6] = renderMode as unknown as number  // reinterpreted as u32 in WGSL
-    this._uniformData[7] = ohlcHalfSize
-    this._uniformData[8] = this._panOffsetCss
+    this._uniformF32[0] = priceFrom
+    this._uniformF32[1] = priceRange
+    this._uniformF32[2] = pw
+    this._uniformF32[3] = ph
+    this._uniformF32[4] = pr
+    this._uniformF32[5] = barHalfWidth
+    this._uniformU32[6] = renderMode
+    this._uniformF32[7] = ohlcHalfSize
+    this._uniformF32[8] = this._panOffsetCss
     this._device.queue.writeBuffer(this._uniformBuffer, 0, this._uniformData)
 
     // P2-A: Use render bundle on VBO-clean frames (uniforms still uploaded above).

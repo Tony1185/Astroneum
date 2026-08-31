@@ -8,6 +8,7 @@ import type DeepPartial from './common/DeepPartial'
 import type Coordinate from './common/Coordinate'
 import type Bounding from './common/Bounding'
 import type { CandleData } from './common/Data'
+import ChartRegistry from './ChartRegistry'
 
 import { logError, logTag, logWarn } from './common/utils/logger'
 
@@ -47,15 +48,14 @@ import { checkCoordinateOnRect } from './extension/figure/rect'
 import { checkCoordinateOnText, type TextAttrs } from './extension/figure/text'
 
 import { registerFigure, getSupportedFigures, getFigureClass } from './extension/figure/index'
-import { registerIndicator, getSupportedIndicators } from './extension/indicator/index'
+import { registerBuiltInIndicators, registerIndicator, getSupportedIndicators } from './extension/indicator/index'
 import { registerLocale, getSupportedLocales } from './extension/i18n/index'
-import { registerOverlay, getOverlayClass, getSupportedOverlays } from './extension/overlay/index'
+import { registerBuiltInOverlays, registerOverlay, getOverlayClass, getSupportedOverlays } from './extension/overlay/index'
 import { registerStyles } from './extension/styles/index'
 import { registerXAxis } from './extension/x-axis'
 import { registerYAxis } from './extension/y-axis'
 
-const charts = new Map<string, ChartImp>()
-let chartBaseId = 1
+const charts = new ChartRegistry<ChartImp>()
 
 /**
  * Chart version
@@ -75,7 +75,7 @@ function init (ds: HTMLElement | string, options?: Options): Nullable<Chart> {
   if (!_tagLogged) { _tagLogged = true; logTag() }
   let dom: Nullable<HTMLElement> = null
   if (isString(ds)) {
-    dom = document.getElementById(ds)
+    dom = typeof document === 'undefined' ? null : document.getElementById(ds)
   } else {
     dom = ds
   }
@@ -83,17 +83,20 @@ function init (ds: HTMLElement | string, options?: Options): Nullable<Chart> {
     logError('', '', 'The chart cannot be initialized correctly. Please check the parameters. The chart container cannot be null and child elements need to be added!!!')
     return null
   }
-  let chart = charts.get(dom.id)
-  if (isValid(chart)) {
-    logWarn('', '', 'The chart has been initialized on the dom！！！')
+  const result = charts.getOrCreate(dom, id => {
+    const chart = new ChartImp(dom, options)
+    chart.id = id
     return chart
+  })
+  if (result === null) {
+    logError('', '', 'The chart container is already owned by another chart registry.')
+    return null
   }
-  const id = `k_line_chart_${chartBaseId++}`
-  chart = new ChartImp(dom, options)
-  chart.id = id
-  dom.setAttribute('k-line-chart-id', id)
-  charts.set(id, chart)
-  return chart
+  if (!result.created) {
+    logWarn('', '', 'The chart has been initialized on the dom！！！')
+    return result.chart
+  }
+  return result.chart
 }
 
 /**
@@ -101,21 +104,18 @@ function init (ds: HTMLElement | string, options?: Options): Nullable<Chart> {
  * @param dcs
  */
 function dispose (dcs: HTMLElement | Chart | string): void {
-  let id: Nullable<string> = null
   if (dcs instanceof ChartImp) {
-    id = dcs.id
+    charts.dispose(dcs)
   } else {
     let dom: Nullable<HTMLElement> = null
     if (isString(dcs)) {
-      dom = document.getElementById(dcs)
+      dom = typeof document === 'undefined' ? null : document.getElementById(dcs)
     } else {
       dom = dcs as HTMLElement
     }
-    id = dom?.getAttribute('k-line-chart-id') ?? null
-  }
-  if (id !== null) {
-    charts.get(id)?.destroy()
-    charts.delete(id)
+    if (dom !== null) {
+      charts.dispose(dom)
+    }
   }
 }
 
@@ -150,8 +150,8 @@ const utils = {
 export {
   version, init, dispose,
   registerFigure, getSupportedFigures, getFigureClass,
-  registerIndicator, getSupportedIndicators,
-  registerOverlay, getSupportedOverlays, getOverlayClass,
+  registerBuiltInIndicators, registerIndicator, getSupportedIndicators,
+  registerBuiltInOverlays, registerOverlay, getSupportedOverlays, getOverlayClass,
   registerLocale, getSupportedLocales,
   registerStyles,
   registerXAxis, registerYAxis,

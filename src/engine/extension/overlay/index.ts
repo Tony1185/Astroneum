@@ -30,9 +30,15 @@ const extensions = [
   simpleAnnotation, simpleTag
 ]
 
-extensions.forEach((template: OverlayTemplate) => {
-  overlays[template.name] = OverlayImp.extend(template)
-})
+let builtInsRegistered = false
+
+function registerBuiltInOverlays (): void {
+  if (builtInsRegistered) return
+  extensions.forEach((template: OverlayTemplate) => {
+    overlays[template.name] = OverlayImp.extend(template)
+  })
+  builtInsRegistered = true
+}
 
 function registerOverlay<E = unknown> (template: OverlayTemplate<E>): void {
   overlays[template.name] = OverlayImp.extend(template)
@@ -50,4 +56,4 @@ function getSupportedOverlays (): string[] {
   return Object.keys(overlays)
 }
 
-export { registerOverlay, getOverlayClass, getOverlayInnerClass, getSupportedOverlays }
+export { registerBuiltInOverlays, registerOverlay, getOverlayClass, getOverlayInnerClass, getSupportedOverlays }

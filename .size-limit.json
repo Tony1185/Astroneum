@@ -6,6 +6,13 @@
     "ignore": ["react", "react-dom"]
   },
   {
+    "name": "astroneum/headless",
+    "path": "dist/entries/headless.js",
+    "import": "*",
+    "limit": "80 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
     "name": "astroneum/replay",
     "path": "dist/entries/replay.js",
     "limit": "15 KB",

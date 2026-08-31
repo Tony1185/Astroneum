@@ -35,7 +35,6 @@ Read the relevant doc **before building**. These are wired as `@references` in o
 | `@indicator-parity` | `INDICATOR_COMPARISON.md` | 50/50 indicator parity table (Astroneum vs TradingView Pro) |
 | `@demo-design` | `demo/DESIGN.md` | Demo app design system — tokens, component specs, terminal layout |
 | `@demo-product` | `demo/PRODUCT.md` | Product framing — users, brand voice, anti-references ("no AI slop"), design principles |
-| `@tv-reference` | `tv-mirror-reference/README.md` | Read-only behavioral evidence — never implementation source or shipped asset |
 
 ## No TradingView-MCP
 

@@ -32,7 +32,7 @@ Examples of unacceptable behavior:
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the project maintainer via the email address listed on the
-[npm package page](https://www.npmjs.com/package/astroneum). All complaints
+[npm package page](https://www.npmjs.com/package/@tony01/astroneum). All complaints
 will be reviewed and investigated promptly and fairly.
 
 Maintainers are obligated to respect the privacy and security of the

@@ -16,11 +16,11 @@ security fixes. Pin to a specific minor in production and read the
 **Please do not file public GitHub issues for security bugs.**
 
 Email the maintainer at the address listed on the
-[npm package page](https://www.npmjs.com/package/astroneum) with:
+[npm package page](https://www.npmjs.com/package/@tony01/astroneum) with:
 
 - A description of the issue and its impact.
 - A minimal reproduction (code snippet, sample input, or a private repo).
-- The affected `astroneum` version(s) and browser(s).
+- The affected `@tony01/astroneum` version(s) and browser(s).
 - Any suggested mitigation.
 
 You should expect an acknowledgement within **5 business days** and a

@@ -38,6 +38,7 @@ export default class Canvas {
   private _nextPixelHeight = 0
 
   private _requestAnimationId = DEFAULT_REQUEST_ID
+  private _destroyed = false
 
   private readonly _mediaQueryListener: () => void = () => {
     const pixelRatio = getPixelRatio(this._element)
@@ -51,6 +52,7 @@ export default class Canvas {
     this._element = createDom('canvas', style)
     this._ctx = this._element.getContext('2d')!
     isSupportedDevicePixelContentBox().then(result => {
+      if (this._destroyed) return
       this._supportedDevicePixelContentBox = result
       if (result) {
         this._resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
@@ -90,8 +92,10 @@ export default class Canvas {
   }
 
   private _executeListener (fn?: () => void): void {
+    if (this._destroyed) return
     if (this._requestAnimationId === DEFAULT_REQUEST_ID) {
       this._requestAnimationId = requestAnimationFrame(() => {
+        if (this._destroyed) return
         this._ctx.clearRect(0, 0, this._width, this._height)
         fn?.()
         this._listener()
@@ -124,8 +128,14 @@ export default class Canvas {
   }
 
   destroy (): void {
+    if (this._destroyed) return
+    this._destroyed = true
+    if (this._requestAnimationId !== DEFAULT_REQUEST_ID) {
+      cancelAnimationFrame(this._requestAnimationId)
+      this._requestAnimationId = DEFAULT_REQUEST_ID
+    }
     if (isValid(this._resizeObserver)) {
-      this._resizeObserver.unobserve(this._element)
+      this._resizeObserver.disconnect()
     }
     if (isValid(this._mediaQueryList)) {
       // eslint-disable-next-line @typescript-eslint/no-deprecated -- ignore

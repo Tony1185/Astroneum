@@ -2,14 +2,14 @@
 
 > Living reference for the Astroneum project deployed at **https://72.62.73.180/astroneum/**.
 > Documents *what lives where*. For design rationale see `docs/design-astroneum.md`.
-> Last updated: **2026-07-12**. Keep this file in sync on every structural change (see §11).
+> Last updated: **2026-08-29**. Keep this file in sync on every structural change (see §11).
 
 ## 1. Overview
 
 | | |
 |---|---|
 | Name | `astroneum` |
-| Version | `0.4.1-beta.2` |
+| Version | `0.4.1-beta.22` |
 | Description | Professional financial charting library, ready out of the box |
 | License | MIT (author `kowito`, repo `github.com/kowito/astroneum`) |
 | Stack | TypeScript · React 18/19 peer · ESM-only · Canvas + WebGL/WebGPU · tsup · pnpm |
@@ -60,7 +60,7 @@ Root files: `index.ts` (public barrel), `types.ts`, `utils.ts`, `constants.ts`, 
 Each is a `index.tsx` + `index.scss` pair: `button`, `checkbox`, `dropdown`, `empty`, `input`, `list`, `loading`, `modal`, `select`, `switch`. Root `index.tsx` + `index.scss` barrel.
 
 ### 3.3 `engine/` — rendering core
-Root: `Chart.ts`, `Event.ts`, `Options.ts`, `Store.ts`, `index.ts`.
+Root: `Chart.ts`, `ChartRegistry.ts`, `Event.ts`, `Options.ts`, `Store.ts`, `index.ts`.
 - `common/` (~45 modules) — renderers & primitives: `Canvas`, `WebGLCanvas`, `SharedIndicatorGLCanvas`, `CandleWebGLRenderer`, `CandleWebGPURenderer`, `CandleWorkerRenderer`, `IndicatorLineWebGLRenderer`, `IndicatorPluginWebGLRenderer`, `IndicatorRectWebGLRenderer`, `TextWebGLRenderer`, `GlyphAtlas`, `candleShaders.ts`; data/coord: `Data`, `DataLoader`, `SymbolInfo`, `Period`, `VisibleRange`, `BarSpace`, `Bounding`, `Coordinate`, `Point`; interaction: `Crosshair`, `EventHandler`, `Eventful`, `Action`, `Animation`, `TickAnimator`, `TaskScheduler`, `Updater`; buffers: `RingBuffer`, `SabRingBuffer`; styling/types: `Styles`, `Nullable`, `DeepPartial`, `DeepRequired`, `PickPartial`, `PickRequired`, `ExcludePickPartial`; `utils/`.
 - `component/` — engine-level components: `Axis`, `XAxis`, `YAxis`, `Figure`, `Indicator`, `Overlay`.
 - `pane/` — `Pane`, `CandlePane`, `IndicatorPane`, `DrawPane`, `SeparatorPane`, `XAxisPane`, `types.ts`.
@@ -76,7 +76,7 @@ Each `index.tsx` + `index.scss` (some with `data.ts`/`types.ts`/`icons/`): `aler
 `DefaultDatafeed.ts`, `StandardCryptoDatafeed.ts` (Binance/Bitget/OKX USDT history, streams, and batched quote snapshots), `WebSocketDatafeed.ts`, `WebTransportDatafeed.ts`, `OPFSCache.ts` (off-thread cache), `codec/BarsCodec.ts`, `index.ts`.
 
 ### 3.6 `entries/` — subpath entry bundles
-`replay.ts`, `multichart.ts`, `watchlist.ts`, `portfolio.ts`, `alerts.ts`, `script.ts`, `datafeeds/polygon.ts`, `datafeeds/crypto.ts`. (Mirror the `exports` map in §4.)
+`headless.ts`, `replay.ts`, `multichart.ts`, `watchlist.ts`, `workspace.ts`, `portfolio.ts`, `alerts.ts`, `script.ts`, `datafeeds/polygon.ts`, `datafeeds/crypto.ts`. (Mirror the `exports` map in §4.)
 
 ### 3.7 `extension/` — drawing tools (32 + utils + index)
 `abcd`, `xabcd`, `arrow`, `circle`, `rect`, `triangle`, `parallelogram`, `pitchfork`, `measure`, `waves`, `gannBox`, `gannFan`, `fibonacciCircle`, `fibonacciExtension`, `fibonacciSegment`, `fibonacciSpeedResistanceFan`, `fibonacciSpiral`, `longPosition`, `shortPosition`, `positionForecast`, `barsPattern`, `ghostFeed`, `sector`, `anchoredVwap`, `fixedRangeVolumeProfile`, `anchoredVolumeProfile`, `priceRange`, `dateRange`, `dateAndPriceRange`; `utils.ts`, `index.ts`.
@@ -92,38 +92,39 @@ Each `index.tsx` + `index.scss` (some with `data.ts`/`types.ts`/`icons/`): `aler
 `ar-SA, de-DE, en-US, es-ES, fr-FR, hi-IN, id-ID, it-IT, ja-JP, ko-KR, nl-NL, pl-PL, pt-BR, ru-RU, th-TH, tr-TR, vi-VN, zh-CN`.
 
 ### 3.12 Misc
-- `plugin/index.ts` — plugin API surface.
+- `plugin/index.ts` — plugin API surface; `plugin/types.ts` keeps study-plugin contracts independent of React declarations.
 - `jsx/` — `jsx-runtime.ts`, `jsx-dev-runtime.ts` (custom JSX runtime; tsconfig `jsxImportSource: @/jsx`).
 - `styles/` — `base.scss`, `index.scss` (built to `dist/astroneum.css`).
 - `assets/` — `logo.svg`, `iconfonts/{fonts, style.css}`.
-- `__tests__/` — `adjustFromTo`, `datafeed-contract`, `persistence`, `plugin`, `script-engine`, `ssr-smoke`, `strategy`, `utils`, `watchlist` (`.test.ts`), + `perf/`.
+- `__tests__/` — `adjustFromTo`, `datafeed-contract`, `headless-bars`, `headless-lifecycle`, `headless-package`, `persistence`, `plugin`, `script-engine`, `ssr-smoke`, `strategy`, `utils`, `watchlist` (`.test.ts`), + `perf/`.
 
 ## 4. Public API surface (`package.json` `exports`)
 
 | Subpath | Dist target |
 |---|---|
-| `astroneum` (`.`) | `dist/index.js` |
-| `astroneum/replay` | `dist/entries/replay.js` |
-| `astroneum/multichart` | `dist/entries/multichart.js` |
-| `astroneum/watchlist` | `dist/entries/watchlist.js` |
-| `astroneum/portfolio` | `dist/entries/portfolio.js` |
-| `astroneum/alerts` | `dist/entries/alerts.js` |
-| `astroneum/script` | `dist/entries/script.js` |
-| `astroneum/datafeeds/polygon` | `dist/entries/datafeeds/polygon.js` |
-| `astroneum/datafeeds/crypto` | `dist/entries/datafeeds/crypto.js` |
-| `astroneum/style.css` | `dist/astroneum.css` |
-| `astroneum/package.json` | `./package.json` |
+| `@tony01/astroneum` (`.`) | `dist/index.js` |
+| `@tony01/astroneum/headless` | `dist/entries/headless.js` |
+| `@tony01/astroneum/replay` | `dist/entries/replay.js` |
+| `@tony01/astroneum/multichart` | `dist/entries/multichart.js` |
+| `@tony01/astroneum/watchlist` | `dist/entries/watchlist.js` |
+| `@tony01/astroneum/portfolio` | `dist/entries/portfolio.js` |
+| `@tony01/astroneum/alerts` | `dist/entries/alerts.js` |
+| `@tony01/astroneum/script` | `dist/entries/script.js` |
+| `@tony01/astroneum/datafeeds/polygon` | `dist/entries/datafeeds/polygon.js` |
+| `@tony01/astroneum/datafeeds/crypto` | `dist/entries/datafeeds/crypto.js` |
+| `@tony01/astroneum/style.css` | `dist/astroneum.css` |
+| `@tony01/astroneum/package.json` | `./package.json` |
 
-tsup entries (single source of truth for the above): `src/index.ts` + the 8 `src/entries/**` files. All entries ship with `.d.ts`. esbuild strips `'use client'`; `tsup.onSuccess` re-injects it into every emitted `.js` so Next.js App Router treats each entry as a Client Module.
+tsup entries (single source of truth for the above): `src/index.ts` + the 10 `src/entries/**` files. All entries ship with `.d.ts`. esbuild strips `'use client'`; `tsup.onSuccess` re-injects it into every emitted `.js` so Next.js App Router treats each entry as a Client Module. The headless entry is SSR-import safe, has no React/native-UI/datafeed dependency, requires no stylesheet, installs optional indicator/drawing built-ins only through an explicit call, and exposes React-independent typed study plus bounded viewport-recovery contracts.
 
 `peerDependencies`: `react` / `react-dom` `^18 || ^19`. `engines.node`: `>=18`.
 
 ## 5. Demo app (`demo/` — `astroneum-demo-next`)
 
-Next.js 15 + React 19 showcase. Private workspace package, depends on `astroneum: workspace:*`.
+Next.js 15 + React 19 showcase. Private workspace package, depends on `@tony01/astroneum: workspace:*`.
 
-- `package.json` — scripts: `dev`, `build`, `start` (= `next start -p 3002`). Deps: `next ^15.3.1`, `react ^19.2`, `astroneum workspace:*`.
-- `next.config.ts` — `transpilePackages: ['astroneum']`, `basePath: NEXT_PUBLIC_BASE_PATH` (=`/astroneum` in prod), `trailingSlash: true`, `outputFileTracingRoot: ../`.
+- `package.json` — scripts: `dev`, `build`, `start` (= `next start -p 3002`). Deps: `next ^15.3.1`, `react ^19.2`, `@tony01/astroneum workspace:*`.
+- `next.config.ts` — `transpilePackages: ['@tony01/astroneum']`, `basePath: NEXT_PUBLIC_BASE_PATH` (=`/astroneum` in prod), `trailingSlash: true`, `outputFileTracingRoot: ../`.
 - `src/app/` routes (App Router):
   - `layout.tsx`, `page.tsx`, `globals.css`
   - `_components/alerts/` — `AlertDialog`, `ErrorBoundary`, `NotificationsDialog`, `Popover` + `alert-dialog.css`
@@ -141,7 +142,7 @@ Next.js 15 + React 19 showcase. Private workspace package, depends on `astroneum
 - **package.json scripts**: `clean`, `build:js` (tsup), `build:css` (sass → esbuild bundle/minify, inlines eot/ttf/woff/svg), `build` (clean + js + css), `typecheck` (`tsc --noEmit`), `test` (`tsx --test src/__tests__/*.test.ts`), `test:watch`, `lint` (`eslint src`), `size` (`size-limit`), `verify` (lint+typecheck+build+test), `prepublishOnly` (verify).
 - **tsup.config.ts** — `format: ['esm']`, `dts: true`, `splitting: true`, `treeshake: true`, `target: 'esnext'`, `outDir: dist`, `external: ['react','react-dom','react-dom/client','react/jsx-runtime']`; esbuild `jsx: 'automatic'`, alias `@ → ./src`, loaders `.less → empty`, `.svg → text`; `onSuccess` walks `dist/` and prepends `'use client';` to every `.js`.
 - **tsconfig.json** — `target/module: ESNext`, `moduleResolution: Bundler`, `jsx: preserve`, `jsxImportSource: @/jsx`, `paths: @/* → ./src/*`, `include: src`, `exclude: src/__tests__`, `noEmit: true` (typecheck only).
-- **.size-limit.json** — 9 budgets (ignore react/react-dom): root `200 KB`; `replay`/`multichart`/`script` `15 KB`; `watchlist`/`portfolio`/`alerts` `10 KB`; `datafeeds/polygon`/`datafeeds/crypto` `30 KB`.
+- **.size-limit.json** — 10 budgets (ignore react/react-dom): root `200 KB`; `headless` `80 KB` with all exports imported; `replay`/`multichart`/`script` `15 KB`; `watchlist`/`portfolio`/`alerts` `10 KB`; `datafeeds/polygon`/`datafeeds/crypto` `30 KB`.
 - **eslint.config.js** — flat config.
 - **Smoke scripts**: `check_dist.mjs` (imports `dist`, asserts `AstroneumChart`, `createStandardCryptoDatafeed`, `STANDARD_CRYPTO_SYMBOLS`); `check_datafeed.mjs` (searchSymbols + bounded history fetch).
 
@@ -231,6 +232,8 @@ This file is the source of truth for *where things live* in the deployed Astrone
 
 ## 12. Change log
 
+- **2026-08-29** — Added the supported `@tony01/astroneum/headless` package entry, explicit optional built-in registration, validated host-owned bar replacement/update APIs, idempotent multi-instance lifecycle registry, SSR/package isolation tests, Chromium lifecycle smoke, and a dedicated size budget. Engine-level keyboard shortcuts moved out of the rendering core; the React host hook remains their owner.
+- **2026-08-29** — Hardened the headless consumer boundary with React-independent typed study plugins, 16-output study/overlay browser coverage, bounded viewport capture/restore, loader and animation teardown guards, and GPU-inclusive screenshot compositing with browser pixel coverage.
 - **2026-07-13** — Watchlist implementation and right-rail placement sync. Documented shipped `WatchlistManager` configuration/live-quote APIs, `Datafeed.getQuotes?`, Binance/Bitget/OKX snapshots, `watchlist.test.ts`, the 3-sub-tab watchlist panel, and the persistent 52px strip on the viewport's outer-right edge.
 - **2026-07-12** — Watchlist parity spec. `WatchlistPanel` documented as 3-sub-tab container (Watchlist/Details/News) — Details+News folded from sidebar rail tabs into the panel. `watchlist` widget entry updated with spec'd `WatchlistManager` extensions (`moveSymbol`/`setSort`/`setColumns`/`setColor`/`updateQuotes`/`addSymbolFromInfo`) and `Datafeed.getQuotes?` optional polling method. `components/panels/` description updated. No structural change yet — spec only.
 - **2026-07-11 (b)** — Synced DrawingBar Batch A and shell rail cleanup docs. `DrawingBar` is now the sole left rail; dead demo `term-rail`/`RailContent` removed. Added cursor submenu, measure, zoom, keep-drawing toggle, Ctrl+Alt+H hide-all, icon sizing fixes, and new draw i18n keys.

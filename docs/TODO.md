@@ -2,7 +2,7 @@
 
 > **Actionable gap index.** One row per gap with status + next action. Shipped items (no gap) are omitted — they live in `docs/tv-functions-skill.md` §3 as `widget-native` / `api-bridged`.
 > **Last updated:** 2026-07-12
-> Deployed at: `https://72.62.73.180/astroneum/` · Library `astroneum` v0.4.1-beta.2 · Demo app `astroneum-demo-next`
+> Deployed at: `https://72.62.73.180/astroneum/` · Library `@tony01/astroneum` v0.4.1-beta.22 · Demo app `astroneum-demo-next`
 >
 > **Authority:** TV-vs-Astroneum status lives in `docs/tv-functions-skill.md` §3 (6-bucket taxonomy). This file is the scannable gap index. When statuses conflict, tv-functions-skill.md wins.
 > **Update this file on every functional change** (see §Maintenance).
@@ -167,6 +167,7 @@
 | 10.8 | Datafeed — WebTransport (HTTP/3) | 🔧 | Experimental `WebTransportDatafeed` |
 | 10.9 | Datafeed — stock/forex/futures (beyond Polygon) | ❌ | — |
 | 10.10 | BYO datafeed docs / examples | 🔧 | Four required methods plus optional `getQuotes?` are documented in `datafeed-guide.md`; add more production REST/WebSocket examples |
+| 10.11 | Headless engine package | ✅ | Released in `@tony01/astroneum@0.4.1-beta.22`; the supported headless entry has no React/widget/datafeed/style/network/keyboard dependency, and its direct bars, typed outputs, bounded viewport recovery, screenshot, lifecycle, SSR, package, size, multi-instance, hidden-container, and Chromium gates pass. |
 
 ## 11. Out of scope (v2-future — noted, not tracked)
 

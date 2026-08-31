@@ -1,5 +1,5 @@
 /**
- * Subpath entry: `astroneum/datafeeds/polygon`
+ * Subpath entry: `@tony01/astroneum/datafeeds/polygon`
  *
  * The Polygon.io REST + WebSocket implementation lives here so consumers
  * who do not use Polygon are not forced to bundle it from the main entry.

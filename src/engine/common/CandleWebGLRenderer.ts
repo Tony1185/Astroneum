@@ -189,7 +189,7 @@ export class CandleWebGLRenderer {
     const gl = canvas.getContext('webgl2', {
       antialias: false,
       premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance',
       alpha: true
     })
@@ -413,62 +413,10 @@ export class CandleWebGLRenderer {
    * LOD: when bar density > 1.5 bars/CSS-pixel, aggregates rawBars into
    * canvas-width buckets first (O(N) CPU cost, but O(canvas-width) GPU cost).
    *
-   * Dirty-flag: an O(1) fingerprint check skips the upload when the visible bar
-   * set is identical to the last uploaded frame (e.g. crosshair hover redraws).
-   *
-   * Overscan fast path: when the new visible range falls within the VBO's stored
-   * data-index range, updates _drawStartOffset and _panOffsetCss without any
-   * VBO upload — O(1) even when new bars scroll into view from the buffer.
+   * Every call uploads the supplied values so host-owned replacements cannot
+   * be hidden by an incomplete rendering fingerprint.
    */
   setData(rawBars: BarRenderData[], visibleOffset = 0, visibleCount = rawBars.length): void {
-    // ── Overscan fast path (Priority 15) ─────────────────────────────────────
-    // When the caller provides dataIndex on each bar and the new visible range
-    // falls entirely within the VBO's previously-uploaded data range, skip the
-    // VBO write and just update the draw-start offset + pan offset.
-    // Guard: skip when LOD is active (aggregated buckets break the index mapping).
-    if (
-      !this._lodActive &&
-      visibleOffset > 0 &&
-      visibleCount > 0 &&
-      visibleOffset + visibleCount <= rawBars.length &&
-      this._barCount > 0 &&
-      this._vboFirstDataIdx >= 0 &&
-      this._vboBarStep !== 0
-    ) {
-      const firstVis = rawBars[visibleOffset]
-      const lastVis = rawBars[visibleOffset + visibleCount - 1]
-      if (
-        firstVis.dataIndex !== undefined &&
-        lastVis.dataIndex !== undefined &&
-        firstVis.dataIndex >= this._vboFirstDataIdx &&
-        lastVis.dataIndex <= this._vboLastDataIdx &&
-        // Ensure bar step matches (guards against zoom change)
-        (visibleCount < 2 || (rawBars[visibleOffset + 1].centerX - firstVis.centerX) === this._vboBarStep)
-      ) {
-        const newDrawStart = firstVis.dataIndex - this._vboFirstDataIdx
-        // Recompute pan offset: new visualX of first visible bar must equal
-        // stored VBO X + _panOffsetCss (shader adds the offset at draw time).
-        // storedX = _vboBar0X + newDrawStart * _vboBarStep
-        const storedX = this._vboBar0X + newDrawStart * this._vboBarStep
-        this._panOffsetCss = firstVis.centerX - storedX
-        this._drawStartOffset = newDrawStart
-        this._visibleBarCount = visibleCount
-        // Update fingerprints so the pure-pan path works on subsequent frames
-        this._fingerprintBarCount = visibleCount
-        this._fingerprintFirstX = firstVis.centerX
-        this._fingerprintLastX = lastVis.centerX
-        this._fingerprintLastClose = lastVis.close
-        this._fingerprintLastBodyColor = lastVis.bodyColor
-        this._fingerprintFirstOpen = firstVis.open
-        this._fingerprintFirstClose = firstVis.close
-        this._fingerprintBarStep = visibleCount >= 2
-          ? rawBars[visibleOffset + 1].centerX - firstVis.centerX
-          : this._fingerprintBarStep
-        this._vboVersion++   // draw params changed — must redraw
-        return
-      }
-    }
-
     // LOD: cap instance count at canvas-pixel-width when bar density is too high.
     // Use visibleCount (not rawBars.length) so overscan bars don't skew the threshold.
     // When LOD is active, aggregate only the visible window; drawStartOffset = 0.
@@ -492,6 +440,9 @@ export class CandleWebGLRenderer {
     this._barCount = totalBarCount
     if (totalBarCount === 0) {
       this._fingerprintBarCount = 0
+      const gl = this._gl
+      gl.clearColor(0, 0, 0, 0)
+      gl.clear(gl.COLOR_BUFFER_BIT)
       return
     }
 
@@ -505,41 +456,11 @@ export class CandleWebGLRenderer {
       return
     }
 
-    // O(1) fingerprint — skip the O(N) staging + bufferSubData when unchanged
     const firstBar = bars[fpStart]
     const lastBar = bars[fpStart + fpCount - 1]
-    if (
-      fpCount === this._fingerprintBarCount &&
-      firstBar.centerX === this._fingerprintFirstX &&
-      lastBar.centerX === this._fingerprintLastX &&
-      lastBar.close === this._fingerprintLastClose &&
-      lastBar.bodyColor === this._fingerprintLastBodyColor
-    ) return
-
-    // ── Pan-offset fast path (Priority 5) ───────────────────────────────
-    // Detect a pure pan: same bars (same count, same first/last OHLC identity,
-    // same bar spacing so zoom didn't fire) but all x-positions shifted uniformly.
-    // If detected → accumulate the pixel delta into _panOffsetCss and return
-    // without touching the VBO at all.  The vertex shader adds _panOffsetCss
-    // to every a_centerX, so the visual result is identical.
     const currentBarStep = fpCount >= 2
       ? bars[fpStart + 1].centerX - firstBar.centerX
       : this._fingerprintBarStep
-    if (
-      fpCount === this._fingerprintBarCount &&
-      lastBar.close === this._fingerprintLastClose &&
-      lastBar.bodyColor === this._fingerprintLastBodyColor &&
-      firstBar.open === this._fingerprintFirstOpen &&
-      firstBar.close === this._fingerprintFirstClose &&
-      currentBarStep === this._fingerprintBarStep
-    ) {
-      // Pure pan — update accumulated offset + x-fingerprint, skip VBO write
-      this._panOffsetCss += firstBar.centerX - this._fingerprintFirstX
-      this._fingerprintFirstX = firstBar.centerX
-      this._fingerprintLastX = lastBar.centerX
-      this._vboVersion++   // u_panOffset uniform will change → draw() must run
-      return
-    }
 
     // ── Full re-upload ────────────────────────────────────────────────────────────
     // Reset pan accumulator: the VBO will be written with the current visual

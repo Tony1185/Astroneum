@@ -4,7 +4,7 @@ import type Nullable from './common/Nullable'
 import type PickPartial from './common/PickPartial'
 import type DeepPartial from './common/DeepPartial'
 import type PickRequired from './common/PickRequired'
-import type { CandleData, VisibleRangeData } from './common/Data'
+import { cloneValidatedBar, cloneValidatedBars, type CandleData, type VisibleRangeData } from './common/Data'
 import type VisibleRange from './common/VisibleRange'
 import type Coordinate from './common/Coordinate'
 import { getDefaultVisibleRange } from './common/VisibleRange'
@@ -94,6 +94,8 @@ export interface Store {
   setPeriod: (period: Period) => void
   getPeriod: () => Nullable<Period>
   getDataList: () => CandleData[]
+  replaceBars: (data: readonly CandleData[]) => void
+  updateBar: (data: CandleData) => void
   setOffsetRightDistance: (distance: number) => void
   getOffsetRightDistance: () => number
   setMaxOffsetLeftDistance: (distance: number) => void
@@ -103,6 +105,7 @@ export interface Store {
   setBarSpace: (space: number) => void
   getBarSpace: () => BarSpace
   getVisibleRange: () => VisibleRange
+  setViewportState: (barSpace: number, rightOffsetBarCount: number) => void
   setDataLoader: (dataLoader: DataLoader) => void
   overrideIndicator: (override: IndicatorCreate) => boolean
   removeIndicator: (filter?: IndicatorFilter) => boolean
@@ -191,6 +194,7 @@ export default class StoreImp implements Store {
    * Load more data callback
    */
   private _dataLoader: Nullable<DataLoader> = null
+  private _dataLoaderGeneration = 0
 
   /**
    * Is loading data flag
@@ -315,6 +319,7 @@ export default class StoreImp implements Store {
    */
   private readonly _pendingCalcMap = new Map<string, { ind: IndicatorImp; mode: 'full' | 'tail' }>()
   private _calcMicrotaskScheduled = false
+  private _destroyed = false
 
   /**
    * Batch-14: minimum data-list length that triggers requestIdleCallback
@@ -409,6 +414,7 @@ export default class StoreImp implements Store {
     }
 
     this._taskScheduler = new TaskScheduler(() => {
+      if (this._destroyed) return
       if (!this._didInitialForcedLayout && this._dataList.length > 0) {
         this._didInitialForcedLayout = true
         this._chart.layout({
@@ -569,6 +575,33 @@ export default class StoreImp implements Store {
     return this._dataList
   }
 
+  replaceBars (data: readonly CandleData[]): void {
+    const nextData = cloneValidatedBars(data)
+    this._useDirectData()
+    this._addData(nextData, 'init')
+  }
+
+  updateBar (data: CandleData): void {
+    const nextData = cloneValidatedBar(data)
+    const lastData = this._dataList[this._dataList.length - 1]
+    if (lastData !== undefined && nextData.timestamp < lastData.timestamp) {
+      throw new RangeError('bar timestamp must match or follow the current last bar')
+    }
+    this._useDirectData()
+    if (lastData === undefined) {
+      this._addData([nextData], 'init')
+    } else {
+      this._addData(nextData, 'update')
+    }
+  }
+
+  private _useDirectData (): void {
+    this._processDataUnsubscribe()
+    this._dataLoaderGeneration++
+    this._dataLoader = null
+    this._loading = false
+  }
+
   getVisibleRangeDataList (): VisibleRangeData[] {
     return this._visibleRangeDataList
   }
@@ -625,15 +658,7 @@ export default class StoreImp implements Store {
       success = true
     } else {
       const dataCount = this._dataList.length
-      const copyTick = (): CandleData => ({
-        timestamp: data.timestamp,
-        open: data.open,
-        high: data.high,
-        low: data.low,
-        close: data.close,
-        volume: data.volume,
-        turnover: data.turnover
-      })
+      const copyTick = (): CandleData => ({ ...data })
       // Determine where individual data should be added
       const timestamp = data.timestamp
       const lastDataTimestamp = formatValue(this._dataList[dataCount - 1], 'timestamp', 0) as number
@@ -647,17 +672,7 @@ export default class StoreImp implements Store {
         success = true
         adjustFlag = true
       } else if (timestamp === lastDataTimestamp) {
-        const prev = this._dataList[dataCount - 1]
-        if (isValid(prev)) {
-          prev.open = data.open
-          prev.high = data.high
-          prev.low = data.low
-          prev.close = data.close
-          prev.volume = data.volume
-          prev.turnover = data.turnover
-        } else {
-          this._dataList[dataCount - 1] = copyTick()
-        }
+        this._dataList[dataCount - 1] = copyTick()
         success = true
         adjustFlag = true
       }
@@ -795,21 +810,25 @@ export default class StoreImp implements Store {
   }
 
   private _processDataLoad (type: DataLoadType): void {
-    if (!this._loading && isValid(this._dataLoader) && isValid(this._symbol) && isValid(this._period)) {
+    if (!this._destroyed && !this._loading && isValid(this._dataLoader) && isValid(this._symbol) && isValid(this._period)) {
       this._loading = true
+      const dataLoader = this._dataLoader
+      const generation = this._dataLoaderGeneration
       const params: DataLoaderGetBarsParams = {
         type,
         symbol: this._symbol,
         period: this._period,
         timestamp: null,
         callback: (data: CandleData[], more?: DataLoadMore) => {
+          if (this._destroyed || this._dataLoader !== dataLoader || this._dataLoaderGeneration !== generation) return
           this._loading = false
           this._addData(data, type, more)
           if (type === 'init') {
-            this._dataLoader?.subscribeBar?.({
+            dataLoader.subscribeBar?.({
               symbol: this._symbol!,
               period: this._period!,
               callback: (data: CandleData) => {
+                if (this._destroyed || this._dataLoader !== dataLoader || this._dataLoaderGeneration !== generation) return
                 this._addData(data, 'update')
               }
             })
@@ -829,7 +848,7 @@ export default class StoreImp implements Store {
           break
         }
       }
-      void this._dataLoader.getBars(params)
+      void dataLoader.getBars(params)
     }
   }
 
@@ -844,6 +863,7 @@ export default class StoreImp implements Store {
 
   resetData (fn?: () => void): void {
     this._processDataUnsubscribe()
+    this._dataLoaderGeneration++
     fn?.()
     this._loading = false
     this._processDataLoad('init')
@@ -865,6 +885,22 @@ export default class StoreImp implements Store {
     this._barSpace = barSpace
     this._calcOptimalBarSpace()
     adjustBeforeFunc?.()
+    this._adjustVisibleRange()
+    this.setCrosshair(this._crosshair, { notInvalidate: true })
+    this._chart.layout({
+      measureWidth: true,
+      update: true,
+      buildYAxisTick: true,
+      cacheYAxisWidth: true
+    })
+  }
+
+  setViewportState (barSpace: number, rightOffsetBarCount: number): void {
+    if (this._barSpace !== barSpace) {
+      this._barSpace = barSpace
+      this._calcOptimalBarSpace()
+    }
+    this._lastBarRightSideDiffBarCount = rightOffsetBarCount
     this._adjustVisibleRange()
     this.setCrosshair(this._crosshair, { notInvalidate: true })
     this._chart.layout({
@@ -1259,6 +1295,7 @@ export default class StoreImp implements Store {
   }
 
   private _calcIndicator (data: IndicatorImp | IndicatorImp[], updateMode: 'full' | 'tail' = 'full'): void {
+    if (this._destroyed) return
     const indicators: IndicatorImp[] = ([] as IndicatorImp[]).concat(data)
     if (indicators.length === 0) return
 
@@ -1277,7 +1314,7 @@ export default class StoreImp implements Store {
 
     queueMicrotask(() => {
       this._calcMicrotaskScheduled = false
-      if (this._pendingCalcMap.size === 0) return
+      if (this._destroyed || this._pendingCalcMap.size === 0) return
 
       const tasks: Record<string, Promise<unknown>> = {}
       this._pendingCalcMap.forEach((entry, id) => {
@@ -1290,7 +1327,9 @@ export default class StoreImp implements Store {
       // Falls back to requestIdleCallback / setTimeout for broader compatibility.
       type TaskSchedulerAPI = { postTask: (fn: () => void, opts: { priority: string }) => void }
       const sched = (globalThis as unknown as { scheduler?: TaskSchedulerAPI }).scheduler
-      const runTasks = (): void => { this._taskScheduler.add(tasks) }
+      const runTasks = (): void => {
+        if (!this._destroyed) this._taskScheduler.add(tasks)
+      }
 
       if (sched !== undefined) {
         sched.postTask(runTasks, { priority: 'background' })
@@ -1747,6 +1786,11 @@ export default class StoreImp implements Store {
   }
 
   destroy (): void {
+    if (this._destroyed) return
+    this._destroyed = true
+    this._processDataUnsubscribe()
+    this._dataLoader = null
+    this._pendingCalcMap.clear()
     this._clearData()
     this._clearLastPriceMarkExtendTextUpdateTimer()
     this._taskScheduler.clear()

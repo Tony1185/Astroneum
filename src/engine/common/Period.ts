@@ -1,4 +1,10 @@
-export type { Timespan as PeriodType, Period } from '@/types'
+export type PeriodType = 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
+
+export interface Period {
+  multiplier: number
+  timespan: PeriodType
+  text: string
+}
 
 export const PeriodTypeXAxisFormat: Record<string, string> = {
   second: 'HH:mm:ss',

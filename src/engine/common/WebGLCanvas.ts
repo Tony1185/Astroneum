@@ -8,7 +8,7 @@ export class WebGLCanvas {
     const gl = this._element.getContext('webgl2', {
       antialias: false,
       premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance'
     })
     if (gl === null) {

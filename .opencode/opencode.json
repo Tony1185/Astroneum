@@ -17,10 +17,6 @@
       "path": "docs/WORKSTREAMS.md",
       "description": "Sequencing, ownership, file scopes, dependencies, and handoff gates"
     },
-    "tv-reference": {
-      "path": "tv-mirror-reference/README.md",
-      "description": "Read-only TradingView behavioral evidence; never import captured assets or HTML"
-    },
     "design-gaps": {
       "path": "docs/TODO-DESIGN.md",
       "description": "Design/layout gap backlog — TV UI surfaces to Astroneum mirror"

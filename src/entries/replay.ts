@@ -1,5 +1,5 @@
 /**
- * Subpath entry: `astroneum/replay`
+ * Subpath entry: `@tony01/astroneum/replay`
  *
  * Lets consumers import the bar-replay controller without dragging in the
  * rest of the chart surface when they only need replay logic
