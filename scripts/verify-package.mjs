@@ -24,10 +24,16 @@ if (manifest === undefined) {
 }
 const paths = new Set(manifest.files.map(file => file.path))
 const required = ['LICENSE', 'dist/entries/headless.js', 'dist/entries/headless.d.ts']
-const forbidden = [...paths].filter(path => path.startsWith('tv-mirror-reference/'))
+const unexpected = [...paths].filter(path => (
+  path !== 'LICENSE' &&
+  path !== 'README.md' &&
+  path !== 'CHANGELOG.md' &&
+  path !== 'package.json' &&
+  !path.startsWith('dist/')
+))
 
-if (required.some(path => !paths.has(path)) || forbidden.length > 0) {
-  throw new Error(`package content is invalid: ${JSON.stringify({ required, forbidden })}`)
+if (required.some(path => !paths.has(path)) || unexpected.length > 0) {
+  throw new Error(`package content is invalid: ${JSON.stringify({ required, unexpected })}`)
 }
 
 console.log(JSON.stringify({

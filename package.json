@@ -1,6 +1,6 @@
 {
   "name": "@tony01/astroneum",
-  "version": "0.4.1-beta.24",
+  "version": "0.4.1-beta.25",
   "packageManager": "pnpm@10.33.0",
   "description": "Astroneum - Professional financial charting library, ready out of the box.",
   "type": "module",
@@ -73,7 +73,6 @@
     "LICENSE",
     "README.md",
     "CHANGELOG.md",
-    "docs",
     "dist/**/*.js",
     "dist/**/*.css",
     "dist/**/*.d.ts"
