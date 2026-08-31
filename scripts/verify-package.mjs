@@ -10,7 +10,11 @@ if (result.status !== 0) {
   process.exit(result.status ?? 1)
 }
 
-const [manifest] = JSON.parse(result.stdout)
+const parsed = JSON.parse(result.stdout)
+const manifest = Array.isArray(parsed) ? parsed[0] : parsed
+if (manifest === null || typeof manifest !== 'object' || !Array.isArray(manifest.files)) {
+  throw new TypeError('npm pack returned an invalid manifest')
+}
 const paths = new Set(manifest.files.map(file => file.path))
 const required = ['LICENSE', 'dist/entries/headless.js', 'dist/entries/headless.d.ts']
 const forbidden = [...paths].filter(path => path.startsWith('tv-mirror-reference/'))
