@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 once it reaches v1.0. Until then, minor releases may include breaking changes
 — always check this file before upgrading.
 
-## [0.4.1-beta.23] - 2026-08-31
+## [0.4.1-beta.24] - 2026-08-31
 
-The `0.4.1-beta.22` tag failed its package-content gate before npm publication and is not a consumable release.
+The `0.4.1-beta.22` and `0.4.1-beta.23` tags failed their package-content gates before npm publication and are not consumable releases.
 
 ### Added — Headless engine package
 - Added `@tony01/astroneum/headless` with a React-free declaration/runtime graph, no native UI, stylesheet, datafeed, keyboard-shortcut, or implicit-network dependency.

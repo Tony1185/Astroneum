@@ -11,8 +11,15 @@ if (result.status !== 0) {
 }
 
 const parsed = JSON.parse(result.stdout)
-const manifest = Array.isArray(parsed) ? parsed[0] : parsed
-if (manifest === null || typeof manifest !== 'object' || !Array.isArray(manifest.files)) {
+const candidates = Array.isArray(parsed)
+  ? parsed
+  : parsed !== null && typeof parsed === 'object'
+    ? [parsed, ...Object.values(parsed)]
+    : []
+const manifest = candidates.find(candidate => (
+  candidate !== null && typeof candidate === 'object' && Array.isArray(candidate.files)
+))
+if (manifest === undefined) {
   throw new TypeError('npm pack returned an invalid manifest')
 }
 const paths = new Set(manifest.files.map(file => file.path))

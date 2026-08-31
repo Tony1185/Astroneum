@@ -9,7 +9,7 @@
 | | |
 |---|---|
 | Name | `astroneum` |
-| Version | `0.4.1-beta.23` |
+| Version | `0.4.1-beta.24` |
 | Description | Professional financial charting library, ready out of the box |
 | License | MIT (author `kowito`, repo `github.com/kowito/astroneum`) |
 | Stack | TypeScript · React 18/19 peer · ESM-only · Canvas + WebGL/WebGPU · tsup · pnpm |
